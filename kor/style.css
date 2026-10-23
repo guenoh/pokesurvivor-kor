@@ -298,3 +298,23 @@ html[lang="ko"] #lobby-invite { max-height: 160px; }
   html[lang="ko"] #scr-lobby .box > h3 { margin-top: 6px !important; }
   html[lang="ko"] .rk-row { padding: 3px 8px; }
 }
+
+/* Help is an explicit button, distinct from selecting the surrounding move. */
+.kor-rating-badge {
+  border-width: 2px; background: linear-gradient(#243b68, #14264d);
+  box-shadow: inset 0 1px 0 #ffffff24, 0 3px 0 #080f24;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+}
+.kor-rating-badge:is(:hover, :focus) {
+  background: #345991; border-color: #ffe17d; color: #fff;
+  box-shadow: 0 0 0 2px #09172e, 0 3px 0 #080f24;
+}
+.kor-rating-badge:focus-visible { outline: 3px solid #ffe17d; outline-offset: 3px; }
+.kor-rating-badge:active { background: #456ba5; box-shadow: inset 0 2px 3px #0008; }
+.kor-rating-info {
+  width: 17px; height: 17px; border: 1px solid currentColor; border-radius: 50%;
+  display: inline-grid; place-items: center; font: bold 12px/1 sans-serif; color: #d8e8ff; flex: 0 0 17px;
+}
+.kor-rating-action { color: #e5edff; font-size: 12px; white-space: nowrap; }
+.kor-rating-support { gap: 12px; flex-wrap: wrap; max-width: 100%; }
+html[lang="ko"] .card:has(.kor-rating-badge:is(:hover, :focus-visible)) { transform: none; }

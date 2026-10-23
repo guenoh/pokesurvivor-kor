@@ -134,7 +134,7 @@ G.MoveRatings = (() => {
     }
     dialog.replaceChildren();
     const head=document.createElement('div');head.className='kor-rating-head';
-    const title=document.createElement('h2');title.id='kor-rating-title';title.textContent=result.name+' · 기술 평가';
+    const title=document.createElement('h2');title.id='kor-rating-title';title.textContent=result.name+(result.support?' · 보조 기술 설명':' · 기술 평가');
     const close=document.createElement('button');close.type='button';close.className='btn small';close.textContent='닫기';close.onclick=()=>dialog.close();head.append(title,close);dialog.append(head);
     const body=document.createElement('div');body.className='kor-rating-body';
     const paragraph=text=>{const p=document.createElement('p');p.textContent=text;body.append(p);};
@@ -155,18 +155,32 @@ G.MoveRatings = (() => {
     if(G.I18n.lang!=='ko')return;
     const result=analyze(move,context);if(!result)return;
     const row=document.createElement('div');row.className='kor-move-ratings';row.setAttribute('translate','no');
+    function helpButton(b,label){
+      b.setAttribute('aria-label',label+' · 설명 보기');b.setAttribute('aria-haspopup','dialog');
+      b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')e.stopPropagation();});
+      b.onclick=e=>{e.stopPropagation();b.focus({preventScroll:true});G.Audio?.sfx('click');explain(result);};
+    }
     const badge=(role,label,grade)=>{
       const b=document.createElement('button');b.type='button';b.className='kor-rating-badge';b.dataset.grade=grade;
-      b.setAttribute('aria-label',label+' '+grade+'등급 · 참고 평가 이유 보기');
+      helpButton(b,label+' '+grade+'등급');
       const icons=document.createElement('span');icons.className='kor-rating-icons';icons.setAttribute('aria-hidden','true');
       icons.innerHTML=role==='mob'?G.Icons.html('ball',13).repeat(3):G.Icons.html('boss',22);
-      const value=document.createElement('strong');value.textContent=grade;b.append(icons,value);
-      b.onclick=e=>{e.stopPropagation();explain(result);};row.append(b);
+      const value=document.createElement('strong');value.textContent=grade;
+      const info=document.createElement('span');info.className='kor-rating-info';info.textContent='?';info.setAttribute('aria-hidden','true');
+      b.append(icons,value,info);row.append(b);
     };
-    if(result.support){const b=document.createElement('button');b.type='button';b.className='kor-rating-badge kor-rating-support';b.textContent='보조 기술 ⓘ';b.onclick=e=>{e.stopPropagation();explain(result);};row.append(b);}
+    if(result.support){const b=document.createElement('button');b.type='button';b.className='kor-rating-badge kor-rating-support';helpButton(b,'보조 기술');
+      const label=document.createElement('span');label.textContent='보조 기술';
+      const action=document.createElement('span');action.className='kor-rating-action';action.textContent='설명 보기 ›';
+      b.append(label,action);row.append(b);}
     else {badge('mob','무리 사냥',result.mob);badge('boss','보스전',result.boss);}
     host.append(row);
   }
+
+  // The original battle input suppresses Tab and Space. Keep native help-button navigation available.
+  if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
+    if(e.key==='Tab'&&[...document.querySelectorAll('.kor-rating-badge')].some(b=>b.getClientRects().length))e.stopPropagation();
+  },true);
 
   function decoratePicker(host,dex,attribute='data-id') {
     if(G.I18n.lang!=='ko')return;
