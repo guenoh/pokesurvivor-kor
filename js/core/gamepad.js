@@ -62,6 +62,7 @@ G.Pad = (() => {
   // ---------------- selección en los menús ----------------
 
   function scopes() {
+    if (G.PokemonTiers && G.PokemonTiers.isOpen()) return [G.PokemonTiers.dialog];
     if (G.MoveRatings && G.MoveRatings.isOpen()) return [G.MoveRatings.dialog];
     const top = topScreen(), out = [];
     const tap = document.getElementById('tap-start');

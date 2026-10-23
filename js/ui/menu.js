@@ -164,6 +164,8 @@ G.MenuUI = (() => {
       sb.appendChild(c);
     }
 
+    if (G.PokemonTiers) G.PokemonTiers.addEntry(sb);
+
     // Tipo y búsqueda (la búsqueda mira en todas las generaciones).
     const ts = $('dex-type');
     ts.innerHTML = `<option value="">Todos los tipos</option>` +
@@ -351,6 +353,7 @@ G.MenuUI = (() => {
       G.UI.toast(p.name + (s.partnerShiny ? ' shiny' : '') + ' es ahora tu compañero');
       renderGrid(true); showDetail(dex);
     };
+    if (G.PokemonTiers && own) G.PokemonTiers.mountDetail(dex, box);
     if (own) wireExtras(dex, box);
   }
 
