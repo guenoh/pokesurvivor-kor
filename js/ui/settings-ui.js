@@ -78,7 +78,10 @@ G.SettingsUI = (() => {
       G.UI.soundControls($('set-sound'));
     } else if (tab === 'gfx') {
       const auto = ['baja', 'media', 'alta'][G.Settings.autoLevel];
-      box.innerHTML = section('Idioma', 'El juego se recarga al cambiarlo.')
+      box.innerHTML = (G.I18n.lang === 'ko' ? '<div translate="no">'
+          + section('메뉴 크기', '자동은 작은 화면에서 메뉴와 창을 줄입니다. 게임 화면과 조작 범위는 그대로이며, 선택은 이 기기에 저장됩니다.')
+          + choice('uiScale', [['auto', '자동'], [0.8, '80%'], [0.9, '90%'], [1, '100%'], [1.1, '110%']]) + '</div>' : '')
+        + section('Idioma', 'El juego se recarga al cambiarlo.')
         + `<div class="chips set-chips" translate="no">${G.I18n.choices.map(([v, l]) =>
              `<button class="chip ${G.I18n.lang === v ? 'on' : ''}" data-lang="${v}">${G.I18n.lang === 'ko' ? esc(G.T(l, 'language')) : l}</button>`).join('')}</div>`
         + section('Calidad', 'Cuántos efectos y partículas se dibujan. <b>Auto</b> la baja sola si el juego va a tirones (ahora: ' + auto + ').')

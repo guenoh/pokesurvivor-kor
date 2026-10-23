@@ -64,3 +64,77 @@ dialog.kor-notices::backdrop { background: #081022d9; }
 .kor-notices-message { color: #ffe391; line-height: 1.6; }
 .kor-notices-message:empty { display: none; }
 .kor-support .btn { display: inline-block; text-decoration: none; }
+
+/* Scale DOM menus, never the world canvas or touch controls. Compensated layout
+   dimensions keep every screen and its scroll area inside Safari's visible area. */
+:root { --kor-vw: 100vw; --kor-vh: 100dvh; --kor-vleft: 0px; --kor-vtop: 0px; --kor-ui-scale: 1; }
+html[lang="ko"] .scr {
+  inset: auto; left: var(--kor-vleft); top: var(--kor-vtop);
+  width: calc(var(--kor-vw) / var(--kor-ui-scale));
+  height: calc(var(--kor-vh) / var(--kor-ui-scale));
+  transform: scale(var(--kor-ui-scale)); transform-origin: top left;
+  padding-left: max(10px, calc(env(safe-area-inset-left) / var(--kor-ui-scale)));
+  padding-right: max(10px, calc(env(safe-area-inset-right) / var(--kor-ui-scale)));
+  padding-bottom: max(6px, calc(env(safe-area-inset-bottom) / var(--kor-ui-scale)));
+}
+html[lang="ko"] #scr-menu {
+  padding-left: calc(env(safe-area-inset-left) / var(--kor-ui-scale));
+  padding-right: calc(env(safe-area-inset-right) / var(--kor-ui-scale));
+}
+/* Keep login fields at readable native size, avoiding Safari's focus auto zoom. */
+html[lang="ko"] #scr-login { transform: none; width: var(--kor-vw); height: var(--kor-vh); }
+html[lang="ko"] #scr-login input { font-size: max(16px, 1em); }
+html[lang="ko"] .topbar {
+  top: calc(var(--kor-vtop) + max(6px, env(safe-area-inset-top)));
+  right: max(8px, env(safe-area-inset-right));
+  max-width: calc(var(--kor-vw) - 16px);
+  transform: scale(var(--kor-ui-scale)); transform-origin: top right;
+}
+html[lang="ko"] .ach-pop {
+  max-width: calc(var(--kor-vw) - 24px);
+  transform: translateX(-50%) scale(var(--kor-ui-scale)); transform-origin: center bottom;
+}
+dialog.kor-notices { max-height: calc(var(--kor-vh) - 24px); }
+html[lang="ko"] .box.settings > .row, html[lang="ko"] #set-tabs { flex-shrink: 0; }
+html[lang="ko"] .box.settings { max-height: 100%; }
+.kor-storage-tools { flex-shrink: 0; font-size: 12px; border-top: 1px solid #8ba9dc66; margin-top: 8px; padding-top: 6px; }
+.kor-storage-tools summary { cursor: pointer; color: #e5edff; }
+.kor-storage-tools .btn { margin: 8px 6px 0 0; }
+#pull-fx {
+  inset: auto; left: var(--kor-vleft); top: var(--kor-vtop);
+  width: var(--kor-vw); height: var(--kor-vh);
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+.kor-slot-frame {
+  position: relative; flex: 0 0 auto;
+  width: min(440px, calc(var(--kor-vw) - 40px), calc((var(--kor-vh) - 130px) * 176 / 170));
+}
+.kor-pulling #pull-fx { gap: 0; justify-content: center; }
+.kor-pulling #pull-fx::before, .kor-pulling #pull-fx::after { display: none; }
+.kor-slot-frame[hidden] { display: none; }
+.kor-slot-stage { position: relative; }
+.kor-slot-frame #slot { display: block; width: 100%; height: auto; animation: none; }
+.kor-slot-led {
+  position: absolute; left: 20.45%; top: 58.82%; width: 51.14%; height: 9.41%;
+  display: flex; align-items: center; justify-content: center; pointer-events: none;
+  background: #190f19; color: #fff2ad; font: 700 14px/1.2 "Galmuri11", sans-serif;
+  white-space: nowrap; text-shadow: none; border: 1px solid #79545a;
+}
+.kor-slot-caption { margin: 6px -20px 0; color: #fff2ad; text-align: center; font: 700 16px/1.5 "Galmuri11", sans-serif; }
+.kor-slot-hint { margin: 6px -20px 0; color: #e5edff; text-align: center; font: 12px/1.5 "Galmuri11", sans-serif; }
+.kor-pulling .ach-pop {
+  top: auto; bottom: max(6px, env(safe-area-inset-bottom));
+  font-size: 12px; padding: 6px 10px; pointer-events: none;
+}
+@media (max-height: 360px) { .kor-slot-led { font-size: 12px; } }
+@media (max-height: 520px) {
+  .kor-pulling #pull-fx { padding-bottom: max(60px, env(safe-area-inset-bottom)); }
+  html[lang="ko"] #scr-gacha .banner .feat { height: 100px; margin-top: 0; }
+  html[lang="ko"] #scr-gacha .banner .feat canvas { width: 90px; height: auto; }
+  html[lang="ko"] #scr-gacha .banner { padding: 10px 14px; }
+  html[lang="ko"] #scr-gacha .banner h2 { margin: 0; font-size: 22px; }
+  html[lang="ko"] #scr-gacha .banner p { margin: 4px 0; }
+  html[lang="ko"] .kor-server-actions { gap: 6px; margin-bottom: 10px; }
+  dialog.kor-notices { padding: 12px 16px; font-size: 14px; }
+  .kor-notices-header { top: -12px; }
+}
