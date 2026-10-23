@@ -11,6 +11,12 @@
   const seenKey = notice => `ps.kor.notice.${G.DB.accountKey}.${notice.id}.${notice.version}`;
   function markRead() { for (const notice of data?.notices || []) try { localStorage.setItem(seenKey(notice), '1'); } catch {} }
   function unread(notice) { try { return !localStorage.getItem(seenKey(notice)); } catch { return true; } }
+  function rewardLabel(reward) {
+    const parts = [];
+    if (reward.ticket10) parts.push(`10회 뽑기권 ${reward.ticket10.toLocaleString('ko-KR')}장 · 총 ${(reward.ticket10 * 10).toLocaleString('ko-KR')}회`);
+    if (reward.coins) parts.push(`${reward.coins.toLocaleString('ko-KR')}코인`);
+    return parts.join(' + ');
+  }
   function updateSupport(support) {
     let href;
     try { const url = new URL(support?.url); if (url.protocol === 'https:') href = url.href; } catch {}
@@ -61,13 +67,14 @@
       if (notice.reward) {
         const reward = notice.reward;
         const gift = make('div', 'kor-notice-gift');
-        gift.append(make('strong', '', `10회 뽑기권 ${reward.ticket10.toLocaleString('ko-KR')}장 · 총 ${(reward.ticket10 * 10).toLocaleString('ko-KR')}회`));
+        gift.append(make('strong', '', rewardLabel(reward)));
         gift.append(make('p', 'kor-auth-help', reward.window === 'signup24h' ? '가입 후 24시간 안에 계정당 한 번 받을 수 있습니다.' : '오픈 이벤트 시작부터 24시간 동안 계정당 한 번 받을 수 있습니다.'));
+        if (reward.partiallyClaimed) gift.append(make('p', 'kor-auth-help', `이미 받은 선물은 유지됩니다. 추가로 받을 선물: ${rewardLabel(reward.remaining)}`));
         if (reward.expiresAt && !reward.claimed) {
           const date = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: false }).format(new Date(reward.expiresAt));
           gift.append(make('p', 'kor-auth-help', `수령 기한: ${date} (한국 시간)`));
         }
-        const button = make('button', 'btn gold', reward.claimed ? '수령 완료' : reward.needsLogin ? '로그인 후 받기' : reward.eligible ? '받기' : '수령 기간 종료');
+        const button = make('button', 'btn gold', reward.claimed ? '수령 완료' : reward.needsLogin ? '로그인 후 받기' : reward.eligible ? reward.partiallyClaimed ? '추가 선물 받기' : '받기' : '수령 기간 종료');
         button.type = 'button'; button.disabled = reward.claimed || reward.needsLogin || !reward.eligible;
         button.onclick = async () => {
           if (busy) return;
@@ -76,7 +83,7 @@
             const result = await G.DB.claimNotice(notice.id);
             data = await G.DB.getNotices(); render();
             G.UI.refreshCoins();
-            message.textContent = result.alreadyClaimed ? '이미 받은 선물입니다.' : `10회 뽑기권 ${reward.ticket10}장을 받았습니다! 즐거운 모험 되세요.`;
+            message.textContent = result.alreadyClaimed ? '이미 받은 선물입니다.' : `${rewardLabel(result.awarded || reward)} 선물을 받았습니다! 즐거운 모험 되세요.`;
           } catch (error) {
             message.textContent = error.message || '선물을 받지 못했습니다. 다시 시도해 주세요.';
             try { data = await G.DB.getNotices(); render(); } catch { button.disabled = false; }
