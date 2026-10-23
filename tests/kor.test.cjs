@@ -14,6 +14,23 @@ function bootAdapter(fetch) {
   return { db: sandbox.G.DB, storage };
 }
 const json = data => ({ ok: true, json: async () => data });
+test('Korean account guidance follows server limits and confirmation compares the exact password', () => {
+  const sandbox = { G: { LoginUI: { init() {} } } }; vm.createContext(sandbox);
+  vm.runInContext(read('kor/signup.js'), sandbox);
+  const { validate, normalizeName } = sandbox.G.KorSignup;
+  const password = 'a'.repeat(12);
+  for (const name of ['한글이름', 'Trainer_25', '日本語', 'a'.repeat(16)]) assert.equal(validate(name, password, password), null, name);
+  for (const name of ['', '가나', 'a'.repeat(17), '피카 츄', '피카츄!', 'Trainer-25']) assert.equal(validate(name, password, password).field, 'f-user', name);
+  assert.equal(normalizeName('  Ｔｒａｉｎｅｒ＿２５  '), 'Trainer_25');
+  assert.equal(validate('Trainer', 'a'.repeat(11), 'a'.repeat(11)).field, 'f-pass');
+  assert.equal(validate('Trainer', 'a'.repeat(128), 'a'.repeat(128)), null);
+  assert.equal(validate('Trainer', 'a'.repeat(129), 'a'.repeat(129)).field, 'f-pass');
+  assert.equal(validate('Trainer', password, '').field, 'f-pass-confirm');
+  assert.equal(validate('Trainer', password, 'A' + password.slice(1)).field, 'f-pass-confirm');
+  assert.equal(validate('Trainer', password, password + ' ').field, 'f-pass-confirm');
+  assert.equal(validate('Trainer', password, '', false), null);
+  assert.equal(validate('Trainer', '한글비밀번호도쓸수있어요', '한글비밀번호도쓸수있어요'), null);
+});
 test('Korean dictionary preserves placeholders and covers every in-game species', () => {
   const { capture, SOURCES } = require('../tools/build_langs');
   const dictionaries = capture(SOURCES).filter(([, l]) => l === 'ko');

@@ -22,3 +22,17 @@ html[lang="ko"] .toast { max-width: min(90vw, 680px); text-align: center; }
 html[lang="ko"] #dex-detail .stat { grid-template-columns: 90px minmax(0, 1fr) 5ch; }
 html[lang="ko"] .stat > span:last-child { white-space: nowrap; text-align: right; }
 #btn-google, #btn-support { display: none !important; }
+.kor-auth-help {
+  color: #d5e0f5;
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 5px 0 13px;
+  text-align: left;
+}
+.kor-auth-help[hidden], .kor-password-confirm[hidden] { display: none; }
+.kor-auth-status { min-height: 1.65em; margin-bottom: 0; }
+.kor-auth-status:empty { display: none; }
+.kor-auth-status.is-match { color: #adf0b2; }
+.kor-auth-status.is-error { color: #ffd0cf; }
+#login-form .field[aria-invalid="true"] { border-color: #ffb9b5; }
+#login-err:empty { display: none; }
