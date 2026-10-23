@@ -44,6 +44,7 @@ G.RunUI = (() => {
   }
 
   function reroll() {
+    if (G.MoveRatings && G.MoveRatings.isOpen()) return;
     if (!offers || rerollsLeft() <= 0) return;
     const p = G.Game.player;
     p.rerolls = (p.rerolls || 0) + 1;
@@ -73,11 +74,13 @@ G.RunUI = (() => {
          <div class="key">${i + 1}</div>`;
       el.dataset.sfx = 'none';             // el juego pone su propio sonido al elegir
       el.onclick = () => pick(i);
+      if (G.MoveRatings) G.MoveRatings.mountChoice(el, c, G.Game.player);
       box.appendChild(el);
     });
   }
 
   function pick(i) {
+    if (G.MoveRatings && G.MoveRatings.isOpen()) return;
     if (!offers || !offers[i] || guarded()) return;
     const c = offers[i], cb = offerCb;
     offers = null; offerCb = null;
@@ -216,11 +219,13 @@ G.RunUI = (() => {
          <div class="key">${i + 1}</div>`;
       el.dataset.sfx = 'none';
       el.onclick = () => pickBond(i);
+      if (G.MoveRatings) G.MoveRatings.mount(el, m, G.Game.player);
       box.appendChild(el);
     });
   }
 
   function pickBond(i) {
+    if (G.MoveRatings && G.MoveRatings.isOpen()) return;
     if (!bond || !bond.list[i] || guarded()) return;
     const m = bond.list[i];
     if (bond.opt.mode === 'pair' && !bond.first) {

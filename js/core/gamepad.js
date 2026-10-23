@@ -62,6 +62,7 @@ G.Pad = (() => {
   // ---------------- selección en los menús ----------------
 
   function scopes() {
+    if (G.MoveRatings && G.MoveRatings.isOpen()) return [G.MoveRatings.dialog];
     const top = topScreen(), out = [];
     const tap = document.getElementById('tap-start');
     if (tap && !tap.classList.contains('hidden')) return [tap];
