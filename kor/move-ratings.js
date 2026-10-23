@@ -151,8 +151,20 @@ G.MoveRatings = (() => {
     dialog.append(body);dialog.showModal();close.focus();
   }
 
+  function mountCategory(host,move) {
+    const title=host.querySelector('.nm') || host.querySelector(':scope > .chip');
+    if(!title)return;
+    title.querySelectorAll('.tag-chip.cat, .kor-move-category').forEach(el=>el.remove());
+    const category=move.kind==='buff'?'support':move.cat;
+    const label={physical:'물리',special:'특수',support:'보조'}[category];
+    if(!label)return;
+    const tag=document.createElement('span');tag.className='kor-move-category';tag.dataset.category=category;
+    tag.setAttribute('translate','no');tag.textContent=label;title.append(tag);
+  }
+
   function mount(host,move,context){
     if(G.I18n.lang!=='ko')return;
+    mountCategory(host,move);
     const result=analyze(move,context);if(!result)return;
     const row=document.createElement('div');row.className='kor-move-ratings';row.setAttribute('translate','no');
     function helpButton(b,label){
