@@ -98,7 +98,7 @@
       }
       open(result);
       if (state !== 'conflict') backup();
-      return { granted: result.granted, alreadyClaimed: result.alreadyClaimed };
+      return { granted: result.granted, alreadyClaimed: result.alreadyClaimed, awarded: result.awarded };
     },
     async saveNow() { try { await flush(); return local.guest ? { ok: false, why: 'guest' } : { ok: true }; } catch { return { ok: false, why: 'fail' }; } },
     onSync(fn) { listeners.add(fn); },
