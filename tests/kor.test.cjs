@@ -93,6 +93,9 @@ test('Korean dynamic names receive the right particles in text and formatted mes
   assert.equal(I.f('동료 {x}', '잠만보'), '잠만보는 동료가 되었다!');
   assert.equal(I.f('동료 {x}', '폴리곤'), '폴리곤은 동료가 되었다!');
   assert.equal(I.f('동료 {x}', '폴리곤2'), '폴리곤2는 동료가 되었다!');
+  assert.equal(I.f('동료 {x}', 'Pikachu'), '피카츄는 동료가 되었다!');
+  I.add({ 'Tu apodo es {x}': '내 닉네임은 {x}입니다' }, 'ko');
+  assert.equal(I.f('Tu apodo es {x}', 'Pikachu'), '내 닉네임은 Pikachu입니다');
   assert.equal(I.f('이동 {x}', '마을'), '마을로 이동');
   assert.equal(I.f('이동 {x}', '집'), '집으로 이동');
 });

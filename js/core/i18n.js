@@ -159,7 +159,16 @@ G.I18n = (() => {
   }
 
   /** Texto con huecos para el código: T('Nivel {x}', 5). */
-  function f(es, ...vals) { let i = 0; return koParticles(t(es).replace(/\{(?:x|name)\}/g, () => vals[i++])); }
+  function f(es, ...vals) {
+    let i = 0;
+    const slots = es.match(/\{(?:x|name)\}/g) || [];
+    const named = nameTemplates.has(es.replace(/\{name\}/g, '{x}'));
+    return koParticles(t(es).replace(/\{(?:x|name)\}/g, () => {
+      const index = i++, value = vals[index];
+      // Translate species/move values before attaching particles, but preserve player nicknames.
+      return lang === 'ko' && slots[index] !== '{name}' && !(named && index === 0) ? t(value) : value;
+    }));
+  }
 
   // ---------------- DOM ----------------
   const ATTRS = ['placeholder', 'title', 'alt', 'aria-label'];
