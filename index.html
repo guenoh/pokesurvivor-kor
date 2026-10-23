@@ -42,11 +42,11 @@
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preload" href="assets/fonts/PixelifyPS-400.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/PixelifyPS-700.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="css/style.css?v=4376233cae">
+<link rel="stylesheet" href="css/style.css?v=bbc8e83f49">
 <link rel="preload" href="assets/fonts/galmuri/Galmuri11.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="kor/style.css">
 <script src="kor/bootstrap.js"></script>
-<script src="js/core/locales.js?v=e8ea1b4c10"></script>
+<script src="js/core/locales.js?v=be2a2143e2"></script>
 <script src="js/noframe.js"></script>
 </head>
 <body>
@@ -254,7 +254,7 @@
     <p>코드·음악: PolyForm Noncommercial 1.0.0. 스프라이트: SpriteCollab CC BY-NC 4.0, 작가 목록은 CREDITS.md. 영문 Pixelify Sans·한글 갈무리: OFL 1.1. 명칭 자료: PokeAPI. 라이선스 파일을 함께 제공합니다.</p>
     <p>Pokémon과 캐릭터·상표의 권리는 Nintendo, Creatures Inc., GAME FREAK 및 The Pokémon Company 등 권리자에게 있습니다. 해당 권리자의 승인이나 제휴를 뜻하지 않습니다.</p>
     <h3>저장 데이터와 개인정보</h3>
-    <p>독립 PostgreSQL 서버에 사용자 이름, 비밀번호의 scrypt 해시, 게임 저장 내용과 로그인 세션을 보관합니다. 세션 쿠키는 7일 후 만료됩니다. 브라우저에도 저장 백업을 보관합니다. 원본 Firebase나 Google 로그인에 연결하지 않습니다. 게스트 플레이는 서버에 저장하지 않습니다. 친구·협동·랭킹은 아직 지원하지 않습니다.</p>
+    <p>독립 PostgreSQL 서버에 사용자 이름, 비밀번호의 scrypt 해시, 게임 저장 내용과 로그인 세션을 보관합니다. 세션 쿠키는 7일 후 만료됩니다. 브라우저에도 저장 백업을 보관합니다. 원본 Firebase나 Google 로그인에 연결하지 않습니다. 게스트 플레이는 서버에 저장하지 않습니다. 친구 관계와 생존 기록도 서버에 보관합니다. 순위표에는 계정 이름, 선택한 포켓몬, 생존 시간·레벨·처치 수가 공개됩니다. 친구에게만 접속 상태와 협동 초대가 표시됩니다. 대기실과 진행 중인 협동 전투는 서버가 다시 시작되면 종료되며, 완료된 기록과 저장 데이터는 유지됩니다.</p>
     <p>운영자: 박근오 (guenoh). 계정 삭제 시 서버의 계정·세션·저장 데이터와 선물 수령 기록을 삭제합니다. 자동 암호화 백업은 GitHub에서 최대 90일 보관하며, 별도로 내려받은 복구 사본은 운영자가 관리합니다.</p>
     <p>독립판 문의·권리 요청: <a id="legal-mail" href="#"></a></p>
     <p>독립판 소스: <a id="legal-repo" href="#" target="_blank" rel="noopener"></a></p>
@@ -312,7 +312,7 @@
       <div class="row"><button id="fr-room" class="btn small gold hidden">Ir a la sala</button><button class="btn small ghost" data-back>Volver</button></div></div>
     <p class="sub" id="fr-me"></p>
     <form id="fr-add" class="row" autocomplete="off">
-      <input id="fr-name" class="field grow" maxlength="16" spellcheck="false" placeholder="Apodo de tu amigo">
+      <input id="fr-name" class="field grow" maxlength="16" spellcheck="false" placeholder="친구의 계정 이름">
       <button class="btn gold" type="submit" data-sfx="confirm">Añadir amigo</button>
     </form>
     <p id="fr-msg" class="note"></p>
@@ -551,6 +551,6 @@
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=9c7fef5344"></script>
+<script defer src="js/app.min.js?v=1dd1879599"></script>
 </body>
 </html>

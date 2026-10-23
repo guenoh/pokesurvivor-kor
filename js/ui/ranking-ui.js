@@ -37,7 +37,8 @@ G.RankingUI = (() => {
     if (!G.Social.started) G.Social.start();
     $('rk-mod').classList.toggle('hidden', !G.Ranking.isAdmin());
     tabs();
-    load();
+    if (G.Social.independent && !G.Social.me) G.Social.start().then(() => { if (G.UI.isOpen('scr-rank')) load(); });
+    else load();
   }
 
   function tabs() {
@@ -71,7 +72,7 @@ G.RankingUI = (() => {
     try {
       [rows, me] = await Promise.all([
         G.Ranking.top(mode, period, dex, scope === 'friends'),
-        G.Social.me ? G.Ranking.myRank(mode, period, dex) : Promise.resolve(null)
+        G.Social.me ? G.Ranking.myRank(mode, period, dex, scope === 'friends') : Promise.resolve(null)
       ]);
     } catch (e) {
       if (my !== token) return;
@@ -126,7 +127,7 @@ G.RankingUI = (() => {
        <span class="time">${fmt(r.t)}</span>`);
     el.querySelectorAll('.plink').forEach(a => { a.onclick = e => { e.preventDefault(); G.ProfileUI.show(a.dataset.u); }; });
     // Reportar una marca sospechosa (no la tuya). Lo revisa el admin (mod-ui.js).
-    if (!mine && G.Social.me) {
+    if (!mine && G.Social.me && G.Ranking.canReport !== false) {
       const rep = document.createElement('button');
       const sent = done.has(b + '__' + r.id);
       rep.className = 'rk-rep' + (sent ? ' sent' : '');

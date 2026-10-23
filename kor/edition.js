@@ -11,16 +11,16 @@
     document.title = 'PokéSurvivor 한국어 독립판';
     const history = document.createElement('p');
     history.setAttribute('translate', 'no');
-    history.textContent = '원작 업데이트 기록입니다. 한국어 독립판의 친구·협동·랭킹 등은 아직 준비 중입니다.';
+    history.textContent = '원작 업데이트 기록입니다. 한국어 독립판의 변경 사항은 공지·업데이트에서 확인해 주세요.';
     history.className = 'note';
     document.querySelector('#scr-news .box')?.insertBefore(history, document.getElementById('news-body'));
     const note = document.createElement('p');
     note.setAttribute('translate', 'no');
-    note.textContent = '비공식·비상업 한국어 독립판 · 계정과 저장 데이터는 원본 서비스와 별개입니다. 친구·협동·랭킹은 준비 중입니다.';
+    note.textContent = '비공식·비상업 한국어 독립판 · 계정과 저장 데이터는 원본 서비스와 별개입니다. 친구를 초대해 최대 4명이 함께 생존하고, 기록을 비교할 수 있습니다.';
     note.style.cssText = 'font:12px/1.6 Pixelify,Galmuri11,sans-serif;color:#c5cfdf;margin-top:16px';
     document.querySelector('#scr-login .box')?.append(note);
     for (const item of document.querySelectorAll('[data-go="friends"], [data-go="rank"]')) {
-      item.disabled = true; item.title = '독립 서버 기능 준비 중';
+      item.disabled = false; item.removeAttribute('title');
     }
     const pass = document.getElementById('f-pass');
     if (pass) { pass.minLength = 4; pass.maxLength = 128; }

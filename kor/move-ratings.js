@@ -158,7 +158,6 @@ G.MoveRatings = (() => {
     const badge=(role,label,grade)=>{
       const b=document.createElement('button');b.type='button';b.className='kor-rating-badge';b.dataset.grade=grade;
       b.setAttribute('aria-label',label+' '+grade+'등급 · 참고 평가 이유 보기');
-      b.title=label+' '+grade+'등급 · 참고 평가 이유 보기';
       const icons=document.createElement('span');icons.className='kor-rating-icons';icons.setAttribute('aria-hidden','true');
       icons.innerHTML=role==='mob'?G.Icons.html('ball',13).repeat(3):G.Icons.html('boss',22);
       const value=document.createElement('strong');value.textContent=grade;b.append(icons,value);

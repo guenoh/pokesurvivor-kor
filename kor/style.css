@@ -277,3 +277,24 @@ dialog.kor-rating-dialog::backdrop { background: #081022e8; }
   html[lang="ko"] .kor-choice-box > h2 { font-size: 20px; line-height: 1.25; margin-bottom: 0; }
   html[lang="ko"] .kor-choice-box > .sub { font-size: 13px; line-height: 1.25; margin: 2px 0 5px; }
 }
+
+/* Friends and records share the existing menu width and scale. Scroll lists, keeping actions visible. */
+html[lang="ko"] :is(#scr-friends, #scr-rank) .box {
+  width: min(1100px, 100%); display: flex; flex-direction: column; overflow: hidden; min-height: 0;
+}
+html[lang="ko"] :is(#fr-list, #rk-list) { min-height: 0; flex: 1 1 auto; max-height: none; overflow: auto; }
+html[lang="ko"] .fr-row { flex-wrap: wrap; gap: 8px; }
+html[lang="ko"] .fr-row b { min-width: 0; overflow-wrap: anywhere; }
+html[lang="ko"] .fr-row .btn { flex-shrink: 0; }
+html[lang="ko"] #scr-lobby .box { width: min(1100px, 100%); }
+html[lang="ko"] .lob-card { min-width: 0; overflow-wrap: anywhere; }
+html[lang="ko"] #lobby-invite { max-height: 160px; }
+@media (orientation: landscape) and (max-height: 500px) {
+  html[lang="ko"] .lobby-members { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  html[lang="ko"] .lob-card { min-height: 115px; padding: 4px; gap: 0; }
+  html[lang="ko"] .lob-card canvas { width: 80px; height: 64px; }
+  html[lang="ko"] #lobby-invite { max-height: 86px; }
+  html[lang="ko"] #scr-lobby .box > .sub { margin: 4px 0; }
+  html[lang="ko"] #scr-lobby .box > h3 { margin-top: 6px !important; }
+  html[lang="ko"] .rk-row { padding: 3px 8px; }
+}

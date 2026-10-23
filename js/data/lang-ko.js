@@ -74,7 +74,7 @@ G.I18n.add({
   "Perfil": "프로필",
   "Estadísticas": "통계",
   "Amigos": "친구",
-  "Ranking": "랭킹",
+  "Ranking": "생존 기록",
   "Clasificación": "순위",
   "Cooperativo": "협동 플레이",
   "Solo": "솔로",
@@ -239,4 +239,4 @@ G.I18n.add({
   "Se ha cerrado la sesión.": "로그아웃했습니다."
 }, "ko");
 
-G.I18n.add({"Pulsa para empezar":"눌러서 시작","Sobrevive a las hordas con tu compañero Pokémon":"포켓몬 파트너와 함께 살아남으세요","¿Olvidaste tu contraseña?":"비밀번호를 잊으셨나요?","Aviso legal y privacidad":"권리 및 개인정보 안내","Tu colección":"내 컬렉션","Entra en la mazmorra":"던전에 입장하세요","Haz más fuerte cada run":"플레이할 때마다 강해지세요","Tienda Kecleon":"켈리몬 상점","Mentas, Cápsulas y MT":"민트, 특성캡슐, 기술머신","Vacía":"비어 있음","9 regiones · Pokémon y shinies":"9개 지방 · 포켓몬과 색이 다른 포켓몬","Misiones, logros y perfil":"미션, 업적, 프로필","Juega en grupo, hasta 4":"최대 4인 협동 (준비 중)","Quién aguanta más":"생존 기록 (준비 중)","Sonido, gráficos, controles y cuenta":"소리, 그래픽, 조작, 계정","Tu personalidad es…":"당신의 성격은…","Tu compañero:":"당신의 파트너:","¡Vamos juntos!":"함께 가자!","Elegir otro":"다른 파트너 선택","Elige a tu compañero":"파트너를 선택하세요"}, "ko");
+G.I18n.add({"Pulsa para empezar":"눌러서 시작","Sobrevive a las hordas con tu compañero Pokémon":"포켓몬 파트너와 함께 살아남으세요","¿Olvidaste tu contraseña?":"비밀번호를 잊으셨나요?","Aviso legal y privacidad":"권리 및 개인정보 안내","Tu colección":"내 컬렉션","Entra en la mazmorra":"던전에 입장하세요","Haz más fuerte cada run":"플레이할 때마다 강해지세요","Tienda Kecleon":"켈리몬 상점","Mentas, Cápsulas y MT":"민트, 특성캡슐, 기술머신","Vacía":"비어 있음","9 regiones · Pokémon y shinies":"9개 지방 · 포켓몬과 색이 다른 포켓몬","Misiones, logros y perfil":"미션, 업적, 프로필","Juega en grupo, hasta 4":"친구 초대 · 최대 4인 협동","Quién aguanta más":"개인·협동 생존 기록 비교","Sonido, gráficos, controles y cuenta":"소리, 그래픽, 조작, 계정","Tu personalidad es…":"당신의 성격은…","Tu compañero:":"당신의 파트너:","¡Vamos juntos!":"함께 가자!","Elegir otro":"다른 파트너 선택","Elige a tu compañero":"파트너를 선택하세요"}, "ko");

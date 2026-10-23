@@ -262,7 +262,7 @@ G.Coop = (() => {
 
   G.Net.onPeer((u, mode) => {
     if (!active) return;
-    if (mode === 'direct') {
+    if (mode === 'direct' || mode === 'relay') {
       if (!graceT.has(u)) return;
       stopGrace(u);
       const m = mates.get(u);
@@ -276,7 +276,7 @@ G.Coop = (() => {
       if (host) G.Spawner.say(nameOf(u) + ': reconectando…', 3);
       graceT.set(u, setTimeout(() => {
         graceT.delete(u);
-        if (!active || G.Net.mode(u) === 'direct' || (host && !keeps(u))) return;   // volvió, o se fue ('bye')
+        if (!active || ['direct', 'relay'].includes(G.Net.mode(u)) || (host && !keeps(u))) return;   // volvió, o se fue ('bye')
         if (host) G.Social.dropMember(u);         // no volvió: fuera de la sala
         gone(u);
       }, GRACE_MS));

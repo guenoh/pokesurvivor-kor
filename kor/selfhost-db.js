@@ -118,8 +118,10 @@
     mode: { get: () => 'cloud' }, online: { get: () => false }, fb: { get: () => null },
     nameAccount: { get: () => true }, hasGoogle: { get: () => false },
     syncState: { get: () => state },
+    selfhostUser: { get: () => account },
     accountKey: { get: () => account?.id || 'guest' }
   });
+  G.KorAPI = { request: api };
   G.DB = facade;
   addEventListener('online', () => { if (pending && state !== 'conflict') flush().catch(() => {}); });
 })();
