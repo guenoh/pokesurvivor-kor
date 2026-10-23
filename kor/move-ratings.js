@@ -125,7 +125,7 @@ G.MoveRatings = (() => {
 
   let dialog;
   function isOpen(){return !!dialog?.open;}
-  function explain(result){
+  function explain(results){
     if(!dialog){
       dialog=document.createElement('dialog');dialog.className='box kor-rating-dialog';dialog.setAttribute('translate','no');
       dialog.setAttribute('aria-labelledby','kor-rating-title');document.body.append(dialog);
@@ -134,20 +134,32 @@ G.MoveRatings = (() => {
     }
     dialog.replaceChildren();
     const head=document.createElement('div');head.className='kor-rating-head';
-    const title=document.createElement('h2');title.id='kor-rating-title';title.textContent=result.name+(result.support?' · 보조 기술 설명':' · 기술 평가');
+    const title=document.createElement('h2');title.id='kor-rating-title';title.textContent='기술 설명';
     const close=document.createElement('button');close.type='button';close.className='btn small';close.textContent='닫기';close.onclick=()=>dialog.close();head.append(title,close);dialog.append(head);
+    const tabs=document.createElement('div');tabs.className='kor-rating-tabs';tabs.setAttribute('aria-label','설명할 기술');dialog.append(tabs);
     const body=document.createElement('div');body.className='kor-rating-body';
     const paragraph=text=>{const p=document.createElement('p');p.textContent=text;body.append(p);};
-    if(result.support)paragraph(result.reason);
-    else {
-      paragraph('무리 사냥 '+result.mob+' · 보스전 '+result.boss+' — 현재 포켓몬이 배울 수 있는 공격 기술끼리, 같은 레벨'+(result.evolved?'의 진화 단계':'')+'에서 비교한 참고 등급입니다.');
-      paragraph('무리 사냥: '+result.reasons[0]);paragraph('보스전: '+result.reasons[1]);
-      paragraph((result.category==='physical'?'물리':'특수')+' 기술이며, 현재 포켓몬의 해당 공격 능력치와 공격 강화 효과를 반영합니다. 강한 쪽 공격 능력치 대비 '+Math.round(result.fit*100)+'%입니다.');
-      if(result.ability)paragraph('현재 특성: '+result.ability+' · 공격 보정 ×'+result.abilityMob.toFixed(2)+' / 보스전 ×'+result.abilityBoss.toFixed(2)+'. 확인된 직접 공격 보정만 반영합니다.');
-      paragraph('무리 사냥은 가까이 모인 상대 최대 세 마리, 보스전은 보스 한 마리와 중립 상성을 가정합니다. 범위·공격 간격·일반적인 명중 기회를 이용한 추정이며 실제 피해량 측정은 아닙니다.');
-      paragraph('상대 타입·방어력·이동, 상태이상 추가 피해·회복·생존 효과와 기술 연결 조합은 등급에 포함하지 않습니다. S등급도 모든 상황에서 최선인 것은 아닙니다.');
-      paragraph('S·A·B·C·D 순으로 평가합니다.');
+    function select(result) {
+      body.replaceChildren();body.scrollTop=0;
+      [...tabs.children].forEach((b,i)=>b.setAttribute('aria-pressed',String(results[i]===result)));
+      const name=document.createElement('h3');name.textContent=result.name;body.append(name);
+      if(result.description)paragraph(result.description);
+      if(result.support)paragraph(result.reason);
+      else {
+        paragraph('무리 사냥 '+result.mob+' · 보스전 '+result.boss+' — 현재 포켓몬이 배울 수 있는 공격 기술끼리, 같은 레벨'+(result.evolved?'의 진화 단계':'')+'에서 비교한 참고 등급입니다.');
+        paragraph('무리 사냥: '+result.reasons[0]);paragraph('보스전: '+result.reasons[1]);
+        paragraph((result.category==='physical'?'물리 기술은 공격':'특수 기술은 특수공격')+' 능력치를 사용하며, 현재 포켓몬의 해당 능력치와 공격 강화 효과를 반영합니다. 강한 쪽 공격 능력치 대비 '+Math.round(result.fit*100)+'%입니다.');
+        if(result.ability)paragraph('현재 특성: '+result.ability+' · 공격 보정 ×'+result.abilityMob.toFixed(2)+' / 보스전 ×'+result.abilityBoss.toFixed(2)+'. 확인된 직접 공격 보정만 반영합니다.');
+        paragraph('무리 사냥은 가까이 모인 상대 최대 세 마리, 보스전은 보스 한 마리와 중립 상성을 가정합니다. 범위·공격 간격·일반적인 명중 기회를 이용한 추정이며 실제 피해량 측정은 아닙니다.');
+        paragraph('상대 타입·방어력·이동, 상태이상 추가 피해·회복·생존 효과와 기술 연결 조합은 등급에 포함하지 않습니다. S등급도 모든 상황에서 최선인 것은 아닙니다.');
+        paragraph('S·A·B·C·D 순으로 평가합니다.');
+      }
     }
+    for(const result of results){
+      const tab=document.createElement('button');tab.type='button';tab.className='chip';tab.textContent=result.name;
+      tab.onclick=()=>select(result);tabs.append(tab);
+    }
+    select(results[0]);
     dialog.append(body);dialog.showModal();close.focus();
   }
 
@@ -162,36 +174,51 @@ G.MoveRatings = (() => {
     tag.setAttribute('translate','no');tag.textContent=label;title.append(tag);
   }
 
+  const details=new WeakMap();
   function mount(host,move,context){
     if(G.I18n.lang!=='ko')return;
     mountCategory(host,move);
     const result=analyze(move,context);if(!result)return;
+    details.set(host,{...result,description:G.T(move.desc)});
+    if(result.support)return;
     const row=document.createElement('div');row.className='kor-move-ratings';row.setAttribute('translate','no');
-    function helpButton(b,label){
-      b.setAttribute('aria-label',label+' · 설명 보기');b.setAttribute('aria-haspopup','dialog');
-      b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')e.stopPropagation();});
-      b.onclick=e=>{e.stopPropagation();b.focus({preventScroll:true});G.Audio?.sfx('click');explain(result);};
-    }
     const badge=(role,label,grade)=>{
-      const b=document.createElement('button');b.type='button';b.className='kor-rating-badge';b.dataset.grade=grade;
-      helpButton(b,label+' '+grade+'등급');
+      const b=document.createElement('span');b.className='kor-rating-badge';b.dataset.grade=grade;
+      b.setAttribute('role','img');b.setAttribute('aria-label',label+' '+grade+'등급');
       const icons=document.createElement('span');icons.className='kor-rating-icons';icons.setAttribute('aria-hidden','true');
       icons.innerHTML=role==='mob'?G.Icons.html('ball',13).repeat(3):G.Icons.html('boss',22);
       const value=document.createElement('strong');value.textContent=grade;
-      const info=document.createElement('span');info.className='kor-rating-info';info.textContent='?';info.setAttribute('aria-hidden','true');
-      b.append(icons,value,info);row.append(b);
+      b.append(icons,value);row.append(b);
     };
-    if(result.support){const b=document.createElement('button');b.type='button';b.className='kor-rating-badge kor-rating-support';helpButton(b,'보조 기술');
-      const label=document.createElement('span');label.textContent='보조 기술';
-      const action=document.createElement('span');action.className='kor-rating-action';action.textContent='설명 보기 ›';
-      b.append(label,action);row.append(b);}
-    else {badge('mob','무리 사냥',result.mob);badge('boss','보스전',result.boss);}
-    host.append(row);
+    badge('mob','무리 사냥',result.mob);badge('boss','보스전',result.boss);host.append(row);
   }
 
-  // The original battle input suppresses Tab and Space. Keep native help-button navigation available.
+  function mountHelp(list,anchor) {
+    if(G.I18n.lang!=='ko')return;
+    const results=()=>[...list.querySelectorAll('.card, .kor-rated-option')].map(el=>details.get(el)).filter(Boolean);
+    let row;
+    if(anchor){
+      row=anchor.parentElement;
+      if(!row.matches('.row, .kor-choice-actions')){row=document.createElement('div');anchor.before(row);row.append(anchor);}
+      anchor.style.marginTop='0';
+    }else{
+      row=list.querySelector(':scope > .kor-choice-actions');
+      if(!row){row=document.createElement('div');list.append(row);}
+    }
+    row.classList.add('kor-choice-actions');
+    let button=row.querySelector('.kor-move-help');
+    if(!button){
+      button=document.createElement('button');button.type='button';button.className='btn small kor-move-help';
+      button.setAttribute('translate','no');button.setAttribute('aria-haspopup','dialog');button.textContent='기술 설명';
+      button.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')e.stopPropagation();});row.append(button);
+    }
+    button.hidden=!results().length;
+    button.onclick=e=>{e.stopPropagation();const current=results();if(!current.length)return;button.focus({preventScroll:true});G.Audio?.sfx('click');explain(current);};
+  }
+
+  // Keep native navigation to the shared help control despite the original battle input's Tab shortcut.
   if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
-    if(e.key==='Tab'&&[...document.querySelectorAll('.kor-rating-badge')].some(b=>b.getClientRects().length))e.stopPropagation();
+    if(e.key==='Tab'&&[...document.querySelectorAll('.kor-move-help')].some(b=>b.getClientRects().length))e.stopPropagation();
   },true);
 
   function decoratePicker(host,dex,attribute='data-id') {
@@ -202,7 +229,8 @@ G.MoveRatings = (() => {
       const wrapper=document.createElement('div');wrapper.className='kor-rated-option';
       button.before(wrapper);wrapper.append(button);mount(wrapper,G.Moves.instance(id),ctx);
     });
+    mountHelp(host);
   }
   function mountChoice(host,choice,player){const m=choiceMove(choice,player);if(m)mount(host,m,player);}
-  return {analyze,scores,shape,grade,choiceMove,contextForDex,mount,mountChoice,decoratePicker,isOpen,close:()=>dialog?.close(),get dialog(){return dialog;}};
+  return {analyze,scores,shape,grade,choiceMove,contextForDex,mount,mountHelp,mountChoice,decoratePicker,isOpen,close:()=>dialog?.close(),get dialog(){return dialog;}};
 })();

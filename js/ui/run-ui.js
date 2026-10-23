@@ -77,6 +77,7 @@ G.RunUI = (() => {
       if (G.MoveRatings) G.MoveRatings.mountChoice(el, c, G.Game.player);
       box.appendChild(el);
     });
+    if (G.MoveRatings) G.MoveRatings.mountHelp(box, $('lvl-reroll'));
   }
 
   function pick(i) {
@@ -222,6 +223,7 @@ G.RunUI = (() => {
       if (G.MoveRatings) G.MoveRatings.mount(el, m, G.Game.player);
       box.appendChild(el);
     });
+    if (G.MoveRatings) G.MoveRatings.mountHelp(box, $('bond-back'));
   }
 
   function pickBond(i) {
