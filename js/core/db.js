@@ -974,6 +974,11 @@ G.DB = (() => {
   }
 
   return {
+    openSelfhost(id, name, data) {
+      mode = 'local'; key = 'kor-' + id; user = name; guest = false; uid = null;
+      save = fold(migrate(data && Object.keys(data).length ? data : newSave(name), name));
+      return save;
+    },
     ready, register, login, loginWithGoogle, playAsGuest, logout, commit, deleteAccount, flush: pushNow, saveNow,
     owns, grant, ownsShiny, grantShiny, merge, setName, upgradesOf, isFav, setFav,
     onSync(fn) { listeners.add(fn); },

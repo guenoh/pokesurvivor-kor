@@ -1,3 +1,11 @@
+# PokéSurvivor KOR — 독립 한국어판
+
+현재 구현 상태·미완료 항목·라이선스·운영 방법: **[README.ko.md](README.ko.md)**
+
+아래 내용은 원작 README를 보존한 기록이며, 현재 독립판의 기능·운영 방식을 뜻하지 않습니다.
+
+---
+
 # PokéSurvivor · Mundo Misterioso
 
 Bullet-heaven con Pokémon al estilo de Survivor.io y Megabonk, con sprites de

@@ -1,0 +1,4 @@
+html[lang="ko"] body, html[lang="ko"] button, html[lang="ko"] input, html[lang="ko"] select {
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+#btn-google, #btn-support { display: none !important; }

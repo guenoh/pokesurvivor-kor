@@ -1,0 +1,25 @@
+name: Daily upstream sync
+on:
+  schedule:
+    - cron: '17 20 * * *' # 05:17 Asia/Seoul; schedules may be delayed by GitHub
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    if: github.repository == 'guenoh/pokesurvivor-kor' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - run: bash .github/scripts/sync-upstream.sh
+        env:
+          GH_TOKEN: ${{ github.token }}

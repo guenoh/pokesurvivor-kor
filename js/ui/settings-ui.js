@@ -7,7 +7,7 @@ G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const VERSION = '1.2 · 2026-10-09';
-  const REPO = 'https://github.com/JPTER78/pokesurvivor';
+  const REPO = 'https://github.com/guenoh/pokesurvivor-kor';
   let tab = 'sound';
 
   function init() {
@@ -196,7 +196,7 @@ G.SettingsUI = (() => {
     if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
     if (G.Game.state !== 'ui') G.Game.quit && G.Game.quit();
     G.Audio.music(null);
-    G.DB.logout().then(() => G.Flow.toLogin());
+    G.DB.logout().then(() => G.Flow.toLogin()).catch(() => {});
   }
 
   return { init, open, close, get isOpen() { return isOpen(); } };

@@ -9,6 +9,7 @@ window.PS_PAGES = !!document.querySelector('meta[name="ps-pages"]');
 (function () {
   // El idioma lo elige locales.js (en el <head>).
   var copy = {
+    ko: ['브라우저와 모바일에서 즐기는 무료 포켓몬 생존 게임입니다.', '불러오는 중…'],
     es: ['Juego de supervivencia con Pokémon, gratis en el navegador y en el móvil.', 'Cargando…'],
     en: ['A Pokémon survival game, free in your browser and on mobile.', 'Loading…'],
     fr: ['Un jeu de survie Pokémon gratuit sur navigateur et mobile.', 'Chargement…'],

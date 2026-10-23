@@ -205,11 +205,11 @@ G.I18n = (() => {
     }
     // Chino: Pixelify no tiene sus letras; se añaden las del sistema al poner la fuente
     // (una vez, no en cada texto que se dibuja, que frenaría el juego).
-    if (lang.startsWith('zh-')) {
-      const cjk = lang === 'zh-Hant' ? '"PingFang TC","Microsoft JhengHei","Noto Sans CJK TC"' : '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC"';
+    if ((lang.startsWith('zh-') || lang === 'ko')) {
+      const cjk = lang === 'ko' ? '"Apple SD Gothic Neo","Malgun Gothic",system-ui' : lang === 'zh-Hant' ? '"PingFang TC","Microsoft JhengHei","Noto Sans CJK TC"' : '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC"';
       const fd = Object.getOwnPropertyDescriptor(P, 'font');
       if (fd && fd.set) Object.defineProperty(P, 'font', { configurable: true, enumerable: fd.enumerable, get: fd.get,
-        set(v) { fd.set.call(this, typeof v === 'string' && v.includes('Pixelify') && !v.includes('PingFang') ? v.replace('Pixelify', 'Pixelify,' + cjk) : v); } });
+        set(v) { fd.set.call(this, typeof v === 'string' && v.includes('Pixelify') && !v.includes('PingFang') && !v.includes('Malgun Gothic') ? v.replace('Pixelify', 'Pixelify,' + cjk) : v); } });
     }
     const oc = window.confirm, oa = window.alert;
     window.confirm = s => oc.call(window, t(s));

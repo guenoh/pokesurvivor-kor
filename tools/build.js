@@ -18,7 +18,7 @@ const dev = fs.readFileSync(DEV, 'utf8');
 const i = dev.indexOf(BEGIN), j = dev.indexOf(END);
 if (i < 0 || j < 0) throw new Error('dev.html no tiene las marcas ' + BEGIN + ' / ' + END);
 const block = dev.slice(i, j + END.length);
-const files = [...block.matchAll(/<script[^>]*src="(js\/[^"]+\.js)"/g)].map(m => m[1]);
+const files = [...block.matchAll(/<script[^>]*src="((?:js|kor)\/[^"]+\.js)"/g)].map(m => m[1]);
 
 // Une los archivos en orden; cada uno separado por ';' por si alguno no acaba en punto y coma.
 let joined = files.map(f => `/* ${f} */\n` + fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n;\n');
@@ -36,15 +36,15 @@ const tmp = path.join(ROOT, 'tools', 'cache', 'app.js');
 fs.mkdirSync(path.dirname(tmp), { recursive: true });
 fs.writeFileSync(tmp, joined);
 const outJs = path.join(ROOT, 'js', 'app.min.js');
-const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+const binary = name => path.join(ROOT, 'node_modules', '.bin', name + (process.platform === 'win32' ? '.cmd' : ''));
 const shell = process.platform === 'win32';
-execFileSync(npx, ['--yes', 'terser@5', tmp, '--compress', 'passes=1', '--mangle', '--comments', 'false', '--ecma', '2020', '-o', outJs],
+execFileSync(binary('terser'), [ tmp, '--compress', 'passes=1', '--mangle', '--comments', 'false', '--ecma', '2020', '-o', outJs],
   { stdio: 'inherit', shell });
 // Y ofuscado: el código queda ilegible y se rompe solo si lo reformatean para
 // tocarlo. Las cadenas, en una tabla codificada (sólo una parte, para no frenar
 // el juego). Semilla fija: el mismo código da siempre el mismo archivo.
 if (!EXPOSE) {
-  execFileSync(npx, ['--yes', 'javascript-obfuscator@4.1.1', outJs, '--output', outJs,
+  execFileSync(binary('javascript-obfuscator'), [ outJs, '--output', outJs,
     '--compact', 'true', '--self-defending', 'true', '--seed', '7',
     '--string-array', 'true', '--string-array-encoding', 'base64', '--string-array-threshold', '0.1',
     '--identifier-names-generator', 'hexadecimal', '--rename-globals', 'false', '--transform-object-keys', 'false',
@@ -53,7 +53,7 @@ if (!EXPOSE) {
 }
 const min = fs.readFileSync(outJs);
 // La huella cuenta también el CSS: un cambio sólo de estilos es versión nueva (version.json).
-const hash = crypto.createHash('sha1').update(min).update(fs.readFileSync(path.join(ROOT, 'css', 'style.css'))).digest('hex').slice(0, 10);
+const hash = crypto.createHash('sha1').update(min).update(fs.readFileSync(path.join(ROOT, 'css', 'style.css'))).update(fs.readFileSync(path.join(ROOT, 'kor', 'style.css'))).update(fs.readFileSync(path.join(ROOT, 'js', 'data', 'lang-ko.js'))).update(fs.readFileSync(path.join(ROOT, 'js', 'data', 'lang-ko-names.js'))).digest('hex').slice(0, 10);
 
 // Diccionarios de francés, italiano, portugués y chino (js/lang/), uno por idioma: los pide
 // locales.js con su misma huella ?v=, para que al cambiar no se queden en caché.
@@ -70,7 +70,7 @@ html = html.replace(LOC, `<script src="js/core/locales.js?v=${locHash.digest('he
 // con el style.css viejo que tiene guardado.
 const CSS = '<link rel="stylesheet" href="css/style.css">';
 if (!dev.includes(CSS)) throw new Error('dev.html no carga ' + CSS + ' como se esperaba: revisa build.js');
-const cssHash = crypto.createHash('sha1').update(fs.readFileSync(path.join(ROOT, 'css', 'style.css'))).digest('hex').slice(0, 10);
+const cssHash = crypto.createHash('sha1').update(fs.readFileSync(path.join(ROOT, 'css', 'style.css'))).update(fs.readFileSync(path.join(ROOT, 'kor', 'style.css'))).update(fs.readFileSync(path.join(ROOT, 'js', 'data', 'lang-ko.js'))).update(fs.readFileSync(path.join(ROOT, 'js', 'data', 'lang-ko-names.js'))).digest('hex').slice(0, 10);
 html = html.replace(CSS, `<link rel="stylesheet" href="css/style.css?v=${cssHash}">`);
 html = html.replace(/<meta name="robots" content="noindex">\s*/, '');
 // --sin-seo: sin canonical/redes/datos estructurados ni enlaces a las páginas

@@ -1,12 +1,12 @@
 <!doctype html>
 <!-- dev.html: página fuente. Aquí se edita; index.html lo genera tools/build.js. -->
-<html lang="es">
+<html lang="ko">
 <head>
 <meta charset="utf-8">
 <!-- Seguridad (18-10-2026): sólo se ejecutan los scripts del juego, de Firebase
      y de Google (inicio de sesión). Nada metido en la página (onerror=, etiquetas script
      en un texto...) llega a ejecutarse aunque se colara. Ver js/boot.js. -->
-<meta http-equiv="Content-Security-Policy" content="script-src 'self' file: https://www.gstatic.com https://apis.google.com https://*.firebaseio.com https://*.firebasedatabase.app; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' file:; connect-src 'self'; object-src 'none'; base-uri 'self'">
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>PokéSurvivor – Juego Pokémon gratis online estilo Survivor.io</title>
@@ -83,6 +83,8 @@
 </script>
 <!-- seo:end -->
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="kor/style.css">
+<script src="kor/bootstrap.js"></script>
 <script src="js/core/locales.js"></script>
 <script src="js/noframe.js"></script>
 </head>
@@ -97,10 +99,10 @@
   <div class="box" style="width:min(420px,100%)">
     <div class="logo">
       <div class="t1">PokéSurvivor</div>
-      <div class="t2">Mundo Misterioso</div>
+      <div class="t2">한국어 독립판</div>
     </div>
-    <p class="login-tag">Sobrevive a las hordas con tu compañero Pokémon · gratis, en PC y móvil</p>
-    <p class="login-official">Web oficial: pokesurvivor.com · si alguien te pide pagar, no somos nosotros</p>
+    <p class="login-tag" translate="no">포켓몬 파트너와 함께 살아남으세요 · PC·모바일 무료 팬 게임</p>
+    <p class="login-official" translate="no">비공식·비상업 한국어 독립판 · 원작 공식 사이트: pokesurvivor.com</p>
     <div class="tabs">
       <div class="tab on" data-tab="login">Entrar</div>
       <div class="tab" data-tab="register">Crear cuenta</div>
@@ -112,8 +114,7 @@
       <input id="f-pass" class="field" type="password" maxlength="64">
       <p id="login-err" class="err"></p>
       <p class="note"><a href="#" id="f-forgot">¿Olvidaste tu contraseña?</a></p>
-      <p id="forgot-note" class="note hidden">Si vinculaste tu Gmail, pulsa <b>Entrar con Google</b> con ese Gmail: es tu misma cuenta.
-        Si no lo vinculaste, no se puede recuperar: crea una cuenta nueva (y esta vez vincula tu Gmail desde el aviso que sale al entrar).</p>
+      <p id="forgot-note" class="note hidden" translate="no">현재 비밀번호 복구는 지원하지 않습니다. 비밀번호를 안전하게 보관해 주세요. 원본 또는 Google 계정으로 로그인할 수 없습니다.</p>
       <div class="row">
         <button id="btn-auth" class="btn gold grow" type="submit">Entrar</button>
       </div>
@@ -173,7 +174,7 @@
   <div class="menu-left">
     <div class="logo">
       <div class="t1">PokéSurvivor<span class="splash">Folagor, Sekiam, PokeAlex: ¿un hueco?</span></div>
-      <div class="t2">Mundo Misterioso</div>
+      <div class="t2">한국어 독립판</div>
     </div>
     <div class="partner-card">
       <canvas id="menu-partner" class="stage" width="260" height="200"></canvas>
@@ -277,40 +278,18 @@
 <section id="scr-legal" class="scr dim hidden">
   <div class="box legal" style="width:min(640px,100%)">
     <div class="row between"><h2>Aviso legal</h2><button class="btn small ghost" id="legal-close">Cerrar</button></div>
-    <h3>Proyecto de fan</h3>
-    <p><b>PokéSurvivor</b> es un juego hecho por fans, <b>gratuito y sin ánimo de lucro</b>.
-      No tiene anuncios ni compras. Se puede apoyar con donaciones voluntarias, que se usan sólo para pagar los servidores y el dominio, y que no dan ninguna ventaja en el juego.</p>
-    <p>No está afiliado, patrocinado ni aprobado por Nintendo, Creatures Inc., GAME FREAK ni
-      The Pokémon Company. Pokémon y todos los nombres y personajes relacionados son marcas y
-      propiedad de sus respectivos dueños.</p>
-    <h3>Web oficial</h3>
-    <p>La única web oficial de PokéSurvivor es pokesurvivor.com. El juego es y será gratis: si alguien te pide pagar, no somos nosotros.</p>
-    <h3>Criptomonedas</h3>
-    <p>PokéSurvivor no tiene ninguna criptomoneda, token ni NFT oficial, y su autor no ha creado ninguno. Cualquier token que use el nombre del juego lo han creado terceros: no nos hacemos cargo de ninguna compra, venta o inversión que hagas con ellos, y nada de lo que hay aquí es una recomendación de inversión.</p>
-    <h3>Contenido de terceros</h3>
-    <p>Sprites de <a href="https://github.com/PMDCollab/SpriteCollab" target="_blank" rel="noopener">SpriteCollab</a>
-      (CC BY-NC 4.0, créditos completos en CREDITS.md del repositorio). Datos de la Pokédex de
-      <a href="https://pokeapi.co/" target="_blank" rel="noopener">PokeAPI</a>. Fuente Pixelify Sans (OFL).
-      La música y los efectos de sonido son originales del proyecto.</p>
-    <h3>Contacto y retirada de contenido</h3>
-    <p>Si eres titular de derechos y quieres que retiremos algo, escríbenos y lo quitaremos lo
-      antes posible: <a id="legal-mail" href="#"></a></p>
-    <p>Código fuente: <a id="legal-repo" href="#" target="_blank" rel="noopener"></a></p>
-    <p>Licencia del código: PolyForm Noncommercial 1.0.0 (se puede usar, estudiar y modificar, pero no para ganar dinero). Las versiones hasta el 14-10-2026 siguen bajo MIT.</p>
-    <h3>Privacidad</h3>
-    <p>Si creas una cuenta, guardamos tu nombre de jugador y tu partida (colección, monedas,
-      mejoras y estadísticas) en Google Firebase para que puedas seguir en cualquier ordenador.
-      Si entras con Google, Firebase guarda también tu correo de Google para identificarte
-      (nunca se enseña a otros jugadores).
-      No usamos tus datos para nada más, ni los compartimos, ni hay publicidad ni seguimiento.
-      Como invitado no se guarda nada fuera de tu navegador.</p>
-    <p>Amigos y ranking: tu <b>apodo</b> es público para otros jugadores. Guardamos tu lista de
-      amigos, si estás en línea y tus mejores tiempos (con tu apodo y tu Pokémon).</p>
-    <p>Partidas en grupo: tu navegador se conecta <b>directamente</b> con el de tus compañeros
-      (como en una videollamada), así que cada uno puede llegar a ver la dirección IP del otro.
-      Juega en grupo sólo con gente que conozcas. Si la conexión directa no es posible, la partida
-      pasa por los servidores de Firebase.</p>
-    <p>Puedes borrar tu cuenta cuando quieras (se borran también tu apodo, tus amigos y tus marcas):</p>
+    <div translate="no">
+    <h3>비공식·비상업 한국어 독립판</h3>
+    <p>원작: Jonathan Piera Torregrosa (JPTER78). 원본 공식 사이트는 <a href="https://pokesurvivor.com">pokesurvivor.com</a>입니다. 이 버전은 guenoh의 독립 파생판이며 원작자가 운영하거나 승인한 서비스가 아닙니다.</p>
+    <p>Required Notice: Copyright 2026 JPTER78 (https://github.com/JPTER78/pokesurvivor)</p>
+    <p>코드·음악: PolyForm Noncommercial 1.0.0. 스프라이트: SpriteCollab CC BY-NC 4.0, 작가 목록은 CREDITS.md. Pixelify Sans: OFL 1.1. 명칭 자료: PokeAPI. 라이선스 파일을 함께 제공합니다.</p>
+    <p>Pokémon과 캐릭터·상표의 권리는 Nintendo, Creatures Inc., GAME FREAK 및 The Pokémon Company 등 권리자에게 있습니다. 해당 권리자의 승인이나 제휴를 뜻하지 않습니다.</p>
+    <h3>저장 데이터와 개인정보</h3>
+    <p>독립 PostgreSQL 서버에 사용자 이름, 비밀번호의 scrypt 해시, 게임 저장 내용과 로그인 세션을 보관합니다. 세션 쿠키는 7일 후 만료됩니다. 브라우저에도 저장 백업을 보관합니다. 원본 Firebase나 Google 로그인에 연결하지 않습니다. 게스트 플레이는 서버에 저장하지 않습니다. 친구·협동·랭킹은 아직 지원하지 않습니다.</p>
+    <p>계정 삭제 시 서버의 계정·세션·저장 데이터를 삭제합니다. 운영 서버의 백업 보존 기간과 운영자 정보는 실제 배포 전에 확정해 안내해야 합니다.</p>
+    <p>독립판 문의·권리 요청: <a id="legal-mail" href="#"></a></p>
+    <p>독립판 소스: <a id="legal-repo" href="#" target="_blank" rel="noopener"></a></p>
+    </div>
     <div class="row">
       <button class="btn small" id="legal-delete">Borrar mi cuenta y mi partida</button>
       <span id="legal-del-msg" class="note" style="margin:0"></span>
@@ -615,6 +594,7 @@
 <!-- núcleo -->
 <script defer src="js/core/firebase-config.js"></script>
 <script defer src="js/core/db.js"></script>
+<script defer src="kor/selfhost-db.js"></script>
 <script defer src="js/core/audio.js"></script>
 <script defer src="js/core/input.js"></script>
 <script defer src="js/core/touch.js"></script>
@@ -690,6 +670,7 @@
 <script defer src="js/core/updater.js"></script>
 <!-- juego -->
 <script defer src="js/game.js"></script>
+<script defer src="kor/edition.js"></script>
 <script defer src="js/main.js"></script>
 <!-- scripts:end -->
 </body>

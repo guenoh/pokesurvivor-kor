@@ -33,7 +33,7 @@ G.MenuUI = (() => {
     $('btn-logout').onclick = () => {
       if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
       G.Audio.music(null);
-      G.DB.logout().then(() => G.Flow.toLogin());
+      G.DB.logout().then(() => G.Flow.toLogin()).catch(() => {});
     };
   }
 

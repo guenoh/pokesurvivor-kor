@@ -1,0 +1,65 @@
+name: Manual production deployment
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node --test tests/*.test.cjs
+      - run: node tools/build.js --sin-seo
+      - run: node kor/package.cjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: production-release
+          path: dist/
+          retention-days: 7
+  deploy:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - name: Require configured deployment target
+        env:
+          ENABLED: ${{ vars.DEPLOY_ENABLED }}
+        run: test "$ENABLED" = true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: production-release
+          path: release
+      - name: Upload reviewed release
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]+$ ]]
+          [[ "$DEPLOY_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]]
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          target="$DEPLOY_USER@$DEPLOY_HOST"
+          dir="/srv/pokesurvivor-kor/releases/$GITHUB_SHA"
+          ssh "$target" "mkdir -p '$dir'"
+          rsync -az release/ "$target:$dir/"
+          ssh "$target" "test -s '$dir/index.html' && ln -sfn '$dir' /srv/pokesurvivor-kor/current.next && mv -Tf /srv/pokesurvivor-kor/current.next /srv/pokesurvivor-kor/current"

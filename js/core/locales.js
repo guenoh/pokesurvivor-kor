@@ -9,7 +9,7 @@
  */
 window.PS_LOCALES = (() => {
   const choices = [
-    ['es', 'Español', 'es-ES'], ['en', 'English', 'en-GB'],
+    ['ko', '한국어', 'ko-KR'], ['es', 'Español', 'es-ES'], ['en', 'English', 'en-GB'],
     ['fr', 'Français', 'fr-FR'], ['it', 'Italiano', 'it-IT'],
     ['pt-BR', 'Português (Brasil)', 'pt-BR'],
     ['zh-Hans', '简体中文', 'zh-CN'], ['zh-Hant', '繁體中文', 'zh-TW']
@@ -26,8 +26,8 @@ window.PS_LOCALES = (() => {
   }
   let saved;
   try { saved = localStorage.getItem('ps.lang'); } catch (e) { /* storage can be blocked */ }
-  const lang = normalize(saved) || (/\/en(\/|$)/.test(location.pathname) ? 'en' : null)
-    || normalize((navigator.languages && navigator.languages[0]) || navigator.language || 'es') || 'en';
+  const lang = normalize(saved) || (window.PS_KOR ? 'ko' : null) || (/\/en(\/|$)/.test(location.pathname) ? 'en' : null)
+    || (/\/kor(\/|$)/.test(location.pathname) ? 'ko' : null) || normalize((navigator.languages && navigator.languages[0]) || navigator.language || 'es') || 'en';
   document.documentElement.lang = lang;
   if (lang !== 'es' && lang !== 'en') {
     const me = document.currentScript, v = me && /[?&]v=([\w-]+)/.exec(me.src);
