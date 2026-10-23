@@ -22,7 +22,8 @@ test('Korean account guidance follows server limits and confirmation compares th
   for (const name of ['한글이름', 'Trainer_25', '日本語', 'a'.repeat(16)]) assert.equal(validate(name, password, password), null, name);
   for (const name of ['', '가나', 'a'.repeat(17), '피카 츄', '피카츄!', 'Trainer-25']) assert.equal(validate(name, password, password).field, 'f-user', name);
   assert.equal(normalizeName('  Ｔｒａｉｎｅｒ＿２５  '), 'Trainer_25');
-  assert.equal(validate('Trainer', 'a'.repeat(11), 'a'.repeat(11)).field, 'f-pass');
+  assert.equal(validate('Trainer', 'a'.repeat(3), 'a'.repeat(3)).field, 'f-pass');
+  assert.equal(validate('Trainer', '1234', '1234'), null);
   assert.equal(validate('Trainer', 'a'.repeat(128), 'a'.repeat(128)), null);
   assert.equal(validate('Trainer', 'a'.repeat(129), 'a'.repeat(129)).field, 'f-pass');
   assert.equal(validate('Trainer', password, '').field, 'f-pass-confirm');
@@ -66,6 +67,30 @@ test('stale saves are preserved and rejected instead of overwriting another devi
   await assert.rejects(db.flush(), /conflict/);
   assert.equal(db.syncState, 'conflict'); assert.equal(db.commit(), false);
   assert.equal(JSON.parse(storage.get('ps.kor.pending.conflict')).save.coins, 123);
+});
+test('claiming a Korean server gift first saves progress and adopts the server receipt without double credit', async () => {
+  let revision = 0, save = {}, claimed = false;
+  const user = { id: 'gift-user', name: '선물검사' }, calls = [];
+  const { db } = bootAdapter(async (url, options) => {
+    const data = options.body ? JSON.parse(options.body) : null; calls.push([url, data]);
+    if (url === '/api/save') { assert.equal(data.revision, revision); save = data.save; return json({ revision: ++revision }); }
+    if (url.endsWith('/claim')) {
+      const alreadyClaimed = claimed;
+      if (!claimed) {
+        assert.equal(data.revision, revision);
+        save.tickets.t10 += 100; save.led['server:opening'] = { t10: [100, 0] }; revision++; claimed = true;
+      }
+      return json({ user, save: JSON.parse(JSON.stringify(save)), revision, granted: !alreadyClaimed, alreadyClaimed });
+    }
+    return json({ user, save, revision });
+  });
+  await db.ready(); db.save.tickets.t1 = 5;
+  assert.equal((await db.claimNotice('opening')).granted, true);
+  assert.equal(db.save.coins, 500); assert.equal(db.save.tickets.t1, 5); assert.equal(db.save.tickets.t10, 100);
+  assert.equal((await db.claimNotice('opening')).alreadyClaimed, true);
+  assert.equal(db.save.tickets.t10, 100); assert.equal(db.syncState, 'ok');
+  assert.equal(calls.filter(([url]) => url.endsWith('/claim')).length, 2);
+  assert.ok(calls.findIndex(([url]) => url === '/api/save') < calls.findIndex(([url]) => url.endsWith('/claim')));
 });
 test('service worker excludes private API responses and original domain is absent from deployment identity', () => {
   assert.ok(read('sw.js').includes("url.pathname.startsWith('/api/')"));

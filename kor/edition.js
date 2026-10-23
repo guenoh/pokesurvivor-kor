@@ -23,7 +23,7 @@
       item.disabled = true; item.title = '독립 서버 기능 준비 중';
     }
     const pass = document.getElementById('f-pass');
-    if (pass) { pass.minLength = 12; pass.maxLength = 128; }
+    if (pass) { pass.minLength = 4; pass.maxLength = 128; }
     const input = document.getElementById('f-user');
     if (input) input.pattern = '[\\p{L}\\p{N}_]{3,16}';
     const button = document.createElement('button');

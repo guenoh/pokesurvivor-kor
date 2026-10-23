@@ -79,6 +79,22 @@
       } catch (e) { return { ok: false, error: e.message }; }
     },
     commit, flush,
+    getNotices() { return api('/notices'); },
+    async claimNotice(id) {
+      if (!account || local.guest) throw new Error('계정으로 로그인한 뒤 선물을 받아 주세요.');
+      if (state === 'conflict') throw new Error('저장 충돌을 먼저 해결해 주세요.');
+      commit(); await flush();
+      const userId = account.id, before = JSON.stringify(local.save);
+      const result = await api('/notices/' + encodeURIComponent(id) + '/claim', 'POST', { revision });
+      if (account?.id !== userId) throw new Error('로그인 계정이 바뀌었습니다. 다시 확인해 주세요.');
+      if (JSON.stringify(local.save) !== before) {
+        pending = true; backup(); sync('conflict');
+        throw new Error('선물은 서버에 지급되었습니다. 브라우저 백업을 내보낸 뒤 서버 저장을 다시 불러와 주세요.');
+      }
+      open(result);
+      if (state !== 'conflict') backup();
+      return { granted: result.granted, alreadyClaimed: result.alreadyClaimed };
+    },
     async saveNow() { try { await flush(); return local.guest ? { ok: false, why: 'guest' } : { ok: true }; } catch { return { ok: false, why: 'fail' }; } },
     onSync(fn) { listeners.add(fn); },
     setName(name) { local.setName(name); commit(); },
@@ -96,7 +112,8 @@
     // Cloud here controls save UI; online controls upstream Firebase social modules.
     mode: { get: () => 'cloud' }, online: { get: () => false }, fb: { get: () => null },
     nameAccount: { get: () => true }, hasGoogle: { get: () => false },
-    syncState: { get: () => state }
+    syncState: { get: () => state },
+    accountKey: { get: () => account?.id || 'guest' }
   });
   G.DB = facade;
   addEventListener('online', () => { if (pending && state !== 'conflict') flush().catch(() => {}); });

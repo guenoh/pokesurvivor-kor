@@ -6,7 +6,7 @@
     if (!normalized) return { field: 'f-user', message: '이름을 입력해 주세요.' };
     if (!/^[\p{L}\p{N}_]{3,16}$/u.test(normalized)) return { field: 'f-user', message: '이름은 문자·숫자·밑줄(_)로 3~16자 입력해 주세요. 공백과 다른 특수문자는 사용할 수 없습니다.' };
     if (!password) return { field: 'f-pass', message: '비밀번호를 입력해 주세요.' };
-    if (password.length < 12 || password.length > 128) return { field: 'f-pass', message: '비밀번호는 12~128자로 입력해 주세요.' };
+    if (password.length < 4 || password.length > 128) return { field: 'f-pass', message: '비밀번호는 4~128자로 입력해 주세요.' };
     if (register && !confirmation) return { field: 'f-pass-confirm', message: '비밀번호를 한 번 더 입력해 주세요.' };
     if (register && password !== confirmation) return { field: 'f-pass-confirm', message: '비밀번호가 일치하지 않습니다. 다시 확인해 주세요.' };
     return null;
@@ -28,7 +28,7 @@
       return element;
     };
     const nameHelp = make('p', 'f-user-help', 'kor-auth-help', '한글·영문 등 문자, 숫자, 밑줄(_)로 3~16자 입력해 주세요. 공백과 다른 특수문자는 사용할 수 없으며, 영문 대소문자는 구분하지 않습니다.');
-    const passwordHelp = make('p', 'f-pass-help', 'kor-auth-help', '12~128자로 입력해 주세요. 한글·영문·숫자·특수문자 등을 사용할 수 있으며, 문자 종류를 반드시 섞을 필요는 없습니다.');
+    const passwordHelp = make('p', 'f-pass-help', 'kor-auth-help', '4~128자로 입력해 주세요. 한글·영문·숫자·특수문자 등을 사용할 수 있으며, 문자 종류를 반드시 섞을 필요는 없습니다.');
     username.after(nameHelp); password.after(passwordHelp);
     username.autocomplete = 'username'; username.autocapitalize = 'none';
     username.setAttribute('aria-describedby', nameHelp.id);
