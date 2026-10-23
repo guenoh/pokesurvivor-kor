@@ -65,6 +65,42 @@ dialog.kor-notices::backdrop { background: #081022d9; }
 .kor-notices-message:empty { display: none; }
 .kor-support .btn { display: inline-block; text-decoration: none; }
 
+/* Description and actions must not compete for the same narrow grid row. */
+html[lang="ko"] #scr-upgrades .box { display: flex; flex-direction: column; overflow: hidden; }
+html[lang="ko"] #scr-upgrades .box > .row,
+html[lang="ko"] #scr-upgrades .upg-head { flex-shrink: 0; }
+html[lang="ko"] #upg-list {
+  min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  align-content: start; align-items: stretch; padding: 4px;
+}
+html[lang="ko"] #upg-list .upg-item {
+  min-width: 0; grid-template-columns: 32px minmax(0, 1fr);
+  gap: 8px 10px; align-items: start;
+}
+html[lang="ko"] .upg-copy { min-width: 0; }
+html[lang="ko"] .upg-copy > b { display: block; line-height: 1.5; }
+html[lang="ko"] .upg-description { display: block; line-height: 1.65; margin-top: 4px; }
+html[lang="ko"] #upg-list .upg-btns { grid-column: 1 / -1; min-width: 0; align-self: end; }
+html[lang="ko"] #upg-list .upg-btns .btn { max-width: 100%; white-space: normal; }
+html[lang="ko"] #upg-list .upg-btns [data-start],
+html[lang="ko"] #upg-list .upg-btns [data-start2],
+html[lang="ko"] #upg-list .upg-btns [data-ban] { flex: 1 1 120px; min-width: 0; }
+html[lang="ko"] #upg-list .upg-btns [data-buy] { flex: 0 0 auto; }
+html[lang="ko"] #scr-upgrades .upg-head > .grow { min-width: 0; }
+html[lang="ko"] #scr-upgrades #upg-mon { min-width: 0 !important; width: min(280px, 100%) !important; }
+@media (max-height: 520px) {
+  html[lang="ko"] #scr-upgrades .box { height: 100%; padding: 8px 12px; }
+  html[lang="ko"] #scr-upgrades .upg-head { gap: 10px; margin: 2px 0 8px; }
+  html[lang="ko"] #scr-upgrades .upg-head .stage { width: 64px; height: 52px; flex-basis: 64px; }
+  html[lang="ko"] #scr-upgrades .upg-head .row { margin-top: 4px !important; }
+  html[lang="ko"] #upg-list .upg-item { padding: 10px; }
+}
+@media (max-width: 600px) {
+  html[lang="ko"] #upg-list { grid-template-columns: minmax(0, 1fr); }
+  html[lang="ko"] #scr-upgrades .upg-head .row { flex-wrap: wrap; }
+}
+
 /* Scale DOM menus, never the world canvas or touch controls. Compensated layout
    dimensions keep every screen and its scroll area inside Safari's visible area. */
 :root { --kor-vw: 100vw; --kor-vh: 100dvh; --kor-vleft: 0px; --kor-vtop: 0px; --kor-ui-scale: 1; }
@@ -87,9 +123,13 @@ html[lang="ko"] #scr-login input { font-size: max(16px, 1em); }
 html[lang="ko"] .topbar {
   top: calc(var(--kor-vtop) + max(6px, env(safe-area-inset-top)));
   right: max(8px, env(safe-area-inset-right));
-  max-width: calc(var(--kor-vw) - 16px);
+  max-width: calc((var(--kor-vw) - 16px) / var(--kor-ui-scale));
+  overflow-x: auto; scrollbar-width: none;
   transform: scale(var(--kor-ui-scale)); transform-origin: top right;
 }
+html[lang="ko"] .topbar > * { flex-shrink: 0; white-space: nowrap; }
+html[lang="ko"] .topbar::-webkit-scrollbar { display: none; }
+body:has(#scr-upgrades:not(.hidden)) .credits-line { display: none; }
 html[lang="ko"] .ach-pop {
   max-width: calc(var(--kor-vw) - 24px);
   transform: translateX(-50%) scale(var(--kor-ui-scale)); transform-origin: center bottom;

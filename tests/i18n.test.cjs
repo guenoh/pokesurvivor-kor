@@ -149,3 +149,16 @@ test('external boot follows the shared locale without inline executable scripts'
     if (lang !== 'es') assert.notEqual(paragraphs[1].textContent, 'Cargando…');
   }
 });
+
+test('Korean partner selection handles the empty suffix and shiny variant as complete phrases', () => {
+  const { G } = boot('ko', 'ko-KR');
+  assert.equal(G.T('Elegir de compañero'), '파트너로 선택');
+  assert.equal(G.T('Elegir de compañero (shiny)'), '파트너로 선택 (색이 다름)');
+  assert.equal(G.T('Es tu compañero'), '현재 파트너입니다');
+  assert.equal(G.T('Veto'), '기술 제외');
+  assert.equal(G.T('Mewtwo (compañero) · 92 niveles'), '뮤츠 (파트너) · 강화 92단계');
+  assert.equal(G.T('Moltres · 1 niveles'), '파이어 · 강화 1단계');
+  assert.equal(G.T('Normal', 'appearance'), '일반 모습');
+  assert.equal(G.T('Shiny', 'appearance'), '색이 다른 모습');
+  assert.equal(G.T('Normal'), '노말');
+});
