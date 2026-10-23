@@ -15,8 +15,8 @@ function bootAdapter(fetch) {
 }
 const json = data => ({ ok: true, json: async () => data });
 test('Korean dictionary preserves placeholders and covers every in-game species', () => {
-  const { capture } = require('../tools/build_langs');
-  const dictionaries = capture(['js/data/lang-ko.js', 'js/data/lang-ko-names.js']);
+  const { capture, SOURCES } = require('../tools/build_langs');
+  const dictionaries = capture(SOURCES).filter(([, l]) => l === 'ko');
   const names = Object.assign({}, ...dictionaries.filter(([, l, c]) => l === 'ko' && !c).map(([d]) => d));
   for (const [d] of dictionaries) for (const [key, value] of Object.entries(d)) {
     assert.equal((key.match(/\{(?:x|name)\}/g) || []).length, (value.match(/\{(?:x|name)\}/g) || []).length, key);
@@ -54,4 +54,45 @@ test('service worker excludes private API responses and original domain is absen
   assert.ok(read('sw.js').includes("url.pathname.startsWith('/api/')"));
   assert.ok(read('js/core/firebase-config.js').includes('G.FIREBASE_CONFIG = null'));
   assert.equal(fs.existsSync(require('node:path').join(root, 'CNAME')), false);
+});
+test('Korean covers all English UI keys, release notes, natures and abilities', () => {
+  const { capture, missing, SOURCES } = require('../tools/build_langs');
+  assert.deepEqual(missing().res.ko, []);
+  const dictionaries = capture(SOURCES).filter(([, l]) => l === 'ko');
+  const plain = Object.assign({}, ...dictionaries.filter(([, , c]) => !c).map(([d]) => d));
+  const terms = Object.assign({}, ...dictionaries.filter(([, , c]) => c === 'pokemon-term').map(([d]) => d));
+  const sandbox = { G: { I18n: { lang: 'ko' }, T: text => terms[text] } };
+  vm.createContext(sandbox);
+  for (const file of ['js/data/changelog.js', 'js/data/natures.js', 'js/data/abilities.js', 'js/data/starters.js', 'js/systems/mons.js']) vm.runInContext(read(file), sandbox);
+  for (const row of sandbox.G.CHANGELOG) for (const pair of [row.title, ...(row.new || []), ...(row.chg || []), ...(row.fix || [])]) {
+    if (pair) assert.ok(plain[pair[0]], pair[0]);
+  }
+  for (const names of Object.values(sandbox.G.ABIL)) assert.match(sandbox.G.Mons.name(names), /[가-힣]/, names[1]);
+  for (const nature of sandbox.G.NATURES) assert.match(sandbox.G.Mons.name(nature.n), /[가-힣]/, nature.id);
+  assert.equal(sandbox.G.Mons.name(sandbox.G.ABIL.overgrow), '심록');
+  assert.equal(sandbox.G.Mons.name(sandbox.G.NATURES.find(n => n.id === 'adamant').n), '고집');
+  for (const trait of Object.keys(sandbox.G.TRAIT_TEXT)) {
+    const title = trait.charAt(0).toUpperCase() + trait.slice(1);
+    assert.match(plain[title], /[가-힣]/, title);
+  }
+  assert.ok(read('kor/style.css').includes('Galmuri11.woff2'));
+  assert.ok(read('js/core/i18n.js').includes('"Galmuri11"'));
+  assert.ok(fs.existsSync(require('node:path').join(root, 'assets/fonts/galmuri/LICENSE.txt')));
+});
+test('Korean dynamic names receive the right particles in text and formatted messages', () => {
+  class Canvas { fillText() {} strokeText() {} measureText() { return { width: 0 }; } }
+  const sandbox = { G: {}, PS_LOCALES: { choices: [['ko', '한국어', 'ko-KR']], lang: 'ko', locale: 'ko-KR' },
+    CanvasRenderingContext2D: Canvas, confirm() {}, alert() {} };
+  sandbox.window = sandbox; vm.createContext(sandbox);
+  vm.runInContext(read('js/core/i18n.js'), sandbox);
+  const I = sandbox.G.I18n;
+  I.add({ '등장 {x}': '야생의 {x}(이)가 나타났다!', '동료 {x}': '{x}(은)는 동료가 되었다!',
+    '이동 {x}': '{x}(으)로 이동', 'Pikachu': '피카츄', 'Magikarp': '잉어킹' }, 'ko');
+  assert.equal(I.t('등장 Pikachu'), '야생의 피카츄가 나타났다!');
+  assert.equal(I.t('등장 Magikarp'), '야생의 잉어킹이 나타났다!');
+  assert.equal(I.f('동료 {x}', '잠만보'), '잠만보는 동료가 되었다!');
+  assert.equal(I.f('동료 {x}', '폴리곤'), '폴리곤은 동료가 되었다!');
+  assert.equal(I.f('동료 {x}', '폴리곤2'), '폴리곤2는 동료가 되었다!');
+  assert.equal(I.f('이동 {x}', '마을'), '마을로 이동');
+  assert.equal(I.f('이동 {x}', '집'), '집으로 이동');
 });

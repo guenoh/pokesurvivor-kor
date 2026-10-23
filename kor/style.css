@@ -1,4 +1,24 @@
-html[lang="ko"] body, html[lang="ko"] button, html[lang="ko"] input, html[lang="ko"] select {
-  font-family: "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+@font-face {
+  font-family: "Galmuri11";
+  src: url("../assets/fonts/galmuri/Galmuri11.woff2") format("woff2");
+  font-weight: 400 550;
+  font-display: block;
 }
+@font-face {
+  font-family: "Galmuri11";
+  src: url("../assets/fonts/galmuri/Galmuri11-Bold.woff2") format("woff2");
+  font-weight: 551 900;
+  font-display: block;
+}
+html[lang="ko"] { --font: "Pixelify", "Galmuri11", sans-serif; }
+html[lang="ko"] body, html[lang="ko"] button, html[lang="ko"] input, html[lang="ko"] select {
+  font-family: var(--font);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+html[lang="ko"] .box { line-height: 1.5; }
+html[lang="ko"] .menu-item small { line-height: 1.45; }
+html[lang="ko"] .toast { max-width: min(90vw, 680px); text-align: center; }
+html[lang="ko"] #dex-detail .stat { grid-template-columns: 90px minmax(0, 1fr) 5ch; }
+html[lang="ko"] .stat > span:last-child { white-space: nowrap; text-align: right; }
 #btn-google, #btn-support { display: none !important; }

@@ -93,8 +93,8 @@ G.I18n.add({
   "Más usados": "자주 사용",
   "Ordenar": "정렬",
   "Normal": "노말",
-  "Shiny": "이로치",
-  "shinies": "이로치",
+  "Shiny": "색이 다른 포켓몬",
+  "shinies": "색이 다른 포켓몬",
   "Legendarios": "전설의 포켓몬",
   "Rareza": "희귀도",
   "Generación": "세대",
@@ -131,7 +131,7 @@ G.I18n.add({
   "Velocidad": "스피드",
   "Ataque especial": "특수공격",
   "Defensa especial": "특수방어",
-  "Daño": "피해량",
+  "Daño": "데미지",
   "Alcance": "사거리",
   "Duración": "지속 시간",
   "Probabilidad": "확률",
@@ -158,7 +158,7 @@ G.I18n.add({
   "¡Subes de nivel!": "레벨 업!",
   "¡Nivel {x}!": "레벨 {x}!",
   "¡Has conseguido a {x}!": "{x} 획득!",
-  "¡Has conseguido a {x} shiny!": "이로치 {x} 획득!",
+  "¡Has conseguido a {x} shiny!": "색이 다른 {x} 획득!",
   "¡Nuevo!": "신규!",
   "Nuevo": "신규",
   "Tirar": "뽑기",
@@ -218,10 +218,10 @@ G.I18n.add({
   "Máximo": "최대",
   "Bloqueado": "잠김",
   "Desbloqueado": "해제됨",
-  "Daño físico": "물리 피해",
-  "Daño especial": "특수 피해",
+  "Daño físico": "물리 데미지",
+  "Daño especial": "특수 데미지",
   "Crítico": "급소",
-  "Probabilidad de crítico": "급소 확률",
+  "Probabilidad de crítico": "급소율",
   "Imán": "자석",
   "Experiencia": "경험치",
   "Curación": "회복",
@@ -239,4 +239,4 @@ G.I18n.add({
   "Se ha cerrado la sesión.": "로그아웃했습니다."
 }, "ko");
 
-G.I18n.add({"Pulsa para empezar":"눌러서 시작","Sobrevive a las hordas con tu compañero Pokémon":"포켓몬 파트너와 함께 살아남으세요","¿Olvidaste tu contraseña?":"비밀번호를 잊으셨나요?","Aviso legal y privacidad":"권리 및 개인정보 안내","Tu colección":"내 컬렉션","Entra en la mazmorra":"던전에 입장하세요","Haz más fuerte cada run":"플레이할 때마다 강해지세요","Tienda Kecleon":"켈리몬 상점","Mentas, Cápsulas y MT":"민트, 특성캡슐, 기술머신","Vacía":"비어 있음","9 regiones · Pokémon y shinies":"9개 지방 · 포켓몬과 이로치","Misiones, logros y perfil":"미션, 업적, 프로필","Juega en grupo, hasta 4":"최대 4인 협동 (준비 중)","Quién aguanta más":"생존 기록 (준비 중)","Sonido, gráficos, controles y cuenta":"소리, 그래픽, 조작, 계정","Tu personalidad es…":"당신의 성격은…","Tu compañero:":"당신의 파트너:","¡Vamos juntos!":"함께 가자!","Elegir otro":"다른 파트너 선택","Elige a tu compañero":"파트너를 선택하세요"}, "ko");
+G.I18n.add({"Pulsa para empezar":"눌러서 시작","Sobrevive a las hordas con tu compañero Pokémon":"포켓몬 파트너와 함께 살아남으세요","¿Olvidaste tu contraseña?":"비밀번호를 잊으셨나요?","Aviso legal y privacidad":"권리 및 개인정보 안내","Tu colección":"내 컬렉션","Entra en la mazmorra":"던전에 입장하세요","Haz más fuerte cada run":"플레이할 때마다 강해지세요","Tienda Kecleon":"켈리몬 상점","Mentas, Cápsulas y MT":"민트, 특성캡슐, 기술머신","Vacía":"비어 있음","9 regiones · Pokémon y shinies":"9개 지방 · 포켓몬과 색이 다른 포켓몬","Misiones, logros y perfil":"미션, 업적, 프로필","Juega en grupo, hasta 4":"최대 4인 협동 (준비 중)","Quién aguanta más":"생존 기록 (준비 중)","Sonido, gráficos, controles y cuenta":"소리, 그래픽, 조작, 계정","Tu personalidad es…":"당신의 성격은…","Tu compañero:":"당신의 파트너:","¡Vamos juntos!":"함께 가자!","Elegir otro":"다른 파트너 선택","Elige a tu compañero":"파트너를 선택하세요"}, "ko");

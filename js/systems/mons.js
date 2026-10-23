@@ -25,6 +25,7 @@ G.Mons = (() => {
   const LANG_I = { es: 0, en: 1, fr: 2, it: 3, 'pt-BR': 1, 'zh-Hans': 4, 'zh-Hant': 5 };
   function name(n) {
     if (!Array.isArray(n)) return String(n || '');
+    if (G.I18n && G.I18n.lang === 'ko') return G.T(n[1] || n[0], 'pokemon-term');
     return n[LANG_I[G.I18n ? G.I18n.lang : 'es'] || 0] || n[1] || n[0];
   }
 

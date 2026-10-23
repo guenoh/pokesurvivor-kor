@@ -10,7 +10,7 @@ Required Notice: Copyright 2026 JPTER78 (https://github.com/JPTER78/pokesurvivor
 ## 현재 구현
 
 - 원본 Git 이력을 보존한 별도 저장소. 기존 `GuenohPark/pokesurvivor`는 변경하지 않습니다.
-- 한국어 기본 언어, 한글 폰트 대체, 게임 내 포켓몬 966종 한국어 명칭, 주요 UI 및 기술·도구 번역.
+- 한국어 기본 언어, 한글 픽셀 폰트 갈무리, 게임 내 포켓몬 966종·특성·성격 한국어 명칭, 전체 영어 기준 UI 문구와 원작 업데이트 기록 번역.
 - `kor/selfhost-db.js`가 독립 Node.js/PostgreSQL 백엔드의 로그인·회원가입·저장·삭제 API에 연결합니다.
 - 비밀번호 12~128자, 이름 3~16자(한글 포함), 7일 HttpOnly 세션 쿠키.
 - 저장 시 수정 번호를 검사하며 다른 기기의 변경을 덮어쓰지 않습니다. 저장 충돌 시 설정에서 브라우저 백업을 내보낸 뒤 서버 저장을 다시 불러옵니다.
@@ -20,7 +20,7 @@ Required Notice: Copyright 2026 JPTER78 (https://github.com/JPTER78/pokesurvivor
 
 ## 미완료
 
-- 전체 한국어화는 완료되지 않았습니다. `kor/translation-coverage.json`에 영어 사전 대비 미번역 목록이 있습니다. 이 집계는 `lang-en.js` 일반 문구만 대상으로 하며, 게임 데이터·문맥별 번역 전체를 뜻하지 않습니다.
+- 한국어 회귀 검사는 영어 기준 UI 1,563개, 포켓몬 966종, 성격·특성 이름, 원작 업데이트 기록을 대상으로 합니다. 새 upstream에서 추가되는 문구는 별도 번역이 필요하며, 미번역이 들어오면 테스트가 실패합니다.
 - 친구·협동·랭킹은 Firebase API에 의존하므로 비활성화했습니다. 독립 서버용 구현이 필요합니다.
 - Google 로그인, 비밀번호 복구, 원본 계정·저장 데이터 자동 이전은 지원하지 않습니다.
 - 현재 저장 데이터는 클라이언트가 제출합니다. 서버가 전투나 재화를 검증하는 구조가 아니므로 경쟁 랭킹 구현 전 별도 검증이 필요합니다.
@@ -47,6 +47,6 @@ node kor/package.cjs
 
 현재 원본 코드와 음악은 **PolyForm Noncommercial 1.0.0**입니다. `LICENSE`, `LICENSE-NONCOMMERCIAL.md`, Required Notice를 보존해야 하며 게임 판매·유료 아이템·유료 플레이·광고 수익화를 허용한 것으로 해석하면 안 됩니다. `b297089`까지의 MIT 조건은 이후 커밋에 적용되지 않습니다.
 
-스프라이트는 **CC BY-NC 4.0**으로 작가 표시와 비상업 조건을 지켜야 합니다. `CREDITS.md`를 보존합니다. Pixelify Sans는 **OFL 1.1**이며 폰트 라이선스를 함께 제공합니다. 한국어 명칭의 출처와 다운로드 파일 해시는 `kor/NAME-SOURCES.json`에 기록했습니다.
+스프라이트는 **CC BY-NC 4.0**으로 작가 표시와 비상업 조건을 지켜야 합니다. `CREDITS.md`를 보존합니다. Pixelify Sans와 한글 픽셀 폰트 Galmuri11은 **OFL 1.1**이며 각 폰트 라이선스를 함께 제공합니다. 한글화 기준과 폰트 출처는 `kor/LOCALIZATION.md`, `kor/FONT-SOURCES.json`에 기록했습니다. 한국어 명칭의 출처와 다운로드 파일 해시는 `kor/NAME-SOURCES.json`에 기록했습니다.
 
 Pokémon 상표·캐릭터의 권리는 Nintendo, Creatures Inc., GAME FREAK, The Pokémon Company 등 각 권리자에게 있습니다. 코드·스프라이트 라이선스는 상표·캐릭터 사용에 대한 별도 승인을 뜻하지 않습니다. 수익화나 별도 권리 허락이 필요한 사용은 권리자 확인이 필요합니다.

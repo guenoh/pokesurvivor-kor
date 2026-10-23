@@ -1,12 +1,23 @@
 /* Fork-specific UX. Kept out of upstream game modules. */
 (() => {
   G.LoginUI.updateNotices = () => false; // Original Firebase quota notices do not apply.
+  const boot = G.Flow.boot;
+  G.Flow.boot = function () {
+    if (G.I18n.lang !== 'ko' || !document.fonts) return boot.call(this);
+    Promise.all([document.fonts.load('16px Galmuri11'), document.fonts.load('bold 16px Galmuri11')])
+      .catch(() => {}).then(() => boot.call(this));
+  };
   document.addEventListener('DOMContentLoaded', () => {
     document.title = 'PokéSurvivor 한국어 독립판';
+    const history = document.createElement('p');
+    history.setAttribute('translate', 'no');
+    history.textContent = '원작 업데이트 기록입니다. 한국어 독립판의 친구·협동·랭킹 등은 아직 준비 중입니다.';
+    history.className = 'note';
+    document.querySelector('#scr-news .box')?.insertBefore(history, document.getElementById('news-body'));
     const note = document.createElement('p');
     note.setAttribute('translate', 'no');
     note.textContent = '비공식·비상업 한국어 독립판 · 계정과 저장 데이터는 원본 서비스와 별개입니다. 친구·협동·랭킹은 준비 중입니다.';
-    note.style.cssText = 'font:12px/1.6 system-ui,sans-serif;color:#c5cfdf;margin-top:16px';
+    note.style.cssText = 'font:12px/1.6 Pixelify,Galmuri11,sans-serif;color:#c5cfdf;margin-top:16px';
     document.querySelector('#scr-login .box')?.append(note);
     for (const item of document.querySelectorAll('[data-go="friends"], [data-go="rank"]')) {
       item.disabled = true; item.title = '독립 서버 기능 준비 중';

@@ -100,6 +100,18 @@ G.I18n = (() => {
   }
 
   /** Traduce un texto (sin espacios de los lados) al idioma actual. */
+  // Korean particles depend on the final syllable after a dynamic name is inserted.
+  function koParticles(s) {
+    if (lang !== 'ko') return s;
+    return s.replace(/([가-힣0-9A-Za-z])\((은|이|을|과|으)\)(는|가|를|와|로)/g, (all, last, consonant, vowel) => {
+      const code = last.charCodeAt(0);
+      const digit = [21, 8, 0, 16, 0, 0, 1, 8, 8, 0];
+      const final = code >= 0xAC00 && code <= 0xD7A3 ? (code - 0xAC00) % 28
+        : /[0-9]/.test(last) ? digit[+last] : /[lLrR]/.test(last) ? 8 : /[mMnN]/.test(last) ? 1 : 0;
+      return last + (consonant === '으' && vowel === '로' ? (final && final !== 8 ? '으로' : '로') : final ? consonant : vowel);
+    });
+  }
+
   function t(s, context) {
     const contextual = contexts.get(context);
     if (contextual && Object.prototype.hasOwnProperty.call(contextual, s)) return contextual[s];
@@ -107,7 +119,7 @@ G.I18n = (() => {
     if (!/\p{L}/u.test(s)) return s;
     const c = cache.get(s);
     if (c !== undefined) return c;
-    let r = core(s);
+    let r = koParticles(core(s));
     if (cache.size > 4000) cache.clear();
     cache.set(s, r);
     return r;
@@ -147,7 +159,7 @@ G.I18n = (() => {
   }
 
   /** Texto con huecos para el código: T('Nivel {x}', 5). */
-  function f(es, ...vals) { let i = 0; return t(es).replace(/\{(?:x|name)\}/g, () => vals[i++]); }
+  function f(es, ...vals) { let i = 0; return koParticles(t(es).replace(/\{(?:x|name)\}/g, () => vals[i++])); }
 
   // ---------------- DOM ----------------
   const ATTRS = ['placeholder', 'title', 'alt', 'aria-label'];
@@ -206,7 +218,7 @@ G.I18n = (() => {
     // Chino: Pixelify no tiene sus letras; se añaden las del sistema al poner la fuente
     // (una vez, no en cada texto que se dibuja, que frenaría el juego).
     if ((lang.startsWith('zh-') || lang === 'ko')) {
-      const cjk = lang === 'ko' ? '"Apple SD Gothic Neo","Malgun Gothic",system-ui' : lang === 'zh-Hant' ? '"PingFang TC","Microsoft JhengHei","Noto Sans CJK TC"' : '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC"';
+      const cjk = lang === 'ko' ? '"Galmuri11","Apple SD Gothic Neo","Malgun Gothic",system-ui' : lang === 'zh-Hant' ? '"PingFang TC","Microsoft JhengHei","Noto Sans CJK TC"' : '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC"';
       const fd = Object.getOwnPropertyDescriptor(P, 'font');
       if (fd && fd.set) Object.defineProperty(P, 'font', { configurable: true, enumerable: fd.enumerable, get: fd.get,
         set(v) { fd.set.call(this, typeof v === 'string' && v.includes('Pixelify') && !v.includes('PingFang') && !v.includes('Malgun Gothic') ? v.replace('Pixelify', 'Pixelify,' + cjk) : v); } });

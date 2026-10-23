@@ -53,7 +53,13 @@ if (!EXPOSE) {
 }
 const min = fs.readFileSync(outJs);
 // La huella cuenta también el CSS: un cambio sólo de estilos es versión nueva (version.json).
-const hash = crypto.createHash('sha1').update(min).update(fs.readFileSync(path.join(ROOT, 'css', 'style.css'))).update(fs.readFileSync(path.join(ROOT, 'kor', 'style.css'))).update(fs.readFileSync(path.join(ROOT, 'js', 'data', 'lang-ko.js'))).update(fs.readFileSync(path.join(ROOT, 'js', 'data', 'lang-ko-names.js'))).digest('hex').slice(0, 10);
+const versionHash = crypto.createHash('sha1').update(min)
+  .update(fs.readFileSync(path.join(ROOT, 'css', 'style.css')))
+  .update(fs.readFileSync(path.join(ROOT, 'kor', 'style.css')));
+for (const f of fs.readdirSync(path.join(ROOT, 'js', 'data')).filter(f => /^lang-ko.*\.js$/.test(f)).sort()) {
+  versionHash.update(fs.readFileSync(path.join(ROOT, 'js', 'data', f)));
+}
+const hash = versionHash.digest('hex').slice(0, 10);
 
 // Diccionarios de francés, italiano, portugués y chino (js/lang/), uno por idioma: los pide
 // locales.js con su misma huella ?v=, para que al cambiar no se queden en caché.

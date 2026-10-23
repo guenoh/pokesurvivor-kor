@@ -9,7 +9,7 @@
  */
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..');
-const SOURCES = ['lang-ko.js', 'lang-ko-names.js', 'lang-fr.js', 'lang-it.js', 'lang-pt.js', 'lang-zh-cn.js', 'lang-zh-cn-names.js',
+const SOURCES = ['lang-ko.js', 'lang-ko-names.js', 'lang-ko-complete.js', 'lang-ko-history.js', 'lang-ko-terms.js', 'lang-fr.js', 'lang-it.js', 'lang-pt.js', 'lang-zh-cn.js', 'lang-zh-cn-names.js',
                  'lang-zh-hant.js', 'lang-zh-hant-names.js', 'lang-updates.js'].map(f => 'js/data/' + f);
 const LANGS = ['ko', 'fr', 'it', 'pt-BR', 'zh-Hans', 'zh-Hant'];
 
