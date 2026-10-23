@@ -109,6 +109,8 @@ html[lang="ko"] .box.settings { max-height: 100%; }
   position: relative; flex: 0 0 auto;
   width: min(440px, calc(var(--kor-vw) - 40px), calc((var(--kor-vh) - 130px) * 176 / 170));
 }
+.kor-pulling #pull-fx { gap: 0; justify-content: center; }
+.kor-pulling #pull-fx::before, .kor-pulling #pull-fx::after { display: none; }
 .kor-slot-frame[hidden] { display: none; }
 .kor-slot-stage { position: relative; }
 .kor-slot-frame #slot { display: block; width: 100%; height: auto; animation: none; }
@@ -126,7 +128,7 @@ html[lang="ko"] .box.settings { max-height: 100%; }
 }
 @media (max-height: 360px) { .kor-slot-led { font-size: 12px; } }
 @media (max-height: 520px) {
-  .kor-pulling #pull-fx { padding-bottom: max(60px, env(safe-area-inset-bottom)); gap: 6px; }
+  .kor-pulling #pull-fx { padding-bottom: max(60px, env(safe-area-inset-bottom)); }
   html[lang="ko"] #scr-gacha .banner .feat { height: 100px; margin-top: 0; }
   html[lang="ko"] #scr-gacha .banner .feat canvas { width: 90px; height: auto; }
   html[lang="ko"] #scr-gacha .banner { padding: 10px 14px; }
