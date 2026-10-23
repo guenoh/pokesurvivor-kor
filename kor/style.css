@@ -197,7 +197,7 @@ html[lang="ko"] .kor-choice-box .card .nm { line-height: 1.45; }
 html[lang="ko"] .kor-choice-box .card .ds { line-height: 1.6; margin-top: 4px; }
 html[lang="ko"] .kor-choice-box #lvl-reroll,
 html[lang="ko"] .kor-choice-box #bond-back { min-height: calc(40px / var(--kor-ui-scale)); align-self: center; }
-html[lang="ko"] .kor-choice-box > .row:has(#bond-back.hidden) { display: none; }
+html[lang="ko"] .kor-choice-box > .row:not(.kor-choice-actions):has(#bond-back.hidden) { display: none; }
 html[lang="ko"] .kor-choice-box > .row:has(#bond-back:not(.hidden)) { margin-top: 8px; }
 /* Short landscape screens use the same columns across reward dialogs. */
 @media (min-width: 640px) and (max-height: 600px) and (orientation: landscape) {
@@ -222,22 +222,24 @@ html[lang="ko"] .kor-choice-box > .row:has(#bond-back:not(.hidden)) { margin-top
   html[lang="ko"] #scr-bond .kor-choice-box .bond-hint { display: none; }
 }
 
-/* Two compact role badges. Their buttons explain the rating without choosing
-   the surrounding reward. Color always accompanies a visible letter. */
+/* Read-only role grades. Shared explanations live beside the choice actions. */
 .kor-move-ratings { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; text-shadow: none; }
 .kor-rating-badge {
   display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
-  min-height: calc(40px / var(--kor-ui-scale)); min-width: 70px; padding: 4px 9px;
+  min-height: 32px; min-width: 70px; padding: 3px 7px;
   background: #101e43; border: 1px solid #b9cbf0; border-radius: 7px;
-  color: #f4f8ff; font-size: 15px; cursor: pointer; line-height: 1.2;
+  color: #f4f8ff; font-size: 15px; line-height: 1.2;
 }
-.kor-rating-badge strong { font-size: 19px; }
-.kor-rating-badge[data-grade="S"] strong { color: #ffe17d; }
-.kor-rating-badge[data-grade="A"] strong { color: #a8f1bc; }
-.kor-rating-badge[data-grade="B"] strong { color: #a8dcff; }
-.kor-rating-badge[data-grade="C"] strong,
-.kor-rating-badge[data-grade="D"] strong { color: #e1d8fa; }
-.kor-rating-badge:focus-visible { outline: 3px solid #ffe17d; outline-offset: 2px; }
+/* Standard bold letterforms keep B's two bowls distinct from C's opening. */
+.kor-rating-badge strong {
+  display: inline-grid; place-items: center; min-width: 25px; height: 27px;
+  padding: 0 3px; border-radius: 4px; font: 900 23px/1 Arial, sans-serif; text-shadow: none;
+}
+.kor-rating-badge[data-grade="S"] strong { color: #4b3400; background: #ffe17d; }
+.kor-rating-badge[data-grade="A"] strong { color: #133b24; background: #a8f1bc; }
+.kor-rating-badge[data-grade="B"] strong { color: #102f51; background: #a8dcff; }
+.kor-rating-badge[data-grade="C"] strong { color: #532900; background: #ffbf79; }
+.kor-rating-badge[data-grade="D"] strong { color: #273044; background: #d3d8e2; }
 .kor-rating-icons { display: inline-flex; align-items: center; gap: 1px; pointer-events: none; }
 .kor-rating-icons img { display: block; }
 html[lang="ko"] .kor-choice-box .card { flex-wrap: wrap; }
@@ -299,25 +301,18 @@ html[lang="ko"] #lobby-invite { max-height: 160px; }
   html[lang="ko"] .rk-row { padding: 3px 8px; }
 }
 
-/* Help is an explicit button, distinct from selecting the surrounding move. */
-.kor-rating-badge {
-  border-width: 2px; background: linear-gradient(#243b68, #14264d);
-  box-shadow: inset 0 1px 0 #ffffff24, 0 3px 0 #080f24;
-  transition: background .12s, border-color .12s, box-shadow .12s;
-}
-.kor-rating-badge:is(:hover, :focus) {
-  background: #345991; border-color: #ffe17d; color: #fff;
-  box-shadow: 0 0 0 2px #09172e, 0 3px 0 #080f24;
-}
-.kor-rating-badge:focus-visible { outline: 3px solid #ffe17d; outline-offset: 3px; }
-.kor-rating-badge:active { background: #456ba5; box-shadow: inset 0 2px 3px #0008; }
-.kor-rating-info {
-  width: 17px; height: 17px; border: 1px solid currentColor; border-radius: 50%;
-  display: inline-grid; place-items: center; font: bold 12px/1 sans-serif; color: #d8e8ff; flex: 0 0 17px;
-}
-.kor-rating-action { color: #e5edff; font-size: 12px; white-space: nowrap; }
-.kor-rating-support { gap: 12px; flex-wrap: wrap; max-width: 100%; }
-html[lang="ko"] .card:has(.kor-rating-badge:is(:hover, :focus-visible)) { transform: none; }
+/* One help action per choice list; remains visible when rerolls are exhausted. */
+.kor-choice-actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; flex-shrink: 0; }
+.kor-choice-actions:not(:has(button:not(.hidden):not([hidden]))) { display: none; }
+.kor-choice-actions .btn { margin-top: 0; min-height: calc(40px / var(--kor-ui-scale)); }
+.kor-move-help[hidden] { display: none; }
+.kor-move-help:is(:hover, :focus-visible) { border-color: #ffe17d; background: #345991; color: #fff; }
+.kor-move-help:focus-visible { outline: 3px solid #ffe17d; outline-offset: 3px; }
+.kor-rating-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 10px; max-height: 28vh; overflow: auto; flex-shrink: 0; }
+.kor-rating-tabs .chip { min-height: 38px; }
+.kor-rating-tabs .chip[aria-pressed="true"] { background: #3b5484; border-color: #ffe17d; color: #ffe17d; }
+.kor-rating-tabs .chip:focus-visible { outline: 2px solid #ffe17d; outline-offset: 1px; }
+.kor-rating-body h3 { color: #fff; margin: 0 0 8px; }
 
 /* Move category remains visible when learning, upgrading, evolving or choosing a starter. */
 .kor-move-category {
