@@ -286,6 +286,24 @@ html[lang="ko"] :is(#scr-friends, #scr-rank) .box {
   width: min(1100px, 100%); display: flex; flex-direction: column; overflow: hidden; min-height: 0;
 }
 html[lang="ko"] :is(#fr-list, #rk-list) { min-height: 0; flex: 1 1 auto; max-height: none; overflow: auto; }
+/* Ranking filters and records scroll together; tabs never compete for flex height. */
+html[lang="ko"] #scr-rank { padding-top: calc((56px + env(safe-area-inset-top)) / var(--kor-ui-scale)); }
+html[lang="ko"] #scr-rank .box > .row,
+html[lang="ko"] #rk-me { flex-shrink: 0; }
+html[lang="ko"] .kor-rank-body { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 3px; }
+html[lang="ko"] #scr-rank #rk-list { flex: none; max-height: none; overflow: visible; padding-right: 0; }
+html[lang="ko"] #rk-mode { align-items: stretch; gap: 8px; margin: 6px 0 8px; padding: 3px 2px 6px; }
+html[lang="ko"] #rk-mode .gen-tab { min-width: 96px; min-height: calc(40px / var(--kor-ui-scale)); padding: 6px 14px; justify-content: center; }
+html[lang="ko"] #rk-mode .gen-tab b { display: inline-flex; align-items: center; gap: 6px; line-height: 1.4; white-space: nowrap; font-size: 16px; }
+html[lang="ko"] #rk-mode .gen-tab img { flex-shrink: 0; }
+html[lang="ko"] #rk-period,
+html[lang="ko"] #rk-scope { gap: 8px; }
+html[lang="ko"] :is(#rk-period, #rk-scope) .chip { min-height: calc(36px / var(--kor-ui-scale)); display: inline-flex; align-items: center; justify-content: center; line-height: 1.4; }
+html[lang="ko"] #scr-rank .rk-tools { flex-wrap: wrap; align-items: center; }
+html[lang="ko"] #scr-rank .rk-tools .field { max-width: 100%; }
+@media (max-height: 320px) and (orientation: landscape) {
+  html[lang="ko"] #rk-me { min-height: 0; padding: 6px 10px; margin-top: 6px; font-size: 13px; line-height: 1.4; }
+}
 html[lang="ko"] .fr-row { flex-wrap: wrap; gap: 8px; }
 html[lang="ko"] .fr-row b { min-width: 0; overflow-wrap: anywhere; }
 html[lang="ko"] .fr-row .btn { flex-shrink: 0; }

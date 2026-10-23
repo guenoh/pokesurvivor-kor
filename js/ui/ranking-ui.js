@@ -34,6 +34,7 @@ G.RankingUI = (() => {
   function open() {
     if (!G.SocialUI.needOnline()) return;
     G.UI.show('scr-rank', true);
+    const body = $('rk-body'); if (body) body.scrollTop = 0;
     if (!G.Social.started) G.Social.start();
     $('rk-mod').classList.toggle('hidden', !G.Ranking.isAdmin());
     tabs();
