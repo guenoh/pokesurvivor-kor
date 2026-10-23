@@ -318,3 +318,13 @@ html[lang="ko"] #lobby-invite { max-height: 160px; }
 .kor-rating-action { color: #e5edff; font-size: 12px; white-space: nowrap; }
 .kor-rating-support { gap: 12px; flex-wrap: wrap; max-width: 100%; }
 html[lang="ko"] .card:has(.kor-rating-badge:is(:hover, :focus-visible)) { transform: none; }
+
+/* Move category remains visible when learning, upgrading, evolving or choosing a starter. */
+.kor-move-category {
+  display: inline-flex; align-items: center; flex: 0 0 auto; vertical-align: middle;
+  margin-left: 4px; padding: 3px 7px; border: 1px solid; border-radius: 5px;
+  font-size: 13px; font-weight: 700; line-height: 1.2; white-space: nowrap; text-shadow: none;
+}
+.kor-move-category[data-category="physical"] { color: #fff0da; background: #65301e; border-color: #ffbd84; }
+.kor-move-category[data-category="special"] { color: #e8f5ff; background: #1b416f; border-color: #9bd5ff; }
+.kor-move-category[data-category="support"] { color: #f0eaff; background: #493268; border-color: #d5b8ff; }
