@@ -92,6 +92,16 @@ test('claiming a Korean server gift first saves progress and adopts the server r
   assert.equal(calls.filter(([url]) => url.endsWith('/claim')).length, 2);
   assert.ok(calls.findIndex(([url]) => url === '/api/save') < calls.findIndex(([url]) => url.endsWith('/claim')));
 });
+test('a save race during gift collection preserves the browser backup and enters conflict state', async () => {
+  const { db, storage } = bootAdapter(async url => url === '/api/save' ? json({ revision: 1 }) : url.endsWith('/claim')
+    ? { ok: false, status: 409, json: async () => ({ error: '다른 기기에서 저장되었습니다.' }) }
+    : json({ user: { id: 'gift-race', name: '충돌검사' }, save: {}, revision: 0 }));
+  await db.ready(); db.save.coins = 321;
+  await assert.rejects(db.claimNotice('opening'), /다른 기기/);
+  assert.equal(db.syncState, 'conflict');
+  const saved = JSON.parse(storage.get('ps.kor.pending.gift-race'));
+  assert.equal(saved.save.coins, 321); assert.equal(saved.pending, true); assert.equal(saved.revision, 1);
+});
 test('service worker excludes private API responses and original domain is absent from deployment identity', () => {
   assert.ok(read('sw.js').includes("url.pathname.startsWith('/api/')"));
   assert.ok(read('js/core/firebase-config.js').includes('G.FIREBASE_CONFIG = null'));

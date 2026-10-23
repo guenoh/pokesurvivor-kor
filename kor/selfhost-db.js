@@ -85,7 +85,12 @@
       if (state === 'conflict') throw new Error('저장 충돌을 먼저 해결해 주세요.');
       commit(); await flush();
       const userId = account.id, before = JSON.stringify(local.save);
-      const result = await api('/notices/' + encodeURIComponent(id) + '/claim', 'POST', { revision });
+      let result;
+      try { result = await api('/notices/' + encodeURIComponent(id) + '/claim', 'POST', { revision }); }
+      catch (error) {
+        if (error.status === 409 && account?.id === userId) { pending = true; backup(); sync('conflict'); }
+        throw error;
+      }
       if (account?.id !== userId) throw new Error('로그인 계정이 바뀌었습니다. 다시 확인해 주세요.');
       if (JSON.stringify(local.save) !== before) {
         pending = true; backup(); sync('conflict');
