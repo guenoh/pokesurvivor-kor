@@ -1,5 +1,11 @@
 # Créditos
 
+## 한국어 독립판 제작 표기
+
+- 원작 코드·음악: **Jonathan Piera Torregrosa (JPTER78)** — [원작 저장소](https://github.com/JPTER78/pokesurvivor), [원작 공식 사이트](https://pokesurvivor.com).
+- 한글화·한국판 개발: **박근오** (guenoh).
+- 한국어 독립판은 원작자가 운영하거나 승인한 공식 서비스가 아닙니다. 아래 원작 스프라이트 제작진과 각 라이선스·Required Notice를 함께 보존합니다.
+
 ## Sprites
 
 Los sprites estilo *Pokémon Mundo Misterioso* vienen de

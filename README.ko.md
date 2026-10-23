@@ -1,7 +1,8 @@
 # PokéSurvivor 한국어 독립판
 
 비공식·비상업 파생판입니다. 원작과 계정·데이터·배포를 공유하지 않습니다.
-원작: [JPTER78/pokesurvivor](https://github.com/JPTER78/pokesurvivor).
+원작 코드·음악: [Jonathan Piera Torregrosa (JPTER78)](https://github.com/JPTER78/pokesurvivor).
+한글화·한국판 개발: **박근오** (guenoh).
 기준 커밋: `6f0f4409f68adcc5bc31a77cafaf8ba9a0318397`.
 원작 공식 사이트: https://pokesurvivor.com.
 
