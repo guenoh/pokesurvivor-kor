@@ -1238,3 +1238,28 @@ G.I18n.add({
 }, "ko", "language");
 
 G.I18n.add({"Nº {x}": "도감 {x}"}, "ko");
+
+/* Operational strings missed by the original English-key-only audit. */
+G.I18n.add({
+  "POKé SLOTS": "포켓 슬롯",
+  "Estamos en mantenimiento.": "지금은 점검 중입니다.",
+  "Estamos mudando el juego a servidores nuevos para que siga siendo gratis para todos. Tu cuenta, tu partida y tus Pokémon están a salvo. ¡Vuelve en unas horas!": "무료로 안정적인 서비스를 제공하기 위해 서버를 이전하고 있습니다. 계정과 저장 데이터, 포켓몬은 안전하게 보관됩니다. 잠시 후 다시 접속해 주세요.",
+  "Volver a intentarlo": "다시 시도",
+  "Importante: guarda tu partida": "중요: 진행 상황을 저장해 주세요",
+  "Los rankings se han reiniciado": "랭킹이 초기화되었습니다",
+  "¿Quitar del ranking TODAS las marcas de más de 1 hora (todas las tablas)? No se puede deshacer.": "모든 랭킹에서 1시간을 넘긴 기록을 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
+  "Revisando {x} / {x}…": "확인 중 {x} / {x}…",
+  "Quitadas {x} marcas de más de 1 hora ({x} tablas)": "1시간을 넘긴 기록 {x}개를 삭제했습니다 (랭킹 {x}개)",
+  "No se pudo: {x}": "처리하지 못했습니다: {x}",
+  "Quitar marcas de más de 1 hora": "1시간을 넘긴 기록 삭제",
+  "· ya no está en el top 50": "· 현재 상위 50위에 없음",
+  "Borrar marca": "기록 삭제",
+  "Marca borrada": "기록을 삭제했습니다",
+  "¿Banear a {name}? No podrán volver a salir en el ranking y se borra su marca.": "{name} 사용자의 랭킹 등록을 제한할까요? 기존 기록이 삭제되고 앞으로 랭킹에 등록할 수 없습니다.",
+  "Reporte descartado": "신고를 기각했습니다",
+  "veces reportada": "신고 횟수",
+  "Más de 33 min: casi imposible con la Sentencia de Arceus": "33분 초과: 현재 아르세우스의 심판에서는 달성하기 매우 어려운 기록입니다",
+  "Banear": "랭킹 등록 제한",
+  "Baneado": "등록 제한됨",
+  "Descartar": "기각"
+}, "ko");

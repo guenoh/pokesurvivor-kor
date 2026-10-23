@@ -151,3 +151,13 @@ test('Korean dynamic names receive the right particles in text and formatted mes
   assert.equal(I.f('이동 {x}', '마을'), '마을로 이동');
   assert.equal(I.f('이동 {x}', '집'), '집으로 이동');
 });
+
+test('Korean audit checks actual ability effects and generated data beyond English UI keys', () => {
+  const report = require('../kor/coverage.cjs').audit();
+  assert.equal(report.failures, 0, JSON.stringify(report.groups));
+  assert.ok(report.groups.abilities.checked >= 271);
+  assert.ok(report.groups.abilityEffects.checked > 5000);
+  assert.ok(report.groups.moves.checked >= 103);
+  assert.equal(report.groups.natures.checked, 25);
+  assert.ok(report.groups.operationalUi.checked > 0);
+});
