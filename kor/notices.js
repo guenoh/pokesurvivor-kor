@@ -1,7 +1,7 @@
 /* Korean server announcements. Rewards are granted only by the authenticated API. */
 (() => {
   let dialog, body, message, closeButton, data, loading = false, busy = false;
-  const checked = new Map();
+  const checked = new Map(), supportLinks = [];
   const make = (tag, className, text) => {
     const element = document.createElement(tag);
     if (className) element.className = className;
@@ -11,6 +11,14 @@
   const seenKey = notice => `ps.kor.notice.${G.DB.accountKey}.${notice.id}.${notice.version}`;
   function markRead() { for (const notice of data?.notices || []) try { localStorage.setItem(seenKey(notice), '1'); } catch {} }
   function unread(notice) { try { return !localStorage.getItem(seenKey(notice)); } catch { return true; } }
+  function updateSupport(support) {
+    let href;
+    try { const url = new URL(support?.url); if (url.protocol === 'https:') href = url.href; } catch {}
+    for (const link of supportLinks) {
+      link.hidden = !href;
+      if (href) link.href = href; else link.removeAttribute('href');
+    }
+  }
   function init() {
     if (dialog) return;
     dialog = make('dialog', 'box kor-notices');
@@ -25,14 +33,26 @@
     dialog.append(header, body, message); document.body.append(dialog);
     dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
     dialog.addEventListener('close', markRead);
-    for (const parent of [document.querySelector('#scr-menu .menu-list'), document.querySelector('#scr-login .box')]) {
+    for (const [parent, after] of [
+      [document.querySelector('#scr-menu .menu-right > .box'), null],
+      [document.querySelector('#scr-login .box'), document.querySelector('#scr-login .logo')]
+    ]) {
       if (!parent) continue;
-      const button = make('button', 'btn ghost kor-notices-open', '공지사항 · 오픈 선물');
+      const actions = make('nav', 'kor-server-actions');
+      actions.setAttribute('aria-label', '한국어 서버 안내'); actions.setAttribute('translate', 'no');
+      const button = make('button', 'btn small ghost', '공지사항 · 오픈 선물');
       button.type = 'button'; button.setAttribute('translate', 'no'); button.onclick = () => open();
-      parent.append(button);
+      const support = make('a', 'btn small gold kor-support-shortcut', '서버 후원');
+      support.hidden = true; support.target = '_blank'; support.rel = 'noopener noreferrer';
+      support.title = '한국어 서버 운영을 자율적으로 후원합니다. 외부 페이지가 새 창으로 열립니다.';
+      supportLinks.push(support); actions.append(button, support);
+      if (after) after.after(actions); else parent.prepend(actions);
     }
+    // Fetch the operator's current link once on entry, including before login.
+    G.DB.getNotices().then(result => updateSupport(result.support)).catch(() => {});
   }
   function render() {
+    updateSupport(data.support);
     body.replaceChildren();
     for (const notice of data.notices) {
       const article = make('article', 'kor-notice');
@@ -92,6 +112,7 @@
     checked.set(user, Date.now()); loading = true;
     try {
       const result = await G.DB.getNotices();
+      updateSupport(result.support);
       if (!G.DB.guest && user === G.DB.accountKey && G.Game.state === 'ui' && result.notices.some(unread)) {
         init(); data = result; render(); message.textContent = ''; if (!dialog.open) dialog.showModal();
       }
