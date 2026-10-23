@@ -161,4 +161,6 @@ test('Korean partner selection handles the empty suffix and shiny variant as com
   assert.equal(G.T('Normal', 'appearance'), '일반 모습');
   assert.equal(G.T('Shiny', 'appearance'), '색이 다른 모습');
   assert.equal(G.T('Normal'), '노말');
+  assert.equal(G.T('Psíquico', 'move'), '사이코키네시스');
+  assert.equal(G.T('Psíquico'), '에스퍼');
 });

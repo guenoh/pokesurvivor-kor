@@ -535,7 +535,7 @@ G.MenuUI = (() => {
     el.className = 'panel ban-picker';
     el.innerHTML = `<p class="sub" style="margin:0 0 8px">Elige con qué ataque empieza. Lo puedes cambiar cuando quieras, gratis.</p>
       <div class="ban-moves">${ids.map(id => { const d = G.Moves.BY_ID[id];
-        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${d.name}${id === base ? ' <small>(de serie)</small>' : ''}</button>`; }).join('')}</div>`;
+        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${G.T(d.name, 'move')}${id === base ? ' <small>(de serie)</small>' : ''}</button>`; }).join('')}</div>`;
     el.querySelectorAll('[data-id]').forEach(b => {
       b.onclick = () => {
         const id = b.dataset.id;
@@ -548,7 +548,7 @@ G.MenuUI = (() => {
         if (i >= 0) l.splice(i, 1);
         G.DB.commit();
         G.Audio.sfx('select');
-        G.UI.toast(G.DEX_BY[upgDex].name + ' empezará con ' + G.Moves.BY_ID[id].name);
+        G.UI.toast(G.DEX_BY[upgDex].name + ' empezará con ' + G.T(G.Moves.BY_ID[id].name, 'move'));
         renderUpgrades();
       };
     });
@@ -566,7 +566,7 @@ G.MenuUI = (() => {
     el.className = 'panel ban-picker';
     el.innerHTML = `<p class="sub" style="margin:0 0 8px">Elige el segundo ataque con el que empieza. Lo puedes cambiar cuando quieras, gratis.</p>
       <div class="ban-moves"><button class="chip ${!cur ? 'on' : ''}" data-id="">${G.T('Al azar')}</button>${ids.map(id => { const d = G.Moves.BY_ID[id];
-        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${d.name}</button>`; }).join('')}</div>`;
+        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${G.T(d.name, 'move')}</button>`; }).join('')}</div>`;
     el.querySelectorAll('[data-id]').forEach(b => {
       b.onclick = () => {
         const id = b.dataset.id;
@@ -577,7 +577,7 @@ G.MenuUI = (() => {
         if (i >= 0) l.splice(i, 1);
         G.DB.commit();
         G.Audio.sfx('select');
-        G.UI.toast(id ? G.I18n.f('{x} empezará también con {x}', G.DEX_BY[upgDex].name, G.Moves.BY_ID[id].name)
+        G.UI.toast(id ? G.I18n.f('{x} empezará también con {x}', G.DEX_BY[upgDex].name, G.T(G.Moves.BY_ID[id].name, 'move'))
                       : G.T('El segundo ataque saldrá al azar'));
         renderUpgrades();
       };
