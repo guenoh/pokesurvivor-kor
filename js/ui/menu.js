@@ -413,6 +413,7 @@ G.MenuUI = (() => {
         if (!G.Mons.teach(dex, id)) return;
         done(G.I18n.f('¡{x} ha aprendido {x}!', mon.name, G.T(G.Moves.BY_ID[id].name, 'move')));
       });
+      if (G.MoveRatings) G.MoveRatings.decoratePicker(host, dex, 'data-v');
     }
   }
 
@@ -552,6 +553,7 @@ G.MenuUI = (() => {
         renderUpgrades();
       };
     });
+    if (G.MoveRatings) G.MoveRatings.decoratePicker(el, upgDex);
     return el;
   }
 
@@ -582,6 +584,7 @@ G.MenuUI = (() => {
         renderUpgrades();
       };
     });
+    if (G.MoveRatings) G.MoveRatings.decoratePicker(el, upgDex);
     return el;
   }
 

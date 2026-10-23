@@ -102,6 +102,9 @@ G.Icons = (() => {
     shiny: { pal: { y: '#ff4d5e', w: '#ffd0d6', o: '#b8283a', x: '#fff6b0' }, rows: [
       '.....kk...x.', '.....kk..xxx', '....kwyk..x.', '....kyyk....', 'kkkkwyyykkkk', 'kwyyyyyyyyok',
       '.kyyyyyyyok.', '..kyyyyyyk..', '..kyyyoyyk..', '.kyok..koyk.', '.kok....kok.', '.kk......kk.'] },
+    boss: { pal: { y: '#ffd23f', p: '#c47bff', d: '#7a3fb0', w: '#ffffff', r: '#ff5f6d' }, rows: [
+      '.k...kk...k.', '.kykkyykkyk.', '.kyyyyyyyyk.', '..kkkkkkkk..', '.kppppppppk.',
+      'kppwppppwppk', 'kppwkppkwppk', 'kpppppppppdk', '.kppkrrkddk.', '.kpppkkdddk.', '..kkddddkk..', '....kkkk....'] },
     crown: { pal: { y: '#ffd23f', o: '#c08a10', r: '#ff5f6d' }, rows: [
       '............', '............', 'k....k....k.', 'kk..kyk..kk.', 'kyk.kyk.kyk.', 'kyykyyykyyk.',
       'kyyyyyyyyyk.', 'kyyryyyryyk.', 'kyyyyyyyyyk.', 'koooooooook.', 'kkkkkkkkkkk.', '............'] },
