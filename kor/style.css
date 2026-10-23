@@ -36,7 +36,10 @@ html[lang="ko"] .stat > span:last-child { white-space: nowrap; text-align: right
 .kor-auth-status.is-error { color: #ffd0cf; }
 #login-form .field[aria-invalid="true"] { border-color: #ffb9b5; }
 #login-err:empty { display: none; }
-.kor-notices-open { width: 100%; margin-top: 10px; }
+.kor-server-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.kor-server-actions .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; text-decoration: none; }
+.kor-server-actions .kor-support-shortcut { margin-left: auto; border-color: #fff0ac; box-shadow: 0 0 0 1px #e6c96755; }
+.kor-support-shortcut[hidden] { display: none; }
 dialog.kor-notices { width: min(600px, calc(100vw - 28px)); max-height: calc(100dvh - 36px); color: #eef4ff; margin: auto; padding: 20px; }
 dialog.kor-notices:not([open]) { display: none; }
 dialog.kor-notices::backdrop { background: #081022d9; }
