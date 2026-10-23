@@ -42,7 +42,7 @@
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preload" href="assets/fonts/PixelifyPS-400.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/PixelifyPS-700.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="css/style.css?v=e6a925c8c1">
+<link rel="stylesheet" href="css/style.css?v=2c834caeac">
 <link rel="preload" href="assets/fonts/galmuri/Galmuri11.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="kor/style.css">
 <script src="kor/bootstrap.js"></script>
@@ -87,6 +87,10 @@
       <button id="btn-guest" class="btn ghost grow" type="button">Jugar como invitado</button>
     </div>
     <p class="note center" id="login-mode"></p>
+    <div class="kor-edition-credits" translate="no">
+      <p>원작·음악: <a href="https://github.com/JPTER78/pokesurvivor" target="_blank" rel="noopener noreferrer">Jonathan Piera Torregrosa (JPTER78)</a></p>
+      <p>한글화·한국판 개발: <strong>박근오</strong></p>
+    </div>
     <p class="note center"><a href="#" class="legal-link" data-legal>Aviso legal y privacidad</a></p>
   </div>
 </section>
@@ -161,6 +165,7 @@
     </div>
     <div class="box" style="padding:14px 18px">
       <div id="menu-stats" style="font-size:14px;color:var(--muted)"></div>
+      <p class="kor-edition-credits compact" translate="no">원작: JPTER78 · 한글화·한국판 개발: 박근오 · <a href="#" data-legal>제작·권리 안내</a></p>
     </div>
   </div>
 </section>
@@ -240,6 +245,9 @@
   <div class="box legal" style="width:min(640px,100%)">
     <div class="row between"><h2>Aviso legal</h2><button class="btn small ghost" id="legal-close">Cerrar</button></div>
     <div translate="no">
+    <h3>제작 정보</h3>
+    <p>원작·음악: <a href="https://github.com/JPTER78/pokesurvivor" target="_blank" rel="noopener noreferrer">Jonathan Piera Torregrosa (JPTER78)</a></p>
+    <p>한글화·한국판 개발: <strong>박근오</strong> (guenoh)</p>
     <h3>비공식·비상업 한국어 독립판</h3>
     <p>원작: Jonathan Piera Torregrosa (JPTER78). 원본 공식 사이트는 <a href="https://pokesurvivor.com">pokesurvivor.com</a>입니다. 이 버전은 guenoh의 독립 파생판이며 원작자가 운영하거나 승인한 서비스가 아닙니다.</p>
     <p>Required Notice: Copyright 2026 JPTER78 (https://github.com/JPTER78/pokesurvivor)</p>
@@ -247,7 +255,7 @@
     <p>Pokémon과 캐릭터·상표의 권리는 Nintendo, Creatures Inc., GAME FREAK 및 The Pokémon Company 등 권리자에게 있습니다. 해당 권리자의 승인이나 제휴를 뜻하지 않습니다.</p>
     <h3>저장 데이터와 개인정보</h3>
     <p>독립 PostgreSQL 서버에 사용자 이름, 비밀번호의 scrypt 해시, 게임 저장 내용과 로그인 세션을 보관합니다. 세션 쿠키는 7일 후 만료됩니다. 브라우저에도 저장 백업을 보관합니다. 원본 Firebase나 Google 로그인에 연결하지 않습니다. 게스트 플레이는 서버에 저장하지 않습니다. 친구·협동·랭킹은 아직 지원하지 않습니다.</p>
-    <p>계정 삭제 시 서버의 계정·세션·저장 데이터를 삭제합니다. 운영 서버의 백업 보존 기간과 운영자 정보는 실제 배포 전에 확정해 안내해야 합니다.</p>
+    <p>운영자: 박근오 (guenoh). 계정 삭제 시 서버의 계정·세션·저장 데이터와 선물 수령 기록을 삭제합니다. 자동 암호화 백업은 GitHub에서 최대 90일 보관하며, 별도로 내려받은 복구 사본은 운영자가 관리합니다.</p>
     <p>독립판 문의·권리 요청: <a id="legal-mail" href="#"></a></p>
     <p>독립판 소스: <a id="legal-repo" href="#" target="_blank" rel="noopener"></a></p>
     </div>
@@ -543,6 +551,6 @@
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=e7bb34047e"></script>
+<script defer src="js/app.min.js?v=4efc733800"></script>
 </body>
 </html>
