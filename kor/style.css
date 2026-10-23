@@ -35,6 +35,11 @@ html[lang="ko"] .stat > span:last-child { white-space: nowrap; text-align: right
 .kor-auth-status.is-match { color: #adf0b2; }
 .kor-auth-status.is-error { color: #ffd0cf; }
 #login-form .field[aria-invalid="true"] { border-color: #ffb9b5; }
+#login-form > .row { margin-top: 22px; }
+#login-form > .note { margin: 14px 0 18px; }
+#scr-login a:not(.btn), #scr-login a:not(.btn):visited { color: #e5f0ff; text-decoration: underline; text-underline-offset: 4px; }
+#scr-login a:not(.btn):hover { color: #ffe391; }
+#scr-login a:not(.btn):focus-visible { outline: 2px solid #ffe391; outline-offset: 4px; border-radius: 2px; }
 #login-err:empty { display: none; }
 .kor-server-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
 .kor-server-actions .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; text-decoration: none; }
