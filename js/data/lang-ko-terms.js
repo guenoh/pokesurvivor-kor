@@ -338,3 +338,6 @@ G.I18n.add({
   "Sassy": "건방",
   "Serious": "성실"
 }, "ko", "pokemon-term");
+
+/* Appearance labels must not use the Pokémon type translation for Normal. */
+G.I18n.add({ "Normal": "일반 모습", "Shiny": "색이 다른 모습" }, 'ko', 'appearance');
