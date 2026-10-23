@@ -543,6 +543,7 @@ G.Game = (() => {
   // ---------------- teclado ----------------
 
   function handleKeys() {
+    if (G.PokemonTiers && G.PokemonTiers.isOpen()) { if (G.Input.tap('escape')) G.PokemonTiers.close(); return; }
     if (G.MoveRatings && G.MoveRatings.isOpen()) { if (G.Input.tap('escape')) G.MoveRatings.close(); return; }
     if (G.SettingsUI.isOpen) { if (G.Input.tap('escape')) G.SettingsUI.close(); return; }
     // La Sentencia de Arceus: Espacio, Intro o Esc saltan la animación (si se puede).
