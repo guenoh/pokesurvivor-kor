@@ -35,13 +35,18 @@
       a.href = url; a.download = 'pokesurvivor-kor-save-backup.json'; a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
-    document.querySelector('#scr-settings .box')?.append(button);
+    button.className = 'btn small';
     const reload = document.createElement('button'); reload.setAttribute('translate', 'no');
     reload.textContent = '서버 저장 다시 불러오기';
     reload.onclick = async () => {
       if (!confirm('브라우저 백업을 먼저 내보냈나요? 이 기기의 변경 내용을 버리고 서버의 저장 내용을 불러옵니다.')) return;
       try { await G.DB.reloadServerSave(); location.reload(); } catch (e) { G.UI.toast(e.message); }
     };
-    document.querySelector('#scr-settings .box')?.append(reload);
+    reload.className = 'btn small';
+    const tools = document.createElement('details');
+    tools.className = 'kor-storage-tools'; tools.setAttribute('translate', 'no');
+    const summary = document.createElement('summary'); summary.textContent = '저장·복구 도구';
+    tools.append(summary, button, reload);
+    document.querySelector('#scr-settings .box')?.append(tools);
   });
 })();

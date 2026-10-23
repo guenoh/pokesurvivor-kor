@@ -34,7 +34,8 @@ G.Slots = (() => {
   }
 
   /** Anima las tiradas. → Promise que se resuelve al terminar. */
-  async function play(canvas, results) {
+  async function play(canvas, results, onStatus = () => {}) {
+    const report = (index = 0, phase = 'progress') => onStatus({ text: st.led, index, total: results.length, phase });
     cv = canvas; ctx = cv.getContext('2d');
     fast = false;
     cv.onclick = () => { fast = true; };
@@ -42,6 +43,7 @@ G.Slots = (() => {
       t: 0, lever: 0, reels: REEL_X.map(() => ({ off: Math.random() * 400, spin: false, sym: 'ball', bounce: 0, speed: 0 })),
       ten: results.length === 10, tray: [], led: results.length === 10 ? 'TIRADA ×10' : '¡SUERTE!', ledCol: C.bulbOn, win: null, frenzy: 0, sparks: []
     };
+    report(0, 'ready');
     last = performance.now();
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(frame);
@@ -49,7 +51,8 @@ G.Slots = (() => {
     const ten = results.length === 10;
     for (let i = 0; i < results.length; i++) {
       const r = results[i];
-      if (ten) st.led = 'TIRADA ' + (i + 1) + '/10';
+      if (ten) { st.led = 'TIRADA ' + (i + 1) + '/10'; st.ledCol = C.bulbOn; }
+      report(i + 1);
       // Palanca.
       G.Audio.sfx('ball');
       await tween(v => { st.lever = v; }, 0, 1, ten ? 0.12 : 0.22);
@@ -64,6 +67,7 @@ G.Slots = (() => {
           st.frenzy = 1;
           st.led = r.shiny ? '¡¿SHINY?!' : r.rarity === 5 ? '¡¿LEGENDARIO?!' : '¡¿ÉPICO?!';
           st.ledCol = colOf(r);
+          report(i + 1, 'suspense');
           await tween(v => { st.reels[2].speed = v; }, 520, 120, ten ? 0.5 : 1.1);
         }
         stopReel(st.reels[k], symOf(r));
@@ -75,6 +79,7 @@ G.Slots = (() => {
       st.win = { col: colOf(r), t: 0 };
       st.led = (r.shiny ? 'SHINY · ' : '') + G.Gacha.RARITY_NAME[r.rarity].toUpperCase();
       st.ledCol = colOf(r);
+      report(i + 1, 'result');
       G.Audio.sfx('reveal', { rarity: r.rarity });
       if (r.rarity === 5) G.Audio.sfx('legend');
       if (r.shiny) G.Audio.sfx('shiny');
