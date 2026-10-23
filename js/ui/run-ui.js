@@ -113,7 +113,7 @@ G.RunUI = (() => {
   }
 
   /**
-   * Mensaje de apoyo (Ko-fi) al acabar: tras un récord o cada 10 partidas,
+   * Mensaje de apoyo al servidor coreano al acabar: tras un récord o cada 10 partidas,
    * nunca en la primera y como mucho una vez al día. Se cierra con la X.
    */
   function askSupport(r) {
@@ -145,8 +145,8 @@ G.RunUI = (() => {
       ${r.record ? '<div style="grid-column:1/-1;text-align:center" class="gold">¡Nuevo récord de tiempo!</div>' : ''}
       ${askSupport(r) ? `<div class="support-ask" id="over-ask" style="grid-column:1/-1">
         <button class="x" type="button" aria-label="Cerrar">×</button>
-        <p>¿Te está gustando PokéSurvivor? Lo hago yo solo y los servidores cuestan dinero. Si quieres, puedes ayudarme a mantenerlo en línea.</p>
-        <a class="btn small gold" href="${G.Funding.url}" target="_blank" rel="noopener">${G.Icons.html('heart', 14)} Apoyar en Ko-fi</a>
+        <p>한국어 서버의 지속적인 운영과 유지보수를 위해 자율 후원을 부탁드립니다. 후원 여부에 따른 게임 혜택은 없습니다.</p>
+        <a class="btn small gold" href="${G.Funding.url}" target="_blank" rel="noopener noreferrer">${G.Icons.html('heart', 14)} 한국어 서버 후원하기</a>
       </div>` : ''}`;
     const ask = $('over-ask');
     if (ask) ask.querySelector('.x').onclick = () => ask.remove();

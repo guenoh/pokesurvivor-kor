@@ -20,6 +20,8 @@
   function updateSupport(support) {
     let href;
     try { const url = new URL(support?.url); if (url.protocol === 'https:') href = url.href; } catch {}
+    if (G.Funding) G.Funding.url = href || '';
+    if (G.SupportUI) G.SupportUI.init();
     for (const link of supportLinks) {
       link.hidden = !href;
       if (href) link.href = href; else link.removeAttribute('href');
