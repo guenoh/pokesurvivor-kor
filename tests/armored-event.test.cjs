@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
 function setup(){
-  const noop=()=>{},calls={grants:0,commits:0,heal:0,clears:0,events:[]};
+  const noop=()=>{},calls={grants:0,commits:0,heal:0,clears:0,events:[],shots:[]};
   class Anim{constructor(dex,scale){this.dex=dex;this.scale=scale;this.dir=0;}play(){}busy(){return false;}loop(){}update(){}}
   const s={console,performance:{now:()=>10000},document:{addEventListener:noop,getElementById:()=>null}};s.window=s;vm.createContext(s);
   const load=f=>vm.runInContext(read(f),s,{filename:f});
@@ -10,10 +10,10 @@ function setup(){
   const G=s.G;
   Object.assign(G,{Sprites:{PX:2,Animator:Anim,animMeta:()=>({ay:35}),bodyRadius:()=>18,bodyHeight:()=>72,hovers:()=>false,preload:noop},
     Stats:{sideOf:()=> 'special'},Coop:{active:false,isHost:false,scaleHp:n=>1+(n-1)*.8,enemyGone:noop},
-    FX:new Proxy({},{get:()=>noop}),Audio:{sfx:noop},Camera:{outerRadius:()=>400,kick:noop,sees:()=>true},
+    FX:new Proxy({},{get:()=>noop}),VFX:{forType:type=>({proj:'ring',pal:type})},Audio:{sfx:noop},Camera:{outerRadius:()=>400,kick:noop,sees:()=>true},
     Judgment:{active:false,noteDmg:noop},Rift:{inArena:false,reset:noop},Events:{reset:noop},
     Hazards:{all:[],add(h){this.all.push(h);},clearOwner(id){this.all=this.all.filter(h=>h.owner!==id);},clear(){this.all=[];}},
-    Projectiles:{clear(){calls.clears++;}},Spawner:{say:noop},UI:{toast:noop},Types:{},
+    Projectiles:{clear(){calls.clears++;calls.shots=[];},spawn(p){calls.shots.push(p);return p;},clearEnemyOwner(id){calls.shots=calls.shots.filter(p=>p.friendly!==false||p.eventOwner!==id);}},Spawner:{say:noop},UI:{toast:noop},Types:{},
     Items:{roll:()=> 'leftovers'},Pickups:{drop:noop,dropXp:noop},DB:{save:{owned:{}},owns:id=>!!G.DB.save.owned[id],grant(id,from){calls.grants++;G.DB.save.owned[id]={from};},commit(){calls.commits++;}}});
   const player={x:0,y:0,dead:false,hp:400,maxHp:800,heal(amount){this.hp=Math.min(this.maxHp,this.hp+amount);calls.heal++;}};
   G.Game={state:'playing',player,st:{time:1380},everyone:()=>[player]};
@@ -115,6 +115,41 @@ test('phase one never rushes, and the new corridor cannot inflict an extra beam 
   assert.equal(sent[1].visualOnly,true);
   G.Hazards.update(1.2);assert.equal(hits,0);
   G.Hazards.update(.56);assert.equal(G.Hazards.count,0);assert.equal(hits,0);
+});
+test('boss Psycho Rush fires exactly three fixed-direction shots from its moving path after the warning',()=>{
+  for(const frenzy of [false,true])for(const step of [1/60,.13,2]){
+    const {G,player,calls}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
+    E.breakArmor(e);if(frenzy)E.enrage(e);e.armoredTransition=0;e.armoredAI.cd=0;
+    e.bossMove(.01,player,150,1,0,72);const c=e.armoredAI.cast;
+    e.bossMove(c.wind-.001,player,150,1,0,72);assert.equal(calls.shots.length,0);
+    player.x=e.x+400;player.y=e.y+500; // Dodging does not turn either dash or shots.
+    while(c.t<c.wind+c.duration+.01){const [vx,vy]=e.bossMove(step,player,150,1,0,72);e.x+=vx*step;e.y+=vy*step;}
+    assert.equal(calls.shots.length,3);
+    calls.shots.forEach((p,i)=>{
+      assert.ok(Math.abs(p.x-(c.sx+Math.cos(c.angle)*320*(i+.5)/3))<1e-7);
+      assert.ok(Math.abs(p.y-(c.sy+Math.sin(c.angle)*320*(i+.5)/3))<1e-7);
+      assert.ok(Math.abs(p.vx-Math.cos(c.angle)*340)<1e-7);
+      assert.equal(p.friendly,false);assert.equal(p.cat,'special');assert.equal(p.mtype,'psychic');
+      assert.equal(p.eventOwner,e.id);assert.equal(p.eventMove,'psycho-rush');assert.equal(p.homing,undefined);
+      assert.equal(p.dmg,e.def.shotDmg*e.sc.dmg*.45);
+    });
+  }
+});
+test('host alone creates boss shots and phase changes, defeat and escape clear only its enemy projectiles',()=>{
+  for(const ending of ['enrage','defeat','escape']){
+    const {G,player,calls}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
+    E.breakArmor(e);e.armoredTransition=0;e.armoredAI.cd=0;
+    G.Coop.isHost=true;G.Coop.enemyShot=p=>calls.events.push(p);
+    e.bossMove(.01,player,150,1,0,72);e.bossMove(1.8,player,150,1,0,72);
+    assert.equal(calls.events.length,3);assert.equal(calls.shots.length,3);
+    calls.shots.push({friendly:true,eventOwner:e.id},{friendly:false,eventOwner:999});
+    if(ending==='enrage')E.enrage(e);
+    else if(ending==='defeat'){e.dead=true;E.tick(.1,1400);}
+    else E.tick(.1,1800);
+    assert.equal(calls.shots.length,2);assert.ok(calls.shots.some(p=>p.friendly));assert.ok(calls.shots.some(p=>p.eventOwner===999));
+  }
+  const {G,player,calls}=setup(),E=G.ArmoredMewtwo;
+  G.Coop.active=true;G.Coop.isHost=false;E.updateSpawn(.1,[player],1380);assert.equal(calls.shots.length,0);
 });
 test('frenzy starts exactly at fifteen percent, clears only its old warnings, and never increases damage',()=>{
   const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
