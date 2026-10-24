@@ -1,9 +1,11 @@
 {
   "mode": "guest-only-public-test",
   "productionAccounts": false,
-  "revision": "d5b3db3788da",
+  "revision": "e07599c60ef4",
   "balance": {
-    "soloHpAt28Minutes": 61560,
+    "spawnAt": 1380,
+    "fightLimit": 420,
+    "soloHpAtSpawn": 61560,
     "hpMultiplier": 0.75,
     "damageMultiplier": 1.1,
     "normalWaves": false,
