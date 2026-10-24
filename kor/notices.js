@@ -62,10 +62,22 @@
   function render() {
     updateSupport(data.support);
     body.replaceChildren();
-    for (const notice of data.notices) {
-      const article = make('article', 'kor-notice');
+    // Updates first, newest date first. Reward campaigns retain their identity and claim flow.
+    const notices = [...data.notices].sort((a, b) => Number(!!a.reward) - Number(!!b.reward) || (Date.parse(b.publishedAt) || 0) - (Date.parse(a.publishedAt) || 0));
+    const latest = notices.find(notice => !notice.reward);
+    for (const notice of notices) {
+      const article = make('article', notice === latest ? 'kor-notice kor-notice-latest' : 'kor-notice');
+      if (notice === latest) article.append(make('span', 'kor-notice-badge', '최신 업데이트'));
       article.append(make('h3', '', notice.title));
+      if (notice.summary) article.append(make('p', 'kor-notice-summary', notice.summary));
       for (const paragraph of notice.paragraphs) article.append(make('p', '', paragraph));
+      if (Array.isArray(notice.history) && notice.history.length) {
+        const history = make('details', 'kor-notice-history');
+        history.append(make('summary', '', '이전 업데이트 내역 (' + notice.history.length + ')'));
+        const contents = make('div');
+        for (const paragraph of notice.history) contents.append(make('p', '', paragraph));
+        history.append(contents); article.append(history);
+      }
       if (notice.reward) {
         const reward = notice.reward;
         const gift = make('div', 'kor-notice-gift');
@@ -110,6 +122,7 @@
     if (loading || busy) return;
     loading = true; message.textContent = '공지를 불러오는 중입니다…';
     if (!dialog.open) dialog.showModal();
+    dialog.scrollTop = 0;
     try { data = await G.DB.getNotices(); render(); message.textContent = ''; }
     catch { message.textContent = '공지를 불러오지 못했습니다. 잠시 후 다시 열어 주세요.'; }
     finally { loading = false; }
@@ -123,7 +136,7 @@
       const result = await G.DB.getNotices();
       updateSupport(result.support);
       if (!G.DB.guest && user === G.DB.accountKey && G.Game.state === 'ui' && result.notices.some(unread)) {
-        init(); data = result; render(); message.textContent = ''; if (!dialog.open) dialog.showModal();
+        init(); data = result; render(); message.textContent = ''; if (!dialog.open) dialog.showModal(); dialog.scrollTop = 0;
       }
     } catch { /* Opening announcements must not block the game. Manual retry remains available. */ }
     finally { loading = false; }

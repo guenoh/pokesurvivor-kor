@@ -58,6 +58,13 @@ dialog.kor-notices::backdrop { background: #081022d9; }
 .kor-notice { border-top: 1px solid #b3caff55; margin-top: 16px; padding-top: 12px; }
 .kor-notice h3 { color: #ffe391; margin: 0 0 12px; }
 .kor-notice p { line-height: 1.7; }
+.kor-notice-latest { border-top: 0; margin-top: 0; padding-top: 8px; }
+.kor-notice-badge { display: inline-flex; margin-bottom: 10px; padding: 4px 9px; border-radius: 6px; background: #ffe391; color: #17244a; font-weight: 700; font-size: 13px; }
+.kor-notice .kor-notice-summary { padding: 12px 14px; border: 1px solid #8cafff; border-radius: 8px; background: #132449; color: #fff; font-weight: 700; }
+.kor-notice-history { margin-top: 16px; border-top: 1px solid #b3caff55; border-bottom: 1px solid #b3caff55; }
+.kor-notice-history summary { box-sizing: border-box; min-height: 44px; padding: 12px 0; color: #e4edff; cursor: pointer; font-weight: 700; }
+.kor-notice-history summary:focus-visible { outline: 3px solid #ffe391; outline-offset: 3px; }
+.kor-notice-history > div { padding-bottom: 8px; }
 .kor-notice-gift { padding: 14px; border: 2px solid #e6c967; background: #132449; border-radius: 10px; }
 .kor-notice-gift strong { display: block; color: #ffe391; }
 .kor-notice-gift .btn { min-width: 140px; }
