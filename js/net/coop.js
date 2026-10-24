@@ -203,6 +203,7 @@ G.Coop = (() => {
                 p, e: enemyList(viewOf(m)), ev };
     const ja = G.Judgment.netState();       // Arceus en la Sentencia
     if (ja) f.ja = ja;
+    if (G.ArmoredMewtwo) f.am = G.ArmoredMewtwo.netState();
     // Siempre: quién está eligiendo y, si hay cartas de nivel, cuáles (ver arriba).
     f.ho = holdNames();
     if (waiting.size) f.lu = [levelSeq, levelNow];
@@ -385,6 +386,7 @@ G.Coop = (() => {
       if (msg.lu && msg.lu[0] > doneSeq && (msg.lu[0] > seenSeq || !showing)) { seenSeq = msg.lu[0]; api.levelStart(msg.lu[1]); }
       else if (!msg.lu && showing) api.resume();
     }
+    if (msg.am) G.ArmoredMewtwo?.netApply(msg.am);
     api.syncTeam({ time: msg.t, level: msg.lv, xp: msg.xp, xpNext: msg.xn, kills: msg.ki, bosses: msg.bo, coins: msg.co,
                    t1: (msg.tk || [])[0], t10: (msg.tk || [])[1] });
     for (const u in msg.p || {}) {

@@ -21,12 +21,13 @@ G.Hazards = (() => {
     if (!fromNet && G.Coop.isHost) {
       G.Coop.broadcast(['hz', { kind: o.kind, x: Math.round(o.x), y: Math.round(o.y), r: o.r, angle: o.angle, len: o.len, w: o.w,
                                 delay: o.delay, dmg: Math.round(o.dmg), type: o.type, color: o.color, pct: o.pct, pure: o.pure, vis: o.vis, cat: o.cat,
-                                boom: o.boom ? 1 : 0 }]);
+                                boom: o.boom ? 1 : 0, owner: o.owner, respectInvuln: o.respectInvuln }]);
     }
     return o;
   }
 
   function clear() { list = []; }
+  function clearOwner(owner) { list = list.filter(h => h.owner !== owner); }
 
   function inside(h, x, y, r) {
     if (h.kind === 'zone') return G.U.dist2(x, y, h.x, h.y) < (h.r + r * 0.6) ** 2;
@@ -47,7 +48,7 @@ G.Hazards = (() => {
         detonate(h);
         // (Humedad: la explosión de un kamikaze no le daña, ver data/ability-fx.js.)
         if (pl && !pl.dead && inside(h, pl.x, pl.y, pl.r) && !(h.boom && pl.abil && pl.abil.damp)) {
-          pl.invuln = 0;
+          if (!h.respectInvuln) pl.invuln = 0;
           pl.hurt(h.pct ? Math.max(h.dmg, pl.maxHp * h.pct) : h.dmg, h.type, !!h.pure, h.cat);
         }
       }
@@ -107,5 +108,5 @@ G.Hazards = (() => {
     }
   }
 
-  return { add, clear, update, draw, inside, get all() { return list; }, get count() { return list.length; } };
+  return { add, clear, clearOwner, update, draw, inside, get all() { return list; }, get count() { return list.length; } };
 })();

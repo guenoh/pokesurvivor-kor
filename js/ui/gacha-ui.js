@@ -33,7 +33,7 @@ G.GachaUI = (() => {
     const banner = G.Gacha.BANNERS[gen - 1];
     document.querySelectorAll('#gacha-gens .gen-tab').forEach(t => t.classList.toggle('on', +t.dataset.gen === gen));
 
-    const all = G.DEX.filter(p => p.gen === gen);
+    const all = G.DEX.filter(p => !p.eventOnly && p.gen === gen);
     const owned = all.filter(p => s.owned[p.dex]).length;
     const shinies = all.filter(p => s.shiny && s.shiny[p.dex]).length;
     const [c1, c2, c3] = banner.color;

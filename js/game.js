@@ -119,6 +119,7 @@ G.Game = (() => {
     G.Spawner.reset();
     G.Rift.reset();
     G.Judgment.reset();
+    G.ArmoredMewtwo.reset();
     G.Events.reset();
     G.Weather.reset();
     G.Path.clear();
@@ -714,6 +715,7 @@ G.Game = (() => {
     G.Hazards.update(dt);
     G.Interact.update(dt, pl);
     G.Rift.update(dt, pl, time);
+    G.ArmoredMewtwo.tick(dt, time);
     G.Judgment.update(dt, pl, time);
     G.Events.update(dt, all, time);
     G.Weather.update(dt, time, pl);
@@ -826,6 +828,7 @@ G.Game = (() => {
     }
     if (!G.Judgment.cinematic) G.HUD.draw(ctx, w, h, pl, st);
     G.Judgment.drawOverlay(ctx, w, h);
+    G.ArmoredMewtwo.renderHud(time);
     G.Touch.draw(ctx);
     drawAimMark();
     if (G.Settings.get('fps')) {
