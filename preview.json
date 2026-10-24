@@ -1,0 +1,5 @@
+{
+  "mode": "guest-only-public-test",
+  "productionAccounts": false,
+  "source": "https://github.com/guenoh/pokesurvivor-kor/tree/feature/armored-mewtwo-local"
+}

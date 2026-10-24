@@ -1,0 +1,97 @@
+{
+  "checkedAt": "2026-10-23T09:58:34.377Z",
+  "scope": "English UI keys plus actual Korean species, abilities/effects, natures, moves/upgrades/evolutions, items, achievements, release notes and sampled operational UI. Not exhaustive browser-path coverage.",
+  "reference": 1563,
+  "translated": 1563,
+  "missing": [],
+  "groups": {
+    "species": {
+      "checked": 966,
+      "translated": 966,
+      "missing": []
+    },
+    "abilities": {
+      "checked": 271,
+      "translated": 271,
+      "missing": []
+    },
+    "abilityEffects": {
+      "checked": 5868,
+      "translated": 5868,
+      "missing": []
+    },
+    "natures": {
+      "checked": 25,
+      "translated": 25,
+      "missing": []
+    },
+    "moves": {
+      "checked": 103,
+      "translated": 103,
+      "missing": []
+    },
+    "moveDescriptions": {
+      "checked": 103,
+      "translated": 103,
+      "missing": []
+    },
+    "moveUpgrades": {
+      "checked": 412,
+      "translated": 412,
+      "missing": []
+    },
+    "evolutions": {
+      "checked": 291,
+      "translated": 291,
+      "missing": []
+    },
+    "heldItems": {
+      "checked": 22,
+      "translated": 22,
+      "missing": []
+    },
+    "shop": {
+      "checked": 6,
+      "translated": 6,
+      "missing": []
+    },
+    "achievements": {
+      "checked": 283,
+      "translated": 283,
+      "missing": []
+    },
+    "permanentUpgrades": {
+      "checked": 30,
+      "translated": 30,
+      "missing": []
+    },
+    "levelUp": {
+      "checked": 18,
+      "translated": 18,
+      "missing": []
+    },
+    "releaseNotes": {
+      "checked": 145,
+      "translated": 145,
+      "missing": []
+    },
+    "operationalUi": {
+      "checked": 18,
+      "translated": 18,
+      "missing": []
+    }
+  },
+  "abilityEffectUniqueTexts": 149,
+  "failures": 0,
+  "allowedLatin": [
+    "HP",
+    "KO",
+    "AR시스템",
+    "DD래리어트",
+    "폴리곤Z"
+  ],
+  "notes": [
+    "Operational UI includes currently disabled upstream cloud/ranking notices and moderator screens.",
+    "Move IDs can differ from the upstream displayed move name; translation follows the displayed name."
+  ]
+}

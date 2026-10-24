@@ -1,0 +1,388 @@
+@font-face {
+  font-family: "Galmuri11";
+  src: url("../assets/fonts/galmuri/Galmuri11.woff2") format("woff2");
+  font-weight: 400 550;
+  font-display: block;
+}
+@font-face {
+  font-family: "Galmuri11";
+  src: url("../assets/fonts/galmuri/Galmuri11-Bold.woff2") format("woff2");
+  font-weight: 551 900;
+  font-display: block;
+}
+html[lang="ko"] { --font: "Pixelify", "Galmuri11", sans-serif; }
+html[lang="ko"] body, html[lang="ko"] button, html[lang="ko"] input, html[lang="ko"] select {
+  font-family: var(--font);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+html[lang="ko"] .box { line-height: 1.5; }
+html[lang="ko"] .menu-item small { line-height: 1.45; }
+html[lang="ko"] .toast { max-width: min(90vw, 680px); text-align: center; }
+html[lang="ko"] #dex-detail .stat { grid-template-columns: 90px minmax(0, 1fr) 5ch; }
+html[lang="ko"] .stat > span:last-child { white-space: nowrap; text-align: right; }
+#btn-google, #btn-support { display: none !important; }
+.kor-auth-help {
+  color: #d5e0f5;
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 5px 0 13px;
+  text-align: left;
+}
+.kor-auth-help[hidden], .kor-password-confirm[hidden] { display: none; }
+.kor-auth-status { min-height: 1.65em; margin-bottom: 0; }
+.kor-auth-status:empty { display: none; }
+.kor-auth-status.is-match { color: #adf0b2; }
+.kor-auth-status.is-error { color: #ffd0cf; }
+#login-form .field[aria-invalid="true"] { border-color: #ffb9b5; }
+#login-form > .row { margin-top: 22px; }
+#login-form > .note { margin: 14px 0 18px; }
+#scr-login a:not(.btn), #scr-login a:not(.btn):visited { color: #e5f0ff; text-decoration: underline; text-underline-offset: 4px; }
+#scr-login a:not(.btn):hover { color: #ffe391; }
+#scr-login a:not(.btn):focus-visible { outline: 2px solid #ffe391; outline-offset: 4px; border-radius: 2px; }
+#login-err:empty { display: none; }
+.kor-edition-credits { color: #d5e0f5; font-size: 12px; line-height: 1.7; margin-top: 18px; text-align: center; }
+.kor-edition-credits p { margin: 4px 0; }
+.kor-edition-credits strong { color: #fff; }
+.kor-edition-credits a, .kor-edition-credits a:visited { color: #e5f0ff; text-underline-offset: 3px; }
+.kor-edition-credits.compact { margin: 10px 0 0; text-align: left; }
+.kor-server-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.kor-server-actions .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; text-decoration: none; }
+.kor-server-actions .kor-support-shortcut { margin-left: auto; border-color: #fff0ac; box-shadow: 0 0 0 1px #e6c96755; }
+.kor-support-shortcut[hidden] { display: none; }
+dialog.kor-notices { width: min(600px, calc(100vw - 28px)); max-height: calc(100dvh - 36px); color: #eef4ff; margin: auto; padding: 20px; }
+dialog.kor-notices:not([open]) { display: none; }
+dialog.kor-notices::backdrop { background: #081022d9; }
+.kor-notices-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; position: sticky; top: -20px; background: #263c77; z-index: 1; padding: 8px 0; }
+.kor-notices-header h2 { margin: 0; }
+.kor-notice { border-top: 1px solid #b3caff55; margin-top: 16px; padding-top: 12px; }
+.kor-notice h3 { color: #ffe391; margin: 0 0 12px; }
+.kor-notice p { line-height: 1.7; }
+.kor-notice-gift { padding: 14px; border: 2px solid #e6c967; background: #132449; border-radius: 10px; }
+.kor-notice-gift strong { display: block; color: #ffe391; }
+.kor-notice-gift .btn { min-width: 140px; }
+.kor-notices-message { color: #ffe391; line-height: 1.6; }
+.kor-notices-message:empty { display: none; }
+.kor-support .btn { display: inline-block; text-decoration: none; }
+
+/* Description and actions must not compete for the same narrow grid row. */
+html[lang="ko"] #scr-upgrades .box { display: flex; flex-direction: column; overflow: hidden; }
+html[lang="ko"] #scr-upgrades .box > .row,
+html[lang="ko"] #scr-upgrades .upg-head { flex-shrink: 0; }
+html[lang="ko"] #upg-list {
+  min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  align-content: start; align-items: stretch; padding: 4px;
+}
+html[lang="ko"] #upg-list .upg-item {
+  min-width: 0; grid-template-columns: 32px minmax(0, 1fr);
+  gap: 8px 10px; align-items: start;
+}
+html[lang="ko"] .upg-copy { min-width: 0; }
+html[lang="ko"] .upg-copy > b { display: block; line-height: 1.5; }
+html[lang="ko"] .upg-description { display: block; line-height: 1.65; margin-top: 4px; }
+html[lang="ko"] #upg-list .upg-btns { grid-column: 1 / -1; min-width: 0; align-self: end; }
+html[lang="ko"] #upg-list .upg-btns .btn { max-width: 100%; white-space: normal; }
+html[lang="ko"] #upg-list .upg-btns [data-start],
+html[lang="ko"] #upg-list .upg-btns [data-start2],
+html[lang="ko"] #upg-list .upg-btns [data-ban] { flex: 1 1 120px; min-width: 0; }
+html[lang="ko"] #upg-list .upg-btns [data-buy] { flex: 0 0 auto; }
+html[lang="ko"] #scr-upgrades .upg-head > .grow { min-width: 0; }
+html[lang="ko"] #scr-upgrades #upg-mon { min-width: 0 !important; width: min(280px, 100%) !important; }
+@media (max-height: 520px) {
+  html[lang="ko"] #scr-upgrades .box { height: 100%; padding: 8px 12px; }
+  html[lang="ko"] #scr-upgrades .upg-head { gap: 10px; margin: 2px 0 8px; }
+  html[lang="ko"] #scr-upgrades .upg-head .stage { width: 64px; height: 52px; flex-basis: 64px; }
+  html[lang="ko"] #scr-upgrades .upg-head .row { margin-top: 4px !important; }
+  html[lang="ko"] #upg-list .upg-item { padding: 10px; }
+}
+@media (max-width: 600px) {
+  html[lang="ko"] #upg-list { grid-template-columns: minmax(0, 1fr); }
+  html[lang="ko"] #scr-upgrades .upg-head .row { flex-wrap: wrap; }
+}
+
+/* Scale DOM menus, never the world canvas or touch controls. Compensated layout
+   dimensions keep every screen and its scroll area inside Safari's visible area. */
+:root { --kor-vw: 100vw; --kor-vh: 100dvh; --kor-vleft: 0px; --kor-vtop: 0px; --kor-ui-scale: 1; }
+html[lang="ko"] .scr {
+  inset: auto; left: var(--kor-vleft); top: var(--kor-vtop);
+  width: calc(var(--kor-vw) / var(--kor-ui-scale));
+  height: calc(var(--kor-vh) / var(--kor-ui-scale));
+  transform: scale(var(--kor-ui-scale)); transform-origin: top left;
+  padding-left: max(10px, calc(env(safe-area-inset-left) / var(--kor-ui-scale)));
+  padding-right: max(10px, calc(env(safe-area-inset-right) / var(--kor-ui-scale)));
+  padding-bottom: max(6px, calc(env(safe-area-inset-bottom) / var(--kor-ui-scale)));
+}
+html[lang="ko"] #scr-menu {
+  padding-left: calc(env(safe-area-inset-left) / var(--kor-ui-scale));
+  padding-right: calc(env(safe-area-inset-right) / var(--kor-ui-scale));
+}
+/* Keep login fields at readable native size, avoiding Safari's focus auto zoom. */
+html[lang="ko"] #scr-login { transform: none; width: var(--kor-vw); height: var(--kor-vh); }
+html[lang="ko"] #scr-login input { font-size: max(16px, 1em); }
+html[lang="ko"] .topbar {
+  top: calc(var(--kor-vtop) + max(6px, env(safe-area-inset-top)));
+  right: max(8px, env(safe-area-inset-right));
+  max-width: calc((var(--kor-vw) - 16px) / var(--kor-ui-scale));
+  overflow-x: auto; scrollbar-width: none;
+  transform: scale(var(--kor-ui-scale)); transform-origin: top right;
+}
+html[lang="ko"] .topbar > * { flex-shrink: 0; white-space: nowrap; }
+html[lang="ko"] .topbar::-webkit-scrollbar { display: none; }
+body:has(#scr-upgrades:not(.hidden)) .credits-line { display: none; }
+html[lang="ko"] .ach-pop {
+  max-width: calc(var(--kor-vw) - 24px);
+  transform: translateX(-50%) scale(var(--kor-ui-scale)); transform-origin: center bottom;
+}
+dialog.kor-notices { max-height: calc(var(--kor-vh) - 24px); }
+html[lang="ko"] .box.settings > .row, html[lang="ko"] #set-tabs { flex-shrink: 0; }
+html[lang="ko"] .box.settings { max-height: 100%; }
+.kor-storage-tools { flex-shrink: 0; font-size: 12px; border-top: 1px solid #8ba9dc66; margin-top: 8px; padding-top: 6px; }
+.kor-storage-tools summary { cursor: pointer; color: #e5edff; }
+.kor-storage-tools .btn { margin: 8px 6px 0 0; }
+#pull-fx {
+  inset: auto; left: var(--kor-vleft); top: var(--kor-vtop);
+  width: var(--kor-vw); height: var(--kor-vh);
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+.kor-slot-frame {
+  position: relative; flex: 0 0 auto;
+  width: min(440px, calc(var(--kor-vw) - 40px), calc((var(--kor-vh) - 130px) * 176 / 170));
+}
+.kor-pulling #pull-fx { gap: 0; justify-content: center; }
+.kor-pulling #pull-fx::before, .kor-pulling #pull-fx::after { display: none; }
+.kor-slot-frame[hidden] { display: none; }
+.kor-slot-stage { position: relative; }
+.kor-slot-frame #slot { display: block; width: 100%; height: auto; animation: none; }
+.kor-slot-led {
+  position: absolute; left: 20.45%; top: 58.82%; width: 51.14%; height: 9.41%;
+  display: flex; align-items: center; justify-content: center; pointer-events: none;
+  background: #190f19; color: #fff2ad; font: 700 14px/1.2 "Galmuri11", sans-serif;
+  white-space: nowrap; text-shadow: none; border: 1px solid #79545a;
+}
+.kor-slot-caption { margin: 6px -20px 0; color: #fff2ad; text-align: center; font: 700 16px/1.5 "Galmuri11", sans-serif; }
+.kor-slot-hint { margin: 6px -20px 0; color: #e5edff; text-align: center; font: 12px/1.5 "Galmuri11", sans-serif; }
+.kor-pulling .ach-pop {
+  top: auto; bottom: max(6px, env(safe-area-inset-bottom));
+  font-size: 12px; padding: 6px 10px; pointer-events: none;
+}
+@media (max-height: 360px) { .kor-slot-led { font-size: 12px; } }
+@media (max-height: 520px) {
+  .kor-pulling #pull-fx { padding-bottom: max(60px, env(safe-area-inset-bottom)); }
+  html[lang="ko"] #scr-gacha .banner .feat { height: 100px; margin-top: 0; }
+  html[lang="ko"] #scr-gacha .banner .feat canvas { width: 90px; height: auto; }
+  html[lang="ko"] #scr-gacha .banner { padding: 10px 14px; }
+  html[lang="ko"] #scr-gacha .banner h2 { margin: 0; font-size: 22px; }
+  html[lang="ko"] #scr-gacha .banner p { margin: 4px 0; }
+  html[lang="ko"] .kor-server-actions { gap: 6px; margin-bottom: 10px; }
+  dialog.kor-notices { padding: 12px 16px; font-size: 14px; }
+  .kor-notices-header { top: -12px; }
+}
+
+/* Explicit dialog widths avoid intrinsic flex shrinkage. Keep actions outside
+   the scrollable choices so browser toolbars never bury the controls. */
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) { padding-top: max(8px, calc(env(safe-area-inset-top) / var(--kor-ui-scale))); }
+html[lang="ko"] .kor-choice-box {
+  width: min(620px, 100%); min-width: 0; display: flex; flex-direction: column;
+  overflow: hidden; padding: 16px 18px;
+}
+html[lang="ko"] .kor-choice-box > :not(.cards) { flex-shrink: 0; }
+html[lang="ko"] .kor-choice-box .cards {
+  width: 100%; min-height: 0; overflow: auto; overscroll-behavior: contain;
+  padding: 3px; gap: 10px; flex-shrink: 1;
+}
+html[lang="ko"] .kor-choice-box .card { min-width: 0; flex-shrink: 0; }
+html[lang="ko"] .kor-choice-box .card .txt { min-width: 0; }
+html[lang="ko"] .kor-choice-box .card .nm { line-height: 1.45; }
+html[lang="ko"] .kor-choice-box .card .ds { line-height: 1.6; margin-top: 4px; }
+html[lang="ko"] .kor-choice-box #lvl-reroll,
+html[lang="ko"] .kor-choice-box #bond-back { min-height: calc(40px / var(--kor-ui-scale)); align-self: center; }
+html[lang="ko"] .kor-choice-box > .row:not(.kor-choice-actions):has(#bond-back.hidden) { display: none; }
+html[lang="ko"] .kor-choice-box > .row:has(#bond-back:not(.hidden)) { margin-top: 8px; }
+/* Keep the same readable dialog width on short landscape screens. */
+@media (min-width: 640px) and (max-height: 600px) and (orientation: landscape) {
+  html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .kor-choice-box { width: min(1040px, 100%); padding: 10px 14px; }
+  html[lang="ko"] .kor-choice-box > h2 { font-size: 22px; margin-bottom: 4px; }
+  html[lang="ko"] .kor-choice-box > .sub { font-size: 14px; margin-bottom: 8px; }
+  html[lang="ko"] #scr-bond .kor-choice-box .bond-hint { display: none; }
+}
+
+/* Read-only role grades. Shared explanations live beside the choice actions. */
+.kor-move-ratings { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; text-shadow: none; }
+.kor-rating-badge {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
+  min-height: 32px; min-width: 70px; padding: 3px 7px;
+  background: #101e43; border: 1px solid #b9cbf0; border-radius: 7px;
+  color: #f4f8ff; font-size: 15px; line-height: 1.2;
+}
+/* Standard bold letterforms keep B's two bowls distinct from C's opening. */
+.kor-rating-badge strong {
+  display: inline-grid; place-items: center; min-width: 25px; height: 27px;
+  padding: 0 3px; border-radius: 4px; font: 900 23px/1 Arial, sans-serif; text-shadow: none;
+}
+.kor-rating-badge[data-grade="S"] strong { color: #4b3400; background: #ffe17d; }
+.kor-rating-badge[data-grade="A"] strong { color: #133b24; background: #a8f1bc; }
+.kor-rating-badge[data-grade="B"] strong { color: #102f51; background: #a8dcff; }
+.kor-rating-badge[data-grade="C"] strong { color: #532900; background: #ffbf79; }
+.kor-rating-badge[data-grade="D"] strong { color: #273044; background: #d3d8e2; }
+.kor-rating-icons { display: inline-flex; align-items: center; gap: 1px; pointer-events: none; }
+.kor-rating-icons img { display: block; }
+html[lang="ko"] .kor-choice-box .card { flex-wrap: wrap; }
+html[lang="ko"] .kor-choice-box .card > .kor-move-ratings { flex-basis: 100%; grid-column: 1 / -1; }
+@media (min-width: 640px) and (max-height: 600px) and (orientation: landscape) {
+  html[lang="ko"] .kor-choice-box .card > .kor-move-ratings { margin-top: 0; }
+  .kor-rating-badge { padding: 4px 7px; gap: 6px; }
+}
+.kor-rated-option { min-width: 0; display: flex; flex-direction: column; align-items: stretch; padding: 5px; border: 1px solid #a8c3ff55; border-radius: 8px; }
+.kor-rated-option > .chip { width: 100%; text-align: left; }
+.kor-rated-option > .kor-move-ratings { margin-top: 5px; }
+.ban-moves:has(> .kor-rated-option) {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px;
+  width: 100%; min-width: min(320px, 100%); align-items: stretch;
+}
+.ban-moves > .kor-rated-option { width: 100%; min-width: min(320px, 100%); }
+.kor-rated-option > .chip { min-height: calc(40px / var(--kor-ui-scale)); white-space: normal; }
+
+dialog.kor-rating-dialog { margin: auto; width: min(620px, calc(var(--kor-vw) - 28px)); max-height: calc(var(--kor-vh) - 24px); padding: 16px; color: #fff; overflow: hidden; }
+dialog.kor-rating-dialog[open] { display: flex; flex-direction: column; }
+dialog.kor-rating-dialog::backdrop { background: #081022e8; }
+.kor-rating-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-shrink: 0; padding-bottom: 10px; }
+.kor-rating-head h2 { font-size: 20px; margin: 0; }
+.kor-rating-head .btn { flex-shrink: 0; min-height: 40px; }
+.kor-rating-body { min-height: 0; overflow: auto; overscroll-behavior: contain; color: #e5edff; font-size: 14px; line-height: 1.7; }
+.kor-rating-body p { margin: 0 0 12px; }
+/* All reward choices form full-width rows, regardless of orientation.
+   Clamp the minimum to the available space rather than overflowing a phone. */
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .kor-choice-box { min-width: min(360px, 100%); }
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .cards {
+  display: flex; flex-direction: column; align-items: stretch;
+}
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr); width: 100%;
+  min-width: min(320px, 100%); gap: 8px 12px; align-items: center;
+}
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card:hover { transform: none; }
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card .ico { width: 40px; height: 40px; }
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card .ico img { max-width: 100%; height: auto; }
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card .txt { display: block; }
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card > .kor-move-ratings { grid-column: 2; margin-top: 0; }
+html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card .key { grid-column: 2; justify-self: end; }
+@media (min-width: 640px) and (orientation: landscape) {
+  .kor-rated-option { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+  .kor-rated-option > .kor-move-ratings { margin-top: 0; }
+  html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card { grid-template-columns: 40px minmax(0, 1fr) auto; }
+  html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card > .kor-move-ratings { grid-column: 3; grid-row: 1; }
+  html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .card .key { grid-column: 3; }
+}
+@media (min-width: 640px) and (max-height: 320px) and (orientation: landscape) {
+  html[lang="ko"] :is(#scr-levelup, #scr-bond, #scr-item) .kor-choice-box { padding: 8px 10px; }
+  html[lang="ko"] .kor-choice-box .card:has(> .kor-move-ratings) { padding: 8px; gap: 6px; }
+  html[lang="ko"] .kor-choice-box > h2 { font-size: 20px; line-height: 1.25; margin-bottom: 0; }
+  html[lang="ko"] .kor-choice-box > .sub { font-size: 13px; line-height: 1.25; margin: 2px 0 5px; }
+}
+
+/* Friends and records share the existing menu width and scale. Scroll lists, keeping actions visible. */
+html[lang="ko"] :is(#scr-friends, #scr-rank) .box {
+  width: min(1100px, 100%); display: flex; flex-direction: column; overflow: hidden; min-height: 0;
+}
+html[lang="ko"] :is(#fr-list, #rk-list) { min-height: 0; flex: 1 1 auto; max-height: none; overflow: auto; }
+/* Ranking filters and records scroll together; tabs never compete for flex height. */
+html[lang="ko"] #scr-rank { padding-top: calc((56px + env(safe-area-inset-top)) / var(--kor-ui-scale)); }
+html[lang="ko"] #scr-rank .box > .row,
+html[lang="ko"] #rk-me { flex-shrink: 0; }
+html[lang="ko"] .kor-rank-body { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 3px; }
+html[lang="ko"] #scr-rank #rk-list { flex: none; max-height: none; overflow: visible; padding-right: 0; }
+html[lang="ko"] #rk-mode { align-items: stretch; gap: 8px; margin: 6px 0 8px; padding: 3px 2px 6px; }
+html[lang="ko"] #rk-mode .gen-tab { min-width: 96px; min-height: calc(40px / var(--kor-ui-scale)); padding: 6px 14px; justify-content: center; }
+html[lang="ko"] #rk-mode .gen-tab b { display: inline-flex; align-items: center; gap: 6px; line-height: 1.4; white-space: nowrap; font-size: 16px; }
+html[lang="ko"] #rk-mode .gen-tab img { flex-shrink: 0; }
+html[lang="ko"] #rk-period,
+html[lang="ko"] #rk-scope { gap: 8px; }
+html[lang="ko"] :is(#rk-period, #rk-scope) .chip { min-height: calc(36px / var(--kor-ui-scale)); display: inline-flex; align-items: center; justify-content: center; line-height: 1.4; }
+html[lang="ko"] #scr-rank .rk-tools { flex-wrap: wrap; align-items: center; }
+html[lang="ko"] #scr-rank .rk-tools .field { max-width: 100%; }
+@media (max-height: 320px) and (orientation: landscape) {
+  html[lang="ko"] #rk-me { min-height: 0; padding: 6px 10px; margin-top: 6px; font-size: 13px; line-height: 1.4; }
+}
+html[lang="ko"] .fr-row { flex-wrap: wrap; gap: 8px; }
+html[lang="ko"] .fr-row b { min-width: 0; overflow-wrap: anywhere; }
+html[lang="ko"] .fr-row .btn { flex-shrink: 0; }
+html[lang="ko"] #scr-lobby .box { width: min(1100px, 100%); }
+html[lang="ko"] .lob-card { min-width: 0; overflow-wrap: anywhere; }
+html[lang="ko"] #lobby-invite { max-height: 160px; }
+@media (orientation: landscape) and (max-height: 500px) {
+  html[lang="ko"] .lobby-members { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  html[lang="ko"] .lob-card { min-height: 115px; padding: 4px; gap: 0; }
+  html[lang="ko"] .lob-card canvas { width: 80px; height: 64px; }
+  html[lang="ko"] #lobby-invite { max-height: 86px; }
+  html[lang="ko"] #scr-lobby .box > .sub { margin: 4px 0; }
+  html[lang="ko"] #scr-lobby .box > h3 { margin-top: 6px !important; }
+  html[lang="ko"] .rk-row { padding: 3px 8px; }
+}
+
+/* One help action per choice list; remains visible when rerolls are exhausted. */
+.kor-choice-actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; flex-shrink: 0; }
+.kor-choice-actions:not(:has(button:not(.hidden):not([hidden]))) { display: none; }
+.kor-choice-actions .btn { margin-top: 0; min-height: calc(40px / var(--kor-ui-scale)); }
+.kor-move-help[hidden] { display: none; }
+.kor-move-help:is(:hover, :focus-visible) { border-color: #ffe17d; background: #345991; color: #fff; }
+.kor-move-help:focus-visible { outline: 3px solid #ffe17d; outline-offset: 3px; }
+.kor-rating-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 10px; max-height: 28vh; overflow: auto; flex-shrink: 0; }
+.kor-rating-tabs .chip { min-height: 38px; }
+.kor-rating-tabs .chip[aria-pressed="true"] { background: #3b5484; border-color: #ffe17d; color: #ffe17d; }
+.kor-rating-tabs .chip:focus-visible { outline: 2px solid #ffe17d; outline-offset: 1px; }
+.kor-rating-body h3 { color: #fff; margin: 0 0 8px; }
+
+/* Move category remains visible when learning, upgrading, evolving or choosing a starter. */
+.kor-move-category {
+  display: inline-flex; align-items: center; flex: 0 0 auto; vertical-align: middle;
+  margin-left: 4px; padding: 3px 7px; border: 1px solid; border-radius: 5px;
+  font-size: 13px; font-weight: 700; line-height: 1.2; white-space: nowrap; text-shadow: none;
+}
+.kor-move-category[data-category="physical"] { color: #fff0da; background: #65301e; border-color: #ffbd84; }
+.kor-move-category[data-category="special"] { color: #e8f5ff; background: #1b416f; border-color: #9bd5ff; }
+.kor-move-category[data-category="support"] { color: #f0eaff; background: #493268; border-color: #d5b8ff; }
+
+/* Pokémon advice uses the menu's scale and explicit scroll regions on short screens. */
+.kor-tier-summary { padding: 10px; margin: 10px 0; border: 1px solid #96baf4; border-radius: 9px; background: #122b50; text-align: left; }
+.kor-tier-summary-head, .kor-tier-lead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.kor-tier-summary-head .btn { margin-left: auto; min-height: 40px; }
+.kor-tier-letter { display: inline-grid; place-items: center; flex: 0 0 30px; width: 30px; height: 32px; border-radius: 5px; font: 900 24px/1 Arial,sans-serif; text-shadow: none; }
+.kor-tier-letter[data-tier="S"] { color: #4b3400; background: #ffe17d; }
+.kor-tier-letter[data-tier="A"] { color: #133b24; background: #a8f1bc; }
+.kor-tier-letter[data-tier="B"] { color: #102f51; background: #a8dcff; }
+.kor-tier-letter[data-tier="C"] { color: #532900; background: #ffbf79; }
+.kor-tier-letter[data-tier="D"] { color: #273044; background: #d3d8e2; }
+.kor-tier-components { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 6px; margin-top: 10px; }
+.kor-tier-components > div { display: flex; align-items: center; flex-direction: column; gap: 4px; background: #0d1e38; border-radius: 5px; padding: 7px 2px; }
+.kor-tier-components span, .kor-tier-components small { font-size: 12px; color: #e2edff; }
+dialog.kor-tier-dialog { width: min(820px,calc(var(--kor-vw) - 24px)); max-height: calc(var(--kor-vh) - 20px); margin: auto; padding: 16px; color: #f4f8ff; overflow: hidden; }
+dialog.kor-tier-dialog[open] { display: flex; flex-direction: column; }
+dialog.kor-tier-dialog::backdrop { background: #081022ed; }
+.kor-tier-body { min-height: 0; overflow: auto; overscroll-behavior: contain; text-align: left; font-size: 14px; line-height: 1.7; }
+.kor-tier-body h3 { margin: 18px 0 8px; font-size: 18px; color: #ffe17d; }
+.kor-tier-body p { margin: 8px 0; }
+.kor-tier-tabs, .kor-tier-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.kor-tier-tabs .chip { min-height: 40px; }
+.kor-tier-filters .field { min-width: 0; width: auto; flex: 1 1 160px; }
+.kor-tier-phase { border: 1px solid #95b5eb66; background: #122b50; border-radius: 6px; padding: 8px 10px; margin: 8px 0; }
+.kor-tier-phase h4 { margin: 0; font-size: 15px; }
+.kor-tier-row { display: grid; grid-template-columns: 30px minmax(0,1fr); gap: 3px 10px; align-items: center; width: 100%; padding: 9px; margin: 6px 0; background: #132b4e; border: 1px solid #94b9f1; color: #fff; border-radius: 6px; text-align: left; }
+.kor-tier-row .kor-tier-letter { grid-row: span 2; }
+.kor-tier-row small { font-size: 12px; color: #d7e6ff; }
+.kor-tier-row:is(:hover,:focus-visible) { background: #304e7b; border-color: #ffe17d; }
+.kor-tier-dialog button:focus-visible, .kor-tier-summary button:focus-visible, .kor-tier-entry:focus-visible { outline: 2px solid #ffe17d; outline-offset: 2px; }
+@media (max-height: 350px) { dialog.kor-tier-dialog { padding: 10px 14px; } .kor-tier-dialog .kor-rating-head { padding-bottom: 4px; } }
+
+/* Event boss status stays readable in short landscape Safari viewports. */
+#kor-armored-status{position:fixed;z-index:12;top:calc(env(safe-area-inset-top) + 66px);left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 32px));box-sizing:border-box;padding:8px 12px;background:rgba(12,19,44,.94);border:2px solid #dba7ff;border-radius:10px;color:#fff;text-align:center;font:12px/1.4 Galmuri11,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008}
+#kor-armored-status[hidden]{display:none}#kor-armored-status strong{display:block;color:#ffd86d;font-size:16px}#kor-armored-status progress{display:block;width:100%;height:10px;margin:4px 0;accent-color:#d67cff}#kor-armored-status span{display:block;font:10px/1.2 Arial,sans-serif;color:#e5dcff}#kor-armored-status small{display:block;color:#fff;margin-top:3px}
+@media(max-height:420px) and (orientation:landscape){#kor-armored-status{top:calc(env(safe-area-inset-top) + 48px);padding:5px 9px;width:min(360px,calc(100vw - 180px))}#kor-armored-status strong{font-size:13px}#kor-armored-status progress{height:7px;margin:3px 0}#kor-armored-status span{display:none}#kor-armored-status small{font-size:10px}}
+
+/* Explicit account logout confirmation. */
+#kor-logout-dialog{width:min(400px,calc(100vw - 32px));box-sizing:border-box;max-height:calc(100dvh - 32px);color:#fff;text-align:center;padding:22px;overflow:auto}
+#kor-logout-dialog::backdrop{background:rgba(3,6,16,.82)}
+#kor-logout-dialog h2{font-size:22px;line-height:1.5;margin:0 0 12px;color:#fff}
+#kor-logout-dialog p{font-size:15px;line-height:1.7;margin:0 0 20px;color:#e9efff;word-break:keep-all}
+.kor-logout-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.kor-logout-actions .btn{flex:1 1 125px;min-height:44px;white-space:normal}
+@media(max-height:350px){#kor-logout-dialog{padding:16px}#kor-logout-dialog h2{font-size:19px;margin-bottom:8px}#kor-logout-dialog p{font-size:14px;margin-bottom:14px}}
