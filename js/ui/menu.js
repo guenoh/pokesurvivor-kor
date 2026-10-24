@@ -191,15 +191,15 @@ G.MenuUI = (() => {
     const list = G.DEX.filter(p => {
       const own = !!s.owned[p.dex];
       if (q) {
-        // Por número, o por nombre (sin tildes); de los que no tienes no se busca el nombre.
-        if (num != null ? p.dex !== num : !(own && [p.name, G.T(p.name)].some(name => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q)))) return false;
+        // Event names are disclosed even before ownership; ordinary hidden names stay hidden.
+        if (num != null ? p.dex !== num : !((own || p.eventOnly) && [p.name, G.T(p.name)].some(name => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q)))) return false;
       } else if (dexGen && p.gen !== dexGen) return false;
       if (f.status === 'own' && !own) return false;
       if (f.status === 'miss' && own) return false;
       if (f.shiny && !(s.shiny && s.shiny[p.dex])) return false;
       if (f.fav && !G.DB.isFav(p.dex)) return false;
       if (f.rar.size && !f.rar.has(p.rarity)) return false;
-      if (f.type && !(own && p.types.includes(f.type))) return false;
+      if (f.type && !((own || p.eventOnly) && p.types.includes(f.type))) return false;
       return true;
     });
     const at = p => (s.owned[p.dex] && s.owned[p.dex].at) || 0, used = p => +(s.pused || {})[p.dex] || 0;
