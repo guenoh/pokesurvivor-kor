@@ -64,6 +64,19 @@ G.ArmoredMewtwo = (() => {
     if(!e.remote)G.Spawner.say('제어 아머가 부서졌다! 뮤츠의 힘이 해방된다!',3);
     G.Camera.kick(.6);G.Audio.sfx('boss');
   }
+  function enrage(e){
+    if(e.dead||e.armoredFrenzy)return;
+    if(!e.armoredReleased)breakArmor(e);
+    e.armoredFrenzy=true;e.armoredTransition=C.frenzyTransition;e.phase='walk';
+    e.armoredAI={cd:0,turn:0,cast:null,label:'폭주! · 공격 예고와 간격이 짧아집니다'};
+    G.Hazards.clearOwner(e.id);
+    G.FX.ring(e.x,e.y,20,160,'#ff785d',.6,5);
+    G.FX.burst(e.x,e.y-e.bodyH*.45,'#ffb15d',24,190);
+    if(!e.remote)G.Spawner.say('아머드뮤츠가 폭주하기 시작했다! 공격 예고와 간격이 짧아진다!',3);
+    G.Camera.kick(.6);G.Audio.sfx('boss');
+  }
+  const tempo=e=>e.armoredFrenzy?C.frenzyTempo:1;
+  const cooldown=e=>(e.armoredReleased?C.releasedCooldown:C.cooldown)/tempo(e);
   function tick(dt,time){
     if(!authority()){
       if(boss&&released(boss))breakArmor(boss);
@@ -80,17 +93,17 @@ G.ArmoredMewtwo = (() => {
     const hard=!!e.armoredReleased, turn=ai.turn++;
     // Lead with the new rush after armor breaks, then alternate it with the old patterns.
     const pattern=hard?(turn%4===0?3:(turn%4)-1):turn%3;
-    const delay=hard?1.2:1.25;
+    const speed=tempo(e),delay=(hard?1.2:1.25)/speed;
     const damage=e.def.shotDmg*e.sc.dmg;
     const angle=Math.atan2(p.y-e.y,p.x-e.x);
-    ai.cast={t:0,wind:delay,after:.5};
+    ai.cast={t:0,wind:delay,after:.5/speed};
     e.anim.play('Charge',{speed:1});
     if(pattern===3){
-      ai.cast={id:'rush',t:0,wind:C.rushWarning,after:C.rushRecovery,angle,
+      ai.cast={id:'rush',t:0,wind:C.rushWarning/speed,after:C.rushRecovery/speed,angle,
         length:C.rushDistance,duration:C.rushDuration};
       // The corridor is a warning only. Damage comes from the moving body, not a second beam hit.
       hazard(e,{kind:'beam',x:e.x,y:e.y,angle,len:C.rushDistance+e.r,w:e.r*2+16,
-        delay:C.rushWarning,end:C.rushDuration,dmg:0,visualOnly:true,color:'#ffad66'});
+        delay:ai.cast.wind,end:C.rushDuration,dmg:0,visualOnly:true,color:'#ffad66'});
       ai.label='돌진 준비 · 표시된 경로 옆으로 피하세요';
     }else if(pattern===0){
       const n=hard?5:3;
@@ -99,18 +112,19 @@ G.ArmoredMewtwo = (() => {
     }else if(pattern===1){
       const n=hard?5:3;
       for(let i=0;i<n;i++)hazard(e,{kind:'zone',x:p.x+(i?Math.cos(i*2.4)*90:0),y:p.y+(i?Math.sin(i*2.4)*90:0),r:44,
-        delay:delay+i*.18,dmg:damage*.9});
-      ai.cast.after+=n*.18;
+        delay:delay+i*.18/speed,dmg:damage*.9});
+      ai.cast.after+=n*.18/speed;
       ai.label='사이코키네시스 · 표시된 바닥을 벗어나세요';
     }else{
-      hazard(e,{kind:'zone',x:e.x,y:e.y,r:112,delay:delay+.2,dmg:damage*1.15});
-      ai.cast.wind+=.2;
+      hazard(e,{kind:'zone',x:e.x,y:e.y,r:112,delay:delay+.2/speed,dmg:damage*1.15});
+      ai.cast.wind+=.2/speed;
       ai.label='염동 파동 · 뮤츠에게서 멀어지세요';
     }
   }
   function move(e,dt,p,dist,dx,dy,spd){
-    const ai=e.armoredAI||(e.armoredAI={cd:2.5,turn:0,cast:null,label:'공격 예고를 확인하세요'});
     if(released(e))breakArmor(e);
+    if(!e.dead&&e.hp<=e.maxHp*C.frenzyAt)enrage(e);
+    const ai=e.armoredAI||(e.armoredAI={cd:2.5,turn:0,cast:null,label:'공격 예고를 확인하세요'});
     if(e.armoredTransition>0){e.armoredTransition-=dt;return [0,0,'Idle'];}
     if(ai.cast){
       const c=ai.cast,previous=c.t;
@@ -126,12 +140,12 @@ G.ArmoredMewtwo = (() => {
         if(c.t>=c.wind+c.duration){
           e.phase='walk';ai.label='돌진 후 빈틈 · 지금 공격하세요';
         }
-        if(c.t>=c.wind+c.duration+c.after){ai.cast=null;ai.cd=C.releasedCooldown;}
+        if(c.t>=c.wind+c.duration+c.after){ai.cast=null;ai.cd=cooldown(e);}
         // Integrate only the part of this frame within the dash: no overshoot or homing.
         return distance>0?[Math.cos(c.angle)*distance/dt,Math.sin(c.angle)*distance/dt,'Walk']:[0,0,'Idle'];
       }
       if(ai.cast.t>=ai.cast.wind&&!ai.cast.fired){ai.cast.fired=true;e.anim.play('Shoot');}
-      if(ai.cast.t>=ai.cast.wind+ai.cast.after){ai.cast=null;ai.cd=e.armoredReleased?C.releasedCooldown:C.cooldown;}
+      if(ai.cast.t>=ai.cast.wind+ai.cast.after){ai.cast=null;ai.cd=cooldown(e);}
       return [0,0,'Idle'];
     }
     ai.cd-=dt;
@@ -148,8 +162,12 @@ G.ArmoredMewtwo = (() => {
     if(!this.armoredReleased&&this.hp>this.maxHp*C.breakAt){
       amount=Math.min(amount,this.hp-Math.floor(this.maxHp*C.breakAt));
     }
+    if(this.armoredReleased&&!this.armoredFrenzy&&this.hp>this.maxHp*C.frenzyAt){
+      amount=Math.min(amount,this.hp-Math.floor(this.maxHp*C.frenzyAt));
+    }
     const result=hurt.call(this,amount,...args);
     if(!this.dead&&released(this))breakArmor(this);
+    if(!this.dead&&this.hp<=this.maxHp*C.frenzyAt)enrage(this);
     return result;
   };
   const bossMove=G.Enemy.prototype.bossMove;
@@ -169,11 +187,12 @@ G.ArmoredMewtwo = (() => {
   };
   const slow=G.Enemy.prototype.applySlow;
   G.Enemy.prototype.applySlow=function(factor,dur){return slow.call(this,this.dex===ID?Math.min(.45,factor):factor,dur);};
-  function netState(){return [stage,boss?.id||0,releaseAt,deadline,won];}
+  function netState(){return [stage,boss?.id||0,releaseAt,deadline,won,!!boss?.armoredFrenzy];}
   function netApply(a){
     if(authority()||!Array.isArray(a)||!['waiting','fight','recovery','escaped','done'].includes(a[0])||!Number.isFinite(a[2]))return;
     const previous=stage;
     stage=a[0];boss=G.EnemyMgr.get(a[1])||boss;releaseAt=a[2];deadline=Number.isFinite(a[3])?a[3]:0;won=a[4]===true||stage==='recovery';
+    if(boss&&a[5]===true)enrage(boss);
     if(previous==='waiting'&&stage==='fight'){G.Projectiles.clear();G.Hazards.clear();G.Rift.reset();G.Events.reset();}
     if(previous==='fight'&&['recovery','escaped','done'].includes(stage)){
       if(boss)G.Hazards.clearOwner(boss.id);
@@ -187,10 +206,11 @@ G.ArmoredMewtwo = (() => {
     el.hidden=!playing||!['fight','recovery','escaped'].includes(stage);
     if(el.hidden)return;
     const remaining=Math.max(0,Math.ceil(deadline-time)),timer=`${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,'0')}`;
-    const title=stage==='escaped'?'제한시간 종료 · 이벤트 보상 없음':stage==='recovery'?'아머드뮤츠 격파!':`아머드뮤츠 · ${boss?.armoredReleased?'힘 해방':'제어 아머'} · ${timer}`;
+    const title=stage==='escaped'?'제한시간 종료 · 이벤트 보상 없음':stage==='recovery'?'아머드뮤츠 격파!':`아머드뮤츠 · ${boss?.armoredFrenzy?'폭주 · 패턴 가속':boss?.armoredReleased?'힘 해방':'제어 아머'} · ${timer}`;
     const hint=['recovery','escaped'].includes(stage)?`다음 관문 준비 ${Math.max(0,Math.ceil(releaseAt-time))}초 · 아르세우스 등장 대기`:boss?.armoredAI?.label||'공격 예고를 보고 피하세요';
     const value=stage==='fight'&&boss?Math.max(0,Math.ceil(boss.hp)):0,max=boss?.maxHp||1;
     const key=[title,hint,value,max].join('|');if(key===lastHud)return;lastHud=key;
+    el.classList.toggle('frenzy',!!boss?.armoredFrenzy);
     el.querySelector('strong').textContent=title;el.querySelector('small').textContent=hint;
     const bar=el.querySelector('progress');bar.max=max;bar.value=value;
     el.querySelector('span').textContent=`${value.toLocaleString()} / ${max.toLocaleString()}`;
@@ -200,6 +220,6 @@ G.ArmoredMewtwo = (() => {
     el.innerHTML='<strong></strong><progress aria-label="아머드뮤츠 남은 체력"></progress><span></span><small></small>';
     document.body.append(el);
   });
-  return {reset,definition,updateSpawn,tick,canJudge,netState,netApply,breakArmor,renderHud,
+  return {reset,definition,updateSpawn,tick,canJudge,netState,netApply,breakArmor,enrage,renderHud,
     get stage(){return stage;},get boss(){return boss;},get blocking(){return ['fight','recovery','escaped'].includes(stage);}};
 })();
