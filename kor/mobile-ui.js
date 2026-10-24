@@ -12,28 +12,40 @@ G.KorMobileUI = (() => {
 
   function init() {
     const root = document.documentElement;
-    let pending = false, settleTimers = [];
+    const viewport = document.createElement('div');
+    viewport.className = 'kor-viewport-probe';
+    viewport.setAttribute('aria-hidden', 'true');
+    document.body.append(viewport);
+    let pending = false, settleTimers = [], previousLayout;
     function resize() {
       pending = false;
       const view = window.visualViewport;
-      // Let native pinch zoom work. Do not resize the UI against the user's zoom.
-      if (view && Math.abs(view.scale - 1) > 0.02) return;
+      // Safari can leave innerWidth / visualViewport at the portrait size after
+      // rotation. Measure dynamic CSS viewport units independently of those APIs.
+      const bounds = viewport.getBoundingClientRect();
+      const layoutWidth = bounds.width || innerWidth, layoutHeight = bounds.height || innerHeight;
+      const layoutChanged = !previousLayout || Math.abs(previousLayout.width - layoutWidth) > 2 || Math.abs(previousLayout.height - layoutHeight) > 2;
+      const zoomed = view && Math.abs(view.scale - 1) > 0.02;
+      // A pinch in the same layout must not resize the UI. A real layout change
+      // must still recover even when Safari also reports a transient zoom scale.
+      if (zoomed && !layoutChanged) return;
       // Safari can report the previous orientation's visual viewport first.
       // At native zoom its width must agree with the layout viewport. Use one
       // complete snapshot until both have caught up, never mix the two sizes.
-      const current = view && Math.abs(view.width - innerWidth) <= 2;
-      const width = current ? view.width : innerWidth, height = current ? view.height : innerHeight;
+      const current = view && !zoomed && Math.abs(view.width - layoutWidth) <= 2;
+      const width = current ? view.width : layoutWidth, height = current ? view.height : layoutHeight;
       if (!(width > 0 && height > 0)) return;
+      previousLayout = { width: layoutWidth, height: layoutHeight };
       root.style.setProperty('--kor-vw', width + 'px');
       root.style.setProperty('--kor-vh', height + 'px');
-      root.style.setProperty('--kor-vleft', (current ? Math.max(0, Math.min(view.offsetLeft || 0, innerWidth - width)) : 0) + 'px');
-      root.style.setProperty('--kor-vtop', (current ? Math.max(0, Math.min(view.offsetTop || 0, innerHeight - height)) : 0) + 'px');
+      root.style.setProperty('--kor-vleft', (current ? Math.max(0, Math.min(view.offsetLeft || 0, layoutWidth - width)) : 0) + 'px');
+      root.style.setProperty('--kor-vtop', (current ? Math.max(0, Math.min(view.offsetTop || 0, layoutHeight - height)) : 0) + 'px');
       root.classList.toggle('kor-menu-compact', height <= 520);
       root.classList.toggle('kor-menu-short', height <= 400);
       root.classList.toggle('kor-menu-wide', height <= 660);
       root.classList.toggle('kor-menu-stacked', width <= 760 && height > 520);
       // Keyboard opening must not change the chosen menu density.
-      root.style.setProperty('--kor-ui-scale', scaleFor(G.Settings.get('uiScale'), innerWidth, innerHeight, G.Settings.touch));
+      root.style.setProperty('--kor-ui-scale', scaleFor(G.Settings.get('uiScale'), layoutWidth, layoutHeight, G.Settings.touch));
     }
     function schedule() { if (!pending) { pending = true; requestAnimationFrame(resize); } }
     // Rotation / browser chrome animations can finish after the initial event,
@@ -50,6 +62,7 @@ G.KorMobileUI = (() => {
     document.addEventListener('visibilitychange', () => { if (!document.hidden) settle(); });
     window.visualViewport?.addEventListener('resize', schedule);
     window.visualViewport?.addEventListener('scroll', schedule);
+    if (window.ResizeObserver) new ResizeObserver(settle).observe(viewport);
     G.Settings.on(key => { if (key === 'uiScale') resize(); });
     resize();
 
