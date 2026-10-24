@@ -105,5 +105,5 @@ G.KorMobileUI = (() => {
     };
   }
   document.addEventListener('DOMContentLoaded', init);
-  return { scaleFor, rarityFor };
+  return { scaleFor };
 })();
