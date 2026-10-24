@@ -24,12 +24,13 @@ let index=html.slice(0,begin)+'<script defer src="js/preview-game.js?v='+revisio
 index=index.replace('<title>PokéSurvivor 한국어 독립판</title>','<title>아머드뮤츠 공개 테스트 · PokéSurvivor</title>')
  .replace('<link rel="manifest" href="manifest.webmanifest">','')
  .replace('<link rel="preconnect" href="https://www.gstatic.com" crossorigin>','')
+ .replace('href="kor/style.css"','href="kor/style.css?v='+revision+'"')
  .replace('</head>','<link rel="stylesheet" href="preview.css"></head>')
  .replaceAll('https://pokesurvivor-kor.onrender.com/','https://guenoh.github.io/pokesurvivor-kor/')
  .replaceAll('content="PokéSurvivor 한국어 독립판"','content="아머드뮤츠 공개 테스트"');
 fs.writeFileSync(path.join(out,'index.html'),index);
 fs.copyFileSync(path.join(root,'preview/public.css'),path.join(out,'preview.css'));
 fs.writeFileSync(path.join(out,'.nojekyll'),'');
-fs.writeFileSync(path.join(out,'preview.json'),JSON.stringify({mode:'guest-only-public-test',productionAccounts:false,revision,balance:{soloHpAt28Minutes:61560,hpMultiplier:.75,damageMultiplier:1.1,normalWaves:false,releasedRush:{warning:1.2,distance:320,duration:.55,recovery:1.1}},source:'https://github.com/guenoh/pokesurvivor-kor/tree/feature/armored-mewtwo-local'},null,2)+'\n');
+fs.writeFileSync(path.join(out,'preview.json'),JSON.stringify({mode:'guest-only-public-test',productionAccounts:false,revision,balance:{soloHpAt28Minutes:61560,hpMultiplier:.75,damageMultiplier:1.1,normalWaves:false,releasedRush:{warning:1.2,distance:320,duration:.55,recovery:1.1},frenzy:{at:.1,tempo:2.5,damageMultiplier:1,warning:.48,cooldown:.96}},source:'https://github.com/guenoh/pokesurvivor-kor/tree/feature/armored-mewtwo-local'},null,2)+'\n');
 for(const forbidden of ['.git','.env','node_modules','tools','.local'])if(fs.existsSync(path.join(out,forbidden)))throw Error('Unexpected private/development path: '+forbidden);
 console.log('Public static event demo packaged: '+out);

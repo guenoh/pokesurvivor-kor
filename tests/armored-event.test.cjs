@@ -60,12 +60,14 @@ test('solo and co-op stat multipliers match the same-time normal final boss',()=
     if(n===1)assert.equal(E.boss.maxHp,61560);
   }
 });
-test('large hits stop at half HP, the transition clears old hazards and cannot be burst-skipped',()=>{
+test('large hits stop at both phase gates and transitions cannot be burst-skipped',()=>{
   const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
   G.Hazards.add({owner:e.id});G.Hazards.add({owner:999});e.hurt(1e9);
   assert.equal(e.hp,e.maxHp/2);assert.equal(e.dead,false);assert.equal(e.armoredReleased,true);assert.equal(e.anim.dex,150);
   assert.equal(G.Hazards.all.length,1);assert.equal(G.Hazards.all[0].owner,999);
-  e.hurt(1e9);assert.equal(e.dead,false);e.bossMove(2.1,player,150,1,0,72);e.hurt(1e9);assert.equal(e.dead,true);
+  e.hurt(1e9);assert.equal(e.dead,false);e.bossMove(2.1,player,150,1,0,72);e.hurt(1e9);
+  assert.equal(e.dead,false);assert.equal(e.hp,Math.floor(e.maxHp*.1));assert.equal(e.armoredFrenzy,true);
+  e.hurt(1e9);assert.equal(e.dead,false);e.bossMove(.61,player,150,1,0,72);e.hurt(1e9);assert.equal(e.dead,true);
 });
 test('both phases telegraph every pattern for at least one second, and phase two has more beams',()=>{
   const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
@@ -113,6 +115,48 @@ test('phase one never rushes, and the new corridor cannot inflict an extra beam 
   assert.equal(sent[1].visualOnly,true);
   G.Hazards.update(1.2);assert.equal(hits,0);
   G.Hazards.update(.56);assert.equal(G.Hazards.count,0);assert.equal(hits,0);
+});
+test('frenzy starts exactly at ten percent, clears only its old warnings, and never increases damage',()=>{
+  const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
+  e.hp=e.maxHp/2;E.breakArmor(e);e.armoredTransition=0;
+  const damage=e.dmg,shot=e.def.shotDmg,speed=e.spd;
+  e.hp=Math.floor(e.maxHp*.1)+2;e.hurt(1);assert.equal(e.armoredFrenzy,undefined);
+  G.Hazards.add({owner:e.id});G.Hazards.add({owner:999});e.hurt(1);
+  assert.equal(e.hp,e.maxHp*.1);assert.equal(e.armoredFrenzy,true);
+  assert.equal(e.dmg,damage);assert.equal(e.def.shotDmg,shot);assert.equal(e.spd,speed);
+  assert.equal(G.Hazards.all.length,1);assert.equal(G.Hazards.all[0].owner,999);
+  assert.equal(E.netState()[5],true);
+  e.bossMove(.61,player,150,1,0,72);e.bossMove(.01,player,150,1,0,72);
+  const cast=e.armoredAI.cast;assert.equal(cast.id,'rush');
+  e.hurt(1);assert.equal(e.armoredAI.cast,cast);assert.equal(e.armoredTransition<0,true);
+});
+test('frenzy divides all four pattern warnings, waits and recoveries by 2.5 with identical damage',()=>{
+  for(let turn=0;turn<4;turn++){
+    function pattern(frenzy){
+      const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
+      e.hp=e.maxHp*(frenzy?.1:.4);E.breakArmor(e);if(frenzy)E.enrage(e);
+      e.armoredTransition=0;e.armoredAI={cd:0,turn,cast:null};
+      e.bossMove(.01,player,150,1,0,72);
+      return {G,e,player,cast:e.armoredAI.cast,hazards:G.Hazards.all};
+    }
+    const normal=pattern(false),rage=pattern(true),close=(a,b)=>assert.ok(Math.abs(a-b)<1e-8);
+    close(rage.cast.wind,normal.cast.wind/2.5);close(rage.cast.after,normal.cast.after/2.5);
+    assert.equal(rage.hazards.length,normal.hazards.length);
+    normal.hazards.forEach((h,i)=>{close(rage.hazards[i].delay,h.delay/2.5);assert.equal(rage.hazards[i].dmg,h.dmg);});
+    if(turn===0){assert.equal(rage.cast.duration,normal.cast.duration);assert.equal(rage.cast.length,normal.cast.length);}
+    const recovery=rage.cast.wind+(rage.cast.duration||0)+rage.cast.after+.001;
+    rage.e.bossMove(recovery,rage.player,150,1,0,72);
+    assert.equal(rage.e.armoredAI.cast,null);close(rage.e.armoredAI.cd,.96);
+  }
+});
+test('guests use the host frenzy flag and never trigger it from speculative local damage',()=>{
+  const {G,player}=setup(),E=G.ArmoredMewtwo;G.Coop.active=true;G.Coop.isHost=false;
+  const remote=new G.Enemy(E.definition(),100,0,{hp:1,dmg:1,spd:1},true);remote.remote=true;
+  remote.hp=1;G.EnemyMgr.add(remote);
+  E.netApply(['fight',remote.id,0,1860,false,false]);E.tick(.1,1700);
+  assert.equal(remote.armoredFrenzy,undefined);
+  E.netApply(['fight',remote.id,0,1860,false,true]);assert.equal(remote.armoredFrenzy,true);
+  const ai=remote.armoredAI;E.netApply(['fight',remote.id,0,1860,false,true]);assert.equal(remote.armoredAI,ai);
 });
 test('crowd control cannot permanently freeze the event boss',()=>{
   const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;

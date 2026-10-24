@@ -376,6 +376,7 @@ dialog.kor-tier-dialog::backdrop { background: #081022ed; }
 
 /* Event boss status stays readable in short landscape Safari viewports. */
 #kor-armored-status{position:fixed;z-index:12;top:calc(env(safe-area-inset-top) + 66px);left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 32px));box-sizing:border-box;padding:8px 12px;background:rgba(12,19,44,.94);border:2px solid #dba7ff;border-radius:10px;color:#fff;text-align:center;font:12px/1.4 Galmuri11,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008}
+#kor-armored-status.frenzy{border-color:#ff855e;box-shadow:0 0 16px #ff573d88}#kor-armored-status.frenzy strong{color:#ffb580}#kor-armored-status.frenzy progress{accent-color:#ff785d}
 #kor-armored-status[hidden]{display:none}#kor-armored-status strong{display:block;color:#ffd86d;font-size:16px}#kor-armored-status progress{display:block;width:100%;height:10px;margin:4px 0;accent-color:#d67cff}#kor-armored-status span{display:block;font:10px/1.2 Arial,sans-serif;color:#e5dcff}#kor-armored-status small{display:block;color:#fff;margin-top:3px}
 @media(max-height:420px) and (orientation:landscape){#kor-armored-status{top:calc(env(safe-area-inset-top) + 48px);padding:5px 9px;width:min(360px,calc(100vw - 180px))}#kor-armored-status strong{font-size:13px}#kor-armored-status progress{height:7px;margin:3px 0}#kor-armored-status span{display:none}#kor-armored-status small{font-size:10px}}
 
