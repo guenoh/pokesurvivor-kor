@@ -1,7 +1,7 @@
 {
   "mode": "guest-only-public-test",
   "productionAccounts": false,
-  "revision": "23565d62e6a4",
+  "revision": "d5b3db3788da",
   "balance": {
     "soloHpAt28Minutes": 61560,
     "hpMultiplier": 0.75,
@@ -14,7 +14,7 @@
       "recovery": 1.1
     },
     "frenzy": {
-      "at": 0.1,
+      "at": 0.15,
       "tempo": 2.5,
       "damageMultiplier": 1,
       "warning": 0.48,
