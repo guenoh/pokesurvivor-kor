@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),s={console};s.window=s;vm.createContext(s);
-for(const f of ['js/core/util.js','js/data/types.js','js/data/pokedex.js','js/data/sprites-meta.js','js/core/sprites.js','js/data/moves.js','js/systems/stats.js','js/data/abilities.js','js/data/upgrades.js','js/data/ability-fx.js'])vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),s,{filename:f});
+for(const f of ['js/core/util.js','js/data/types.js','js/data/pokedex.js','js/data/sprites-meta.js','js/core/sprites.js','js/data/moves.js','js/systems/stats.js','js/data/abilities.js','js/data/upgrades.js','js/data/ability-fx.js','js/data/tms.js','kor/armored-data.js'])vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),s,{filename:f});
 s.G.T=x=>x;s.G.I18n={lang:'ko'};s.G.Weather={get current(){throw Error('Tier generation must not read live weather');}};
 for(const f of ['kor/move-ratings.js','kor/pokemon-tiers.js'])vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),s,{filename:f});
 const data=s.G.PokemonTiers.snapshot();

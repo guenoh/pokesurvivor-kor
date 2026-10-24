@@ -62,6 +62,7 @@ G.Pad = (() => {
   // ---------------- selección en los menús ----------------
 
   function scopes() {
+    if (G.KorLogout?.isOpen()) return [G.KorLogout.dialog];
     if (G.PokemonTiers && G.PokemonTiers.isOpen()) return [G.PokemonTiers.dialog];
     if (G.MoveRatings && G.MoveRatings.isOpen()) return [G.MoveRatings.dialog];
     const top = topScreen(), out = [];
@@ -190,6 +191,7 @@ G.Pad = (() => {
 
   /** B: el botón de cerrar o volver de la ventana, si lo tiene; si no, Esc. */
   function back() {
+    if (G.KorLogout?.isOpen()) { G.KorLogout.close(); return; }
     const top = topScreen();
     if (top) {
       const btns = [...top.querySelectorAll('button, a')].filter(b => b.getBoundingClientRect().width > 0);
