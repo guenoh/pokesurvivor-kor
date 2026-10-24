@@ -5,12 +5,25 @@ G.GachaUI = (() => {
   const $ = G.UI.$;
   let busy = false;
   let gen = 1;
+  const rarity = rank => G.I18n.lang === 'ko' ? G.KorMobileUI.rarityFor(rank) : null;
+  const rarityLabel = rank => {
+    const r = rarity(rank);
+    return r ? `<span class="kor-rarity-label" translate="no"><strong>${r.en}</strong><small>${r.ko} · ${r.rank}/5</small></span>` : '';
+  };
 
   function init() {
     $('pull-1').onclick = () => pull(1);
     $('pull-10').onclick = () => pull(10, 't1');
     $('pull-10b').onclick = () => pull(10, 't10');
     $('pull-close').onclick = close;
+    if (G.I18n.lang === 'ko') {
+      const legend = document.createElement('div');
+      legend.id = 'kor-pull-rarity-legend'; legend.hidden = true;
+      legend.innerHTML = '<p translate="no">희귀도 1 → 5 · 숫자가 클수록 희귀합니다</p><div class="kor-rarity-order">' +
+        [1,2,3,4,5].map(r => `<span style="--rc:${G.Gacha.RARITY_COLOR[r]}">${rarityLabel(r)}</span>`).join('') +
+        '</div><p translate="no">희귀도는 전투 성능 티어와 다릅니다. 색이 다른 모습(SHINY)은 별도로 표시합니다.</p>';
+      $('pull-results').before(legend);
+    }
 
     const tabs = $('gacha-gens');
     G.Gacha.BANNERS.forEach(b => {
@@ -56,7 +69,7 @@ G.GachaUI = (() => {
     $('gacha-pity').textContent = `Tiradas sin legendaria en ${banner.name}: ${pity} / ${G.Gacha.PITY_5}`;
 
     $('gacha-rates').innerHTML = '<h3>Probabilidades</h3>' + G.Gacha.RATES.slice().reverse().map(([r, w]) => `
-      <div><span style="color:${G.Gacha.RARITY_COLOR[r]}">${G.UI.stars(r, 10)} ${G.Gacha.RARITY_NAME[r]}</span>
+      <div><span style="color:${G.Gacha.RARITY_COLOR[r]}">${G.UI.stars(r, 10)} ${rarity(r) ? `<span translate="no">${rarity(r).en} · ${rarity(r).ko}</span>` : G.Gacha.RARITY_NAME[r]}</span>
       <span>${w}% · ${G.Gacha.pool(r, gen).length}</span></div>`).join('') +
       `<div><span>${G.Icons.html('shiny', 12)} Shiny</span><span>1%</span></div>
        <p class="note">· La tirada ×10 garantiza al menos una Épica.<br>
@@ -89,12 +102,14 @@ G.GachaUI = (() => {
     const best = Math.max(...res.map(r => r.rarity));
     const fx = $('pull-fx'), slot = $('slot'), out = $('pull-results');
     out.innerHTML = '';
+    if ($('kor-pull-rarity-legend')) $('kor-pull-rarity-legend').hidden = true;
     $('pull-close').classList.add('hidden');
     slot.style.display = '';
     fx.classList.remove('hidden');
 
     // La tragaperras (ui/slots.js) y luego las cartas.
     await G.Slots.play(slot, res);
+    if ($('kor-pull-rarity-legend')) $('kor-pull-rarity-legend').hidden = false;
     G.Audio.sfx('burst', { rarity: best });
     slot.style.display = 'none';
 
@@ -102,8 +117,8 @@ G.GachaUI = (() => {
       const mon = G.DEX_BY[r.dex];
       const c = document.createElement('div');
       c.className = 'pcard r' + r.rarity + (r.shiny ? ' shiny' : '');
-      c.style.setProperty('--rc', r.shiny ? '#9ae6ff' : G.Gacha.RARITY_COLOR[r.rarity]);
-      c.innerHTML = `<div class="stars">${G.UI.stars(r.rarity, 24)}</div>`;
+      c.style.setProperty('--rc', rarity(r.rarity) ? G.Gacha.RARITY_COLOR[r.rarity] : r.shiny ? '#9ae6ff' : G.Gacha.RARITY_COLOR[r.rarity]);
+      c.innerHTML = rarityLabel(r.rarity) + (rarity(r.rarity) && r.shiny ? '<span class="kor-shiny-label" translate="no">SHINY · 색이 다름</span>' : '') + `<div class="stars">${G.UI.stars(r.rarity, 24)}</div>`;
       c.appendChild(G.UI.spriteCanvas(r.dex, 132, 120, { lively: r.rarity >= 4 || r.shiny, scale: 2, shiny: r.shiny }));
       const tag = r.isNew
         ? `<span class="new">${r.shiny ? '¡SHINY NUEVO!' : '¡NUEVO!'}</span>`

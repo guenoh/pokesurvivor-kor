@@ -1,5 +1,10 @@
 /* Keep the Korean menus and canvas in the same available browser viewport. */
 G.KorMobileUI = (() => {
+  const rarityNames = [null, ['COMMON', '커먼'], ['UNCOMMON', '언커먼'], ['RARE', '레어'], ['EPIC', '에픽'], ['LEGENDARY', '전설']];
+  function rarityFor(rank) {
+    const names = rarityNames[rank];
+    return names ? { en: names[0], ko: names[1], rank, color: G.Gacha.RARITY_COLOR[rank] } : null;
+  }
   function scaleFor(preference, width, height, touch) {
     if ([0.8, 0.9, 1, 1.1].includes(preference)) return preference;
     return (touch || width <= 900) && (height <= 600 || width <= 600) ? 0.85 : 1;
@@ -74,17 +79,23 @@ G.KorMobileUI = (() => {
       try {
         return await play.call(this, canvas, results, status => {
           const text = G.T(status.text);
-          let short = text;
+          let short = text, detail = text, color = '#fff2ad';
           if (G.I18n.lang === 'ko') {
             if (status.phase === 'ready') short = status.total > 1 ? '10회 뽑기' : '행운 가득!';
             if (status.phase === 'suspense') short = '두근두근!';
             if (status.phase === 'result') {
               const result = results[status.index - 1];
-              short = result.shiny ? '색이 다름!' : G.T(G.Gacha.RARITY_NAME[result.rarity]);
+              const rarity = rarityFor(result.rarity);
+              if (rarity) {
+                short = rarity.en;
+                color = rarity.color;
+                detail = `${rarity.en} · ${rarity.ko} · 희귀도 ${rarity.rank}/5` + (result.shiny ? ' · SHINY (색이 다름)' : '');
+              }
             }
           }
+          frame.style.setProperty('--kor-slot-color', color);
           led.textContent = short;
-          caption.textContent = (status.total > 1 ? `${status.index || 1} / ${status.total} · ` : '') + text;
+          caption.textContent = (status.total > 1 ? `${status.index || 1} / ${status.total} · ` : '') + detail;
           onStatus?.(status);
         });
       } finally {
@@ -94,5 +105,5 @@ G.KorMobileUI = (() => {
     };
   }
   document.addEventListener('DOMContentLoaded', init);
-  return { scaleFor };
+  return { scaleFor, rarityFor };
 })();
