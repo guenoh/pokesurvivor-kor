@@ -453,3 +453,21 @@ dialog.kor-tier-dialog::backdrop { background: #081022ed; }
 #kor-logout-dialog p{font-size:15px;line-height:1.7;margin:0 0 20px;color:#e9efff;word-break:keep-all}
 .kor-logout-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.kor-logout-actions .btn{flex:1 1 125px;min-height:44px;white-space:normal}
 @media(max-height:350px){#kor-logout-dialog{padding:16px}#kor-logout-dialog h2{font-size:19px;margin-bottom:8px}#kor-logout-dialog p{font-size:14px;margin-bottom:14px}}
+
+/* The dex sidebar stays narrow even on a landscape phone. Never share the
+   full-screen picker grid here, or pin nested action buttons over its content. */
+html[lang="ko"] #dex-detail { overflow-x: hidden; }
+html[lang="ko"] #dex-detail .btn { position: static; order: initial; box-shadow: none; flex-shrink: 0; }
+html[lang="ko"] #dex-detail > .btn { margin-top: 12px; }
+html[lang="ko"] #mx-picker .kor-rated-option { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; min-width: 0; }
+html[lang="ko"] #mx-picker .ban-moves { min-width: 0; }
+html[lang="ko"] #mx-picker .kor-rated-option > .chip { flex-wrap: wrap; justify-content: flex-start; font-size: 15px; line-height: 1.5; padding: 8px; word-break: keep-all; }
+html[lang="ko"] #mx-picker .chip[aria-pressed="true"] { border-color: #ffe17d; background: #354e85; }
+html[lang="ko"] #mx-picker .kor-tm-description { color: #e0eaff; line-height: 1.6; word-break: keep-all; }
+html[lang="ko"] #mx-picker .kor-move-ratings { margin: 0; gap: 6px; }
+html[lang="ko"] #mx-picker .kor-rating-badge { font-size: 12px; }
+html[lang="ko"] #mx-picker .kor-tm-confirm { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #9db6e5; padding-top: 8px; }
+html[lang="ko"] #mx-picker .kor-tm-confirm .btn { width: 100%; white-space: normal; line-height: 1.5; margin: 0; }
+html[lang="ko"] #mx-picker .kor-move-help { position: static; }
+html[lang="ko"] #mx-picker .kor-rated-option > .chip::after { content: '선택 ›'; margin-left: auto; color: #ffe17d; font-size: 12px; white-space: nowrap; }
+html[lang="ko"] #mx-picker .kor-rated-option > .chip:focus-visible { outline: 2px solid #ffe17d; outline-offset: 2px; }

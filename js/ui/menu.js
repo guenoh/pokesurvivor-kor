@@ -413,8 +413,25 @@ G.MenuUI = (() => {
     } else if (extraOpen === 'tm') {
       const list = G.Mons.learnable(dex).filter(id => G.Shop.tmCount(id) > 0);
       chips(list.map(id => ({ v: id, html: `${G.Icons.html('move:' + id, 16)} ${G.T(G.Moves.BY_ID[id].name, 'move')} <small>×${G.Shop.tmCount(id)}</small>` })), '', id => {
-        if (!G.Mons.teach(dex, id)) return;
-        done(G.I18n.f('¡{x} ha aprendido {x}!', mon.name, G.T(G.Moves.BY_ID[id].name, 'move')));
+        const teach = () => {
+          if (!G.Mons.teach(dex, id)) return;
+          done(G.I18n.f('¡{x} ha aprendido {x}!', mon.name, G.T(G.Moves.BY_ID[id].name, 'move')));
+        };
+        if (G.I18n.lang !== 'ko') { teach(); return; }
+        host.querySelector('.kor-tm-confirm')?.remove();
+        host.querySelectorAll('[data-v]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === id)));
+        const confirm = document.createElement('div'); confirm.className = 'kor-tm-confirm';
+        confirm.setAttribute('translate', 'no');
+        const note = document.createElement('p');
+        note.textContent = `${G.T(mon.name)}에게 ${G.T(G.Moves.BY_ID[id].name, 'move')} 기술머신 1개를 사용합니다. 배우면 탐험 중 기술 선택지에 추가됩니다.`;
+        const apply = document.createElement('button'); apply.className = 'btn gold'; apply.textContent = '기술머신 1개 사용하고 배우기';
+        apply.onclick = teach;
+        const cancel = document.createElement('button'); cancel.className = 'btn'; cancel.textContent = '취소';
+        cancel.onclick = () => { confirm.remove(); host.querySelectorAll('[data-v]').forEach(b => b.setAttribute('aria-pressed', 'false')); };
+        confirm.append(note, apply, cancel);
+        host.querySelector(`[data-v="${id}"]`).closest('.kor-rated-option').append(confirm);
+        apply.focus({ preventScroll: true });
+        confirm.scrollIntoView({ block: 'nearest' });
       });
       if (G.MoveRatings) G.MoveRatings.decoratePicker(host, dex, 'data-v');
     }
