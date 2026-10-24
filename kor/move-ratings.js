@@ -54,7 +54,10 @@ G.MoveRatings = (() => {
       case 'mine': boss = n * .35; mob = clamp(r*r / 3600 * n,1.5,3) * .75; break;
       case 'meteor': boss = (1 + (n-1) * .15) * .55; mob = Math.min(3,n * clamp(r*r / 3600,1,2)) * .8; break;
       case 'turret': period = m.rate || .6; boss = .75 * Math.min(1,(m.dur||6)/(m.cd||1)); mob = Math.min(3,1+p) * boss; break;
-      case 'dash': boss = .7; mob = clamp(r * (m.width||35)/4000,1.5,3) * .8; break;
+      case 'dash':
+        boss = .7; mob = clamp(r * (m.width||35)/4000,1.5,3) * .8;
+        if(m.rushShots){ boss += m.rushShots*m.rushShotRatio*.85; mob += Math.min(3,m.rushShots*(1+p))*m.rushShotRatio*.8; }
+        break;
       case 'trail': period = .5; boss = .25; mob = clamp(r*r / 2500,1.5,3) * .7; break;
       case 'cone': boss = (1 + Math.min(n-1,6) * .15) * .75; mob = Math.min(3,n * .6 * (1+p)) * .8; break;
       case 'spin': boss = n * .65; mob = clamp(r*r / 3600,1.4,3) * n * .75; break;
@@ -109,7 +112,7 @@ G.MoveRatings = (() => {
     const top=key=>Math.max(score[key],...pool.map(s=>s[key]));
     return {support:false,name:G.T(move.name,'move'),mob:grade(score.mob,top('mob')),boss:grade(score.boss,top('boss')),
       scores:score,level:move.lvl||1,evolved:!!move.evolved,category:move.cat,
-      reasons:REASONS[move.kind],fit:G.Stats.fit(ctx.mon,move.cat), ability:ctx.abilId?G.Mons.abilityName(ctx.abilId):'',
+      reasons:move.rushShots?['돌진 경로의 상대를 한 번씩 공격하고, 이동 중 발사하는 염동력 탄의 무리 견제를 함께 계산합니다.','돌진 타격과 유도탄의 명중 가능성을 따로 반영합니다. 모든 타격이 보스에게 맞는 것으로 계산하지 않습니다.']:REASONS[move.kind],fit:G.Stats.fit(ctx.mon,move.cat), ability:ctx.abilId?G.Mons.abilityName(ctx.abilId):'',
       abilityMob:abilityMultiplier(ctx,move,false),abilityBoss:abilityMultiplier(ctx,move,true)};
   }
 
