@@ -3,22 +3,23 @@ G.RunUI = (() => {
   const $ = G.UI.$;
   let offers = null, offerCb = null, coopMode = false;
 
-  /*
-   * Al aparecer unas cartas (nivel, vínculo, objeto) no se pueden elegir
-   * durante GUARD s y se ven apagadas: en plena pelea se pulsa 1-4 (o se toca
-   * la pantalla) para cambiar de ataque y se elegía una carta sin querer.
-   * Cambiar las cartas o el 2.º paso del vínculo no lo vuelven a poner: ahí ya
-   * estás eligiendo a propósito.
-   */
+  /* Keep battle shortcuts / an already-started gesture from picking a new
+   * card accidentally. A fresh pointer press on a visible card is deliberate
+   * and must work immediately, including inside the old 600 ms guard window. */
   const GUARD = 0.6;
-  let guardUntil = 0, guardT = 0;
-  function guard(box) {
-    guardUntil = performance.now() + GUARD * 1000;
-    box.classList.add('guard');
-    clearTimeout(guardT);
-    guardT = setTimeout(() => document.querySelectorAll('.cards.guard').forEach(b => b.classList.remove('guard')), GUARD * 1000);
-  }
+  let guardUntil = 0;
+  function guard() { guardUntil = performance.now() + GUARD * 1000; }
   const guarded = () => performance.now() < guardUntil;
+  function wireChoice(element, choose) {
+    let freshPointer = false;
+    element.onpointerdown = event => { freshPointer = event.isPrimary !== false && event.button === 0; };
+    element.onpointercancel = () => { freshPointer = false; };
+    element.onclick = () => {
+      const deliberate = freshPointer;
+      freshPointer = false;
+      choose(deliberate);
+    };
+  }
 
   /** @param coop  en grupo: tras elegir, se queda esperando a los demás */
   function showLevelUp(level, list, cb, coop = false) {
@@ -30,7 +31,7 @@ G.RunUI = (() => {
     renderCards(list);
     $('lvl-reroll').onclick = reroll;
     G.UI.show('scr-levelup');
-    guard($('cards'));
+    guard();
   }
 
   /**
@@ -73,16 +74,16 @@ G.RunUI = (() => {
          <div class="txt"><div class="nm">${c.title} ${tag}</div><div class="ds">${c.desc}</div></div>
          <div class="key">${i + 1}</div>`;
       el.dataset.sfx = 'none';             // el juego pone su propio sonido al elegir
-      el.onclick = () => pick(i);
+      wireChoice(el, deliberate => pick(i, deliberate));
       if (G.MoveRatings) G.MoveRatings.mountChoice(el, c, G.Game.player);
       box.appendChild(el);
     });
     if (G.MoveRatings) G.MoveRatings.mountHelp(box, $('lvl-reroll'));
   }
 
-  function pick(i) {
+  function pick(i, deliberate = false) {
     if (G.MoveRatings && G.MoveRatings.isOpen()) return;
-    if (!offers || !offers[i] || guarded()) return;
+    if (!offers || !offers[i] || (!deliberate && guarded())) return;
     const c = offers[i], cb = offerCb;
     offers = null; offerCb = null;
     $('lvl-reroll').classList.add('hidden');
@@ -174,11 +175,11 @@ G.RunUI = (() => {
       el.innerHTML = `<div class="ico">${G.Icons.html(id, 36)}</div>
         <div class="txt"><div class="nm">${verb} ${it.name}</div><div class="ds">${it.desc}</div></div>
         <div class="key">${i + 1}</div>`;
-      el.onclick = () => { if (guarded()) return; G.UI.hide('scr-item'); cb(id); };
+      wireChoice(el, deliberate => { if (!deliberate && guarded()) return; G.UI.hide('scr-item'); cb(id); });
       box.appendChild(el);
     });
     G.UI.show('scr-item');
-    guard(box);
+    guard();
   }
 
   // ---------------- vínculo: qué movimientos se fusionan ----------------
@@ -194,7 +195,7 @@ G.RunUI = (() => {
     $('bond-back').onclick = bondBack;
     renderBond();
     G.UI.show('scr-bond');
-    guard($('bond-cards'));
+    guard();
   }
 
   function renderBond() {
@@ -219,16 +220,16 @@ G.RunUI = (() => {
          <div class="txt"><div class="nm">${G.T(m.name, 'move')} <span class="tag-chip" style="background:${col}">Nv.${m.lvl}</span></div><div class="ds">${desc}</div></div>
          <div class="key">${i + 1}</div>`;
       el.dataset.sfx = 'none';
-      el.onclick = () => pickBond(i);
+      wireChoice(el, deliberate => pickBond(i, deliberate));
       if (G.MoveRatings) G.MoveRatings.mount(el, m, G.Game.player);
       box.appendChild(el);
     });
     if (G.MoveRatings) G.MoveRatings.mountHelp(box, $('bond-back'));
   }
 
-  function pickBond(i) {
+  function pickBond(i, deliberate = false) {
     if (G.MoveRatings && G.MoveRatings.isOpen()) return;
-    if (!bond || !bond.list[i] || guarded()) return;
+    if (!bond || !bond.list[i] || (!deliberate && guarded())) return;
     const m = bond.list[i];
     if (bond.opt.mode === 'pair' && !bond.first) {
       bond.first = m;

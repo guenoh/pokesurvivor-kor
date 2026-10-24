@@ -1,6 +1,6 @@
 /* Keep the Korean menus and canvas in the same available browser viewport. */
 G.KorMobileUI = (() => {
-  const rarityNames = [null, ['COMMON', '커먼'], ['UNCOMMON', '언커먼'], ['RARE', '레어'], ['EPIC', '에픽'], ['LEGENDARY', '전설']];
+  const rarityNames = [null, ['COMMON', '일반'], ['UNCOMMON', '고급'], ['RARE', '희귀'], ['EPIC', '영웅'], ['LEGENDARY', '전설']];
   function rarityFor(rank) {
     const names = rarityNames[rank];
     return names ? { en: names[0], ko: names[1], rank, color: G.Gacha.RARITY_COLOR[rank] } : null;
