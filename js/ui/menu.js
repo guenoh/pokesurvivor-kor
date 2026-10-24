@@ -30,11 +30,7 @@ G.MenuUI = (() => {
     });
     document.querySelectorAll('[data-back]').forEach(b => { b.onclick = open; });
     G.Social.on(() => { if (G.UI.isOpen('scr-menu')) socialLine(); });
-    $('btn-logout').onclick = () => {
-      if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
-      G.Audio.music(null);
-      G.DB.logout().then(() => G.Flow.toLogin()).catch(() => {});
-    };
+    $('btn-logout').onclick = () => G.KorLogout.run();
   }
 
   // ---------------- menú principal ----------------
