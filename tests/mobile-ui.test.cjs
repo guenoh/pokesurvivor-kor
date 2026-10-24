@@ -21,13 +21,49 @@ test('available viewport follows toolbar changes and does not fight pinch zoom o
     addEventListener(event, callback) { if (event === 'resize') resize = callback; } };
   const s = { G: { Settings: { get: () => 'auto', touch: true, on: fn => { settingChanged = fn; } }, Slots: { play() {} } },
     innerWidth: 844, innerHeight: 390, visualViewport: view, addEventListener() {}, requestAnimationFrame: fn => fn(),
-    document: { addEventListener: (_, fn) => { boot = fn; }, documentElement: { style: { setProperty: (k,v) => values.set(k,v) } } } };
+    setTimeout: () => 1, clearTimeout() {},
+    document: { addEventListener: (event, fn) => { if (event === 'DOMContentLoaded') boot = fn; },
+      documentElement: { classList: { toggle() {} }, style: { setProperty: (k,v) => values.set(k,v) } } } };
   s.window = s; vm.createContext(s); vm.runInContext(read('kor/mobile-ui.js'), s); boot();
   assert.equal(values.get('--kor-vh'), '305px'); assert.equal(values.get('--kor-ui-scale'), .85);
   view.height = 360; resize(); assert.equal(values.get('--kor-vh'), '360px');
   view.scale = 2; view.height = 180; resize(); assert.equal(values.get('--kor-vh'), '360px');
   view.scale = 1; view.height = 160; resize(); assert.equal(values.get('--kor-ui-scale'), .85);
   s.G.Settings.get = () => 1.1; settingChanged('uiScale'); assert.equal(values.get('--kor-ui-scale'), 1.1);
+});
+test('Safari rotation settles without a second resize event and shares one viewport across menu and canvas', () => {
+  const events = {}, documentEvents = {}, values = new Map(), classes = new Map(), timers = new Map();
+  let timerId = 0;
+  const view = { width: 390, height: 664, scale: 1, offsetLeft: 0, offsetTop: 0, addEventListener() {} };
+  const s = { G: { Settings: { get: () => 'auto', touch: true, on() {} }, Slots: { play() {} } },
+    innerWidth: 390, innerHeight: 744, visualViewport: view,
+    addEventListener: (event, fn) => { events[event] = fn; }, requestAnimationFrame: fn => fn(),
+    setTimeout: fn => { timers.set(++timerId, fn); return timerId; }, clearTimeout: id => timers.delete(id),
+    document: { hidden: false, addEventListener: (event, fn) => { documentEvents[event] = fn; },
+      documentElement: { classList: { toggle: (k,v) => classes.set(k,v) }, style: { setProperty: (k,v) => values.set(k,v) } } } };
+  s.window = s; vm.createContext(s); vm.runInContext(read('kor/mobile-ui.js'), s); documentEvents.DOMContentLoaded();
+  assert.equal(classes.get('kor-menu-stacked'), true);
+  // Rotation event precedes Safari's visual viewport update. Never pair the
+  // old portrait width with new landscape media/layout dimensions.
+  s.innerWidth = 844; s.innerHeight = 390; view.offsetLeft = 120;
+  events.orientationchange();
+  assert.equal(values.get('--kor-vw'), '844px'); assert.equal(values.get('--kor-vh'), '390px');
+  assert.equal(values.get('--kor-vleft'), '0px'); assert.equal(classes.get('kor-menu-stacked'), false);
+  // The toolbar settles later, with no additional resize notification.
+  view.width = 844; view.height = 305;
+  for (const fn of timers.values()) fn();
+  assert.equal(values.get('--kor-vw'), '844px'); assert.equal(values.get('--kor-vh'), '305px');
+  assert.equal(classes.get('kor-menu-compact'), true); assert.equal(classes.get('kor-menu-short'), true);
+  // Cached pages / app switching must also recover stale dimensions.
+  s.innerWidth = 390; s.innerHeight = 744; events.pageshow();
+  view.width = 390; view.height = 664; view.offsetLeft = 0;
+  for (const fn of timers.values()) fn();
+  assert.equal(values.get('--kor-vh'), '664px'); assert.equal(classes.get('kor-menu-stacked'), true);
+  documentEvents.visibilitychange(); assert.equal(timers.size, 4);
+  // A zoomed viewport is intentional, not another rotation to correct.
+  view.scale = 2; view.width = 195; view.height = 332; events.orientationchange();
+  for (const fn of timers.values()) fn();
+  assert.equal(values.get('--kor-vw'), '390px'); assert.equal(values.get('--kor-vh'), '664px');
 });
 test('slot status reports all ten results, progress and shiny suspense without changing the results', async () => {
   let time = 0;

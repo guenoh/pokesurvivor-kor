@@ -1,4 +1,4 @@
-/* Korean menus use the available browser viewport; the world canvas is unchanged. */
+/* Keep the Korean menus and canvas in the same available browser viewport. */
 G.KorMobileUI = (() => {
   function scaleFor(preference, width, height, touch) {
     if ([0.8, 0.9, 1, 1.1].includes(preference)) return preference;
@@ -7,22 +7,42 @@ G.KorMobileUI = (() => {
 
   function init() {
     const root = document.documentElement;
-    let pending = false;
+    let pending = false, settleTimers = [];
     function resize() {
       pending = false;
       const view = window.visualViewport;
       // Let native pinch zoom work. Do not resize the UI against the user's zoom.
       if (view && Math.abs(view.scale - 1) > 0.02) return;
-      const width = view?.width || innerWidth, height = view?.height || innerHeight;
+      // Safari can report the previous orientation's visual viewport first.
+      // At native zoom its width must agree with the layout viewport. Use one
+      // complete snapshot until both have caught up, never mix the two sizes.
+      const current = view && Math.abs(view.width - innerWidth) <= 2;
+      const width = current ? view.width : innerWidth, height = current ? view.height : innerHeight;
+      if (!(width > 0 && height > 0)) return;
       root.style.setProperty('--kor-vw', width + 'px');
       root.style.setProperty('--kor-vh', height + 'px');
-      root.style.setProperty('--kor-vleft', (view?.offsetLeft || 0) + 'px');
-      root.style.setProperty('--kor-vtop', (view?.offsetTop || 0) + 'px');
+      root.style.setProperty('--kor-vleft', (current ? Math.max(0, Math.min(view.offsetLeft || 0, innerWidth - width)) : 0) + 'px');
+      root.style.setProperty('--kor-vtop', (current ? Math.max(0, Math.min(view.offsetTop || 0, innerHeight - height)) : 0) + 'px');
+      root.classList.toggle('kor-menu-compact', height <= 520);
+      root.classList.toggle('kor-menu-short', height <= 400);
+      root.classList.toggle('kor-menu-wide', height <= 660);
+      root.classList.toggle('kor-menu-stacked', width <= 760 && height > 520);
       // Keyboard opening must not change the chosen menu density.
       root.style.setProperty('--kor-ui-scale', scaleFor(G.Settings.get('uiScale'), innerWidth, innerHeight, G.Settings.touch));
     }
     function schedule() { if (!pending) { pending = true; requestAnimationFrame(resize); } }
-    addEventListener('resize', schedule);
+    // Rotation / browser chrome animations can finish after the initial event,
+    // including when Safari returns from another tab or its back-forward cache.
+    function settle() {
+      schedule();
+      settleTimers.forEach(clearTimeout);
+      settleTimers = [100, 350, 800, 1500].map(ms => setTimeout(schedule, ms));
+    }
+    addEventListener('resize', settle);
+    addEventListener('orientationchange', settle);
+    window.screen?.orientation?.addEventListener('change', settle);
+    addEventListener('pageshow', settle);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) settle(); });
     window.visualViewport?.addEventListener('resize', schedule);
     window.visualViewport?.addEventListener('scroll', schedule);
     G.Settings.on(key => { if (key === 'uiScale') resize(); });
