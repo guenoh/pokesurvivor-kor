@@ -111,6 +111,14 @@ html[lang="ko"] #scr-upgrades #upg-mon { min-width: 0 !important; width: min(280
 /* Scale DOM menus, never the world canvas or touch controls. Compensated layout
    dimensions keep every screen and its scroll area inside Safari's visible area. */
 :root { --kor-vw: 100vw; --kor-vh: 100dvh; --kor-vleft: 0px; --kor-vtop: 0px; --kor-ui-scale: 1; }
+html[lang="ko"] { background: #050914; }
+/* Startup and rotation overlays also need explicit bounds in Home Screen mode;
+   Safari can otherwise retain the previous fixed-position containing block. */
+html[lang="ko"] :is(.boot, .tapstart, #rotate) {
+  inset: auto; left: var(--kor-vleft); top: var(--kor-vtop);
+  width: var(--kor-vw); height: var(--kor-vh);
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
 .kor-viewport-probe {
   position: fixed; left: 0; top: 0; width: 100vw; width: 100dvw; height: 100vh; height: 100dvh;
   visibility: hidden; pointer-events: none; contain: strict;
