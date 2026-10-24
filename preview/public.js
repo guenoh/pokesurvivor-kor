@@ -21,9 +21,9 @@
       for(const perk of G.Upgrades.LIST)G.DB.upgradesOf(dex)[perk.id]=perk.max;
       G.Game.startRun();const p=G.Game.player;p.level=100;p.xpNext=G.Player.xpFor(100);p.hp=p.maxHp=800;
       const ids=['confusion','mist-ball','psychic','psybeam'].filter(id=>G.Moves.BY_ID[id]);
-      p.moves=ids.map(id=>G.Moves.instance(id,5));for(const m of p.moves)m.since=1680;
+      p.moves=ids.map(id=>G.Moves.instance(id,5));for(const m of p.moves)m.since=G.ARMORED_EVENT.at;
       p.slots=[p.moves];p.active=0;G.Projectiles.clearOrbs(p);
-      G.Enemies.BOSSES.forEach(b=>b.at=Infinity);G.Game.debugTime(1680);
+      G.Enemies.BOSSES.forEach(b=>b.at=Infinity);G.Game.debugTime(G.ARMORED_EVENT.at);
       intro.classList.add('hidden');tools.hidden=false;tools.open=false;
       refresh();
     }catch(error){G.UI.toast('시험 전투를 시작하지 못했습니다. 새로고침해 주세요.',8000);console.error('[Preview]',error);}
@@ -33,7 +33,7 @@
   document.addEventListener('DOMContentLoaded',()=>{
     document.title='아머드뮤츠 공개 테스트 · PokéSurvivor';
     intro=document.createElement('section');intro.className='scr dim hidden preview-intro';intro.setAttribute('translate','no');
-    intro.innerHTML='<div class="box center"><h1>아머드뮤츠 공개 테스트</h1><p>28분에 등장하는 이벤트 보스를 바로 만나 보세요.</p><p class="preview-note">로그인 없이 플레이 · 실제 계정에 저장되지 않음<br>시험용 Lv.100 · 최대 영구 강화<br>염동력·미스트볼·사이코키네시스·환상빔: 모두 Lv.5, 4개 연결<br>기술 진화 전 · 일반 적 등장 중지 · 체력 15%에서 폭주<br>무적 기본 ON · 휴대폰은 가로 화면으로 플레이하세요.</p><button class="btn gold" data-start>뮤츠로 전투 시작</button><button class="btn ghost" data-armored>아머드뮤츠로 플레이</button><p class="preview-credit">원작 JPTER78 · 한글화·한국판 개발 박근오<br>비공식·비상업 팬 게임 · 도트·밸런스 시험 버전</p></div>';
+    intro.innerHTML='<div class="box center"><h1>아머드뮤츠 공개 테스트</h1><p>23분에 등장하는 이벤트 보스를 바로 만나 보세요. 제한시간은 7분입니다.</p><p class="preview-note">로그인 없이 플레이 · 실제 계정에 저장되지 않음<br>시험용 Lv.100 · 최대 영구 강화<br>염동력·미스트볼·사이코키네시스·환상빔: 모두 Lv.5, 4개 연결<br>기술 진화 전 · 일반 적 등장 중지 · 체력 15%에서 폭주<br>무적 기본 ON · 휴대폰은 가로 화면으로 플레이하세요.</p><button class="btn gold" data-start>뮤츠로 전투 시작</button><button class="btn ghost" data-armored>아머드뮤츠로 플레이</button><p class="preview-credit">원작 JPTER78 · 한글화·한국판 개발 박근오<br>비공식·비상업 팬 게임 · 도트·밸런스 시험 버전</p></div>';
     intro.querySelector('[data-start]').onclick=()=>start(150);intro.querySelector('[data-armored]').onclick=()=>start(1150);
     tools=document.createElement('details');tools.className='preview-controls';tools.hidden=true;tools.setAttribute('translate','no');
     note=document.createElement('summary');tools.append(note);

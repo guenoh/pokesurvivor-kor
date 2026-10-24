@@ -303,7 +303,7 @@ G.MenuUI = (() => {
     const box = $('dex-detail');
     box.innerHTML = `
       <canvas id="dex-big" class="stage" width="220" height="190"></canvas>
-      ${p.eventOnly ? '<p class="sub center" translate="no">이벤트 포켓몬 · 28분 이후 아머드뮤츠를 쓰러뜨리면 동료가 됩니다.</p>' : ''}
+      ${p.eventOnly ? '<p class="sub center" translate="no">이벤트 포켓몬 · 23분 이후 아머드뮤츠를 쓰러뜨리면 동료가 됩니다.</p>' : ''}
       ${hasSh ? `<div class="seg">
           <button class="${viewShiny ? '' : 'on'}" data-v="0">${G.T('Normal', 'appearance')}</button>
           <button class="${viewShiny ? 'on' : ''}" data-v="1">${G.Icons.html('shiny', 12)} ${G.T('Shiny', 'appearance')}</button></div>` : ''}

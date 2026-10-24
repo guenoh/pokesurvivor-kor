@@ -14,7 +14,8 @@ G.ArmoredMewtwo = (() => {
   function spawn(players,time){
     const alive=players.filter(p=>!p.dead); if(!alive.length)return;
     const p=alive[0], angle=0, distance=G.Camera.outerRadius()+80;
-    const scale={...G.Enemies.bossScale(time)};
+    // Scheduling changes keep the previously tested stats; later arrivals may still scale up.
+    const scale={...G.Enemies.bossScale(Math.max(time,C.balanceAt))};
     scale.hp*=G.Coop.scaleHp(players.length)*(players.length>1?1.4:1);
     // Remove the previous wave without counting kills or distributing loot.
     if(G.Coop.isHost)for(const e of G.EnemyMgr.all())G.Coop.enemyGone(e,false);
