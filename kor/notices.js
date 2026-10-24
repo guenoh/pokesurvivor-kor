@@ -62,21 +62,26 @@
   function render() {
     updateSupport(data.support);
     body.replaceChildren();
-    // Updates first, newest date first. Reward campaigns retain their identity and claim flow.
-    const notices = [...data.notices].sort((a, b) => Number(!!a.reward) - Number(!!b.reward) || (Date.parse(b.publishedAt) || 0) - (Date.parse(a.publishedAt) || 0));
-    const latest = notices.find(notice => !notice.reward);
+    // Important campaigns precede routine fixes, regardless of update date.
+    // Reward identity, eligibility and claim flow remain server-owned.
+    const notices = [...data.notices].sort((a, b) => (Number(b.priority) || 0) - (Number(a.priority) || 0) || Number(!!b.reward) - Number(!!a.reward) || (Date.parse(b.publishedAt) || 0) - (Date.parse(a.publishedAt) || 0));
     for (const notice of notices) {
-      const article = make('article', notice === latest ? 'kor-notice kor-notice-latest' : 'kor-notice');
-      if (notice === latest) article.append(make('span', 'kor-notice-badge', '최신 업데이트'));
-      article.append(make('h3', '', notice.title));
-      if (notice.summary) article.append(make('p', 'kor-notice-summary', notice.summary));
-      for (const paragraph of notice.paragraphs) article.append(make('p', '', paragraph));
+      const archived = notice.collapsed === true && !notice.reward;
+      const article = make(archived ? 'details' : 'article', archived ? 'kor-notice kor-notice-archive' : 'kor-notice');
+      const contents = archived ? make('div') : article;
+      if (archived) article.append(make('summary', '', notice.title), contents);
+      else {
+        if (notice.label) article.append(make('span', 'kor-notice-badge', notice.label));
+        article.append(make('h3', '', notice.title));
+      }
+      if (notice.summary) contents.append(make('p', 'kor-notice-summary', notice.summary));
+      for (const paragraph of notice.paragraphs) contents.append(make('p', '', paragraph));
       if (Array.isArray(notice.history) && notice.history.length) {
         const history = make('details', 'kor-notice-history');
         history.append(make('summary', '', '이전 업데이트 내역 (' + notice.history.length + ')'));
-        const contents = make('div');
-        for (const paragraph of notice.history) contents.append(make('p', '', paragraph));
-        history.append(contents); article.append(history);
+        const historyBody = make('div');
+        for (const paragraph of notice.history) historyBody.append(make('p', '', paragraph));
+        history.append(historyBody); contents.append(history);
       }
       if (notice.reward) {
         const reward = notice.reward;
@@ -135,7 +140,7 @@
     try {
       const result = await G.DB.getNotices();
       updateSupport(result.support);
-      if (!G.DB.guest && user === G.DB.accountKey && G.Game.state === 'ui' && result.notices.some(unread)) {
+      if (!G.DB.guest && user === G.DB.accountKey && G.Game.state === 'ui' && result.notices.some(notice => notice.autoOpen !== false && unread(notice))) {
         init(); data = result; render(); message.textContent = ''; if (!dialog.open) dialog.showModal(); dialog.scrollTop = 0;
       }
     } catch { /* Opening announcements must not block the game. Manual retry remains available. */ }
