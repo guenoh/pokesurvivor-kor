@@ -30,6 +30,6 @@ index=index.replace('<title>PokéSurvivor 한국어 독립판</title>','<title>�
 fs.writeFileSync(path.join(out,'index.html'),index);
 fs.copyFileSync(path.join(root,'preview/public.css'),path.join(out,'preview.css'));
 fs.writeFileSync(path.join(out,'.nojekyll'),'');
-fs.writeFileSync(path.join(out,'preview.json'),JSON.stringify({mode:'guest-only-public-test',productionAccounts:false,revision,balance:{soloHpAt28Minutes:123120,hpMultiplier:1.5,damageMultiplier:1.1,normalWaves:false,releasedRush:{warning:1.2,distance:320,duration:.55,recovery:1.1}},source:'https://github.com/guenoh/pokesurvivor-kor/tree/feature/armored-mewtwo-local'},null,2)+'\n');
+fs.writeFileSync(path.join(out,'preview.json'),JSON.stringify({mode:'guest-only-public-test',productionAccounts:false,revision,balance:{soloHpAt28Minutes:61560,hpMultiplier:.75,damageMultiplier:1.1,normalWaves:false,releasedRush:{warning:1.2,distance:320,duration:.55,recovery:1.1}},source:'https://github.com/guenoh/pokesurvivor-kor/tree/feature/armored-mewtwo-local'},null,2)+'\n');
 for(const forbidden of ['.git','.env','node_modules','tools','.local'])if(fs.existsSync(path.join(out,forbidden)))throw Error('Unexpected private/development path: '+forbidden);
 console.log('Public static event demo packaged: '+out);

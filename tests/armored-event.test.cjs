@@ -56,8 +56,8 @@ test('solo and co-op stat multipliers match the same-time normal final boss',()=
     const {G,player}=setup(),E=G.ArmoredMewtwo,t=1680;
     const team=Array.from({length:n},()=>({...player}));E.updateSpawn(.1,team,t);
     const hp=21600*(1+t/600)*G.Coop.scaleHp(n)*(n>1?1.4:1);
-    assert.equal(E.boss.maxHp,Math.round(hp*1.5));assert.ok(Math.abs(E.boss.dmg-82*(1+t/600)*1.1)<1e-8);
-    if(n===1)assert.equal(E.boss.maxHp,123120);
+    assert.equal(E.boss.maxHp,Math.round(hp*.75));assert.ok(Math.abs(E.boss.dmg-82*(1+t/600)*1.1)<1e-8);
+    if(n===1)assert.equal(E.boss.maxHp,61560);
   }
 });
 test('large hits stop at half HP, the transition clears old hazards and cannot be burst-skipped',()=>{
