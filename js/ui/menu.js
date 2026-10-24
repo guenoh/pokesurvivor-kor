@@ -264,7 +264,7 @@ G.MenuUI = (() => {
     else if (sh) cell.insertAdjacentHTML('beforeend', `<span class="badge-r" title="Tienes su shiny">${G.Icons.html('shiny', 12)}</span>`);
     const useShiny = sh && p.dex === s.partner && s.partnerShiny;
     cell.appendChild(G.UI.spriteCanvas(p.dex, 92, 80, { scale: 2, silhouette: !own, shadow: own, shiny: useShiny }));
-    cell.insertAdjacentHTML('beforeend', `<b>${own ? p.name : '???'}</b>${G.UI.stars(p.rarity, 9)}`);
+    cell.insertAdjacentHTML('beforeend', `<b>${own || p.eventOnly ? p.name : '???'}</b>${G.UI.stars(p.rarity, 9)}`);
     cell.onclick = () => {
       dexSel = p.dex;
       $('dex-grid').querySelectorAll('.cell').forEach(c => c.classList.remove('on'));
@@ -303,17 +303,17 @@ G.MenuUI = (() => {
     const box = $('dex-detail');
     box.innerHTML = `
       <canvas id="dex-big" class="stage" width="220" height="190"></canvas>
-      ${p.eventOnly ? '<p class="sub center" translate="no">이벤트 포켓몬 · 23분 이후 아머드뮤츠를 쓰러뜨리면 동료가 됩니다.</p>' : ''}
       ${hasSh ? `<div class="seg">
           <button class="${viewShiny ? '' : 'on'}" data-v="0">${G.T('Normal', 'appearance')}</button>
           <button class="${viewShiny ? 'on' : ''}" data-v="1">${G.Icons.html('shiny', 12)} ${G.T('Shiny', 'appearance')}</button></div>` : ''}
       <div class="center">
-        <div style="color:var(--muted);font-size:13px">${p.eventOnly ? '이벤트 · Nº 150' : 'Nº ' + String(p.dex).padStart(3, '0')} · ${GEN_NAMES[p.gen - 1]}</div>
-        <h3>${own ? p.name : '???'}</h3>
+        <div style="color:var(--muted);font-size:13px">${p.eventOnly ? '이벤트 포켓몬 · Nº ' + p.nationalDex : 'Nº ' + String(p.dex).padStart(3, '0')} · ${GEN_NAMES[p.gen - 1]}</div>
+        <h3>${own || p.eventOnly ? p.name : '???'}</h3>
         ${own ? `<button id="dex-fav" class="chip${G.DB.isFav(dex) ? ' on' : ''}" type="button">${G.Icons.html(G.DB.isFav(dex) ? 'star' : 'starDim', 12)} ${G.DB.isFav(dex) ? 'Favorito' : 'Marcar como favorito'}</button>` : ''}
         <div style="color:${G.Gacha.RARITY_COLOR[p.rarity]}">${G.UI.stars(p.rarity, 24)} ${G.Gacha.RARITY_NAME[p.rarity]}</div>
-        <div style="margin:6px 0">${own ? G.UI.typeChips(p.types) : ''}</div>
+        <div style="margin:6px 0">${own || p.eventOnly ? G.UI.typeChips(p.types) : ''}</div>
       </div>
+      ${p.eventOnly ? '<p class="sub center" data-event-description translate="no"></p>' : ''}
       ${own ? `
         ${bar('Vida', q.hp, max.hp, q.hp)}
         ${bar('Ataque', q.pa, max.atk, '×' + q.pa.toFixed(2), 'pa')}
@@ -330,9 +330,11 @@ G.MenuUI = (() => {
         ${usingThis
           ? '<button class="btn grow" disabled style="width:100%">Es tu compañero</button>'
           : `<button id="dex-pick" class="btn gold" data-sfx="confirm" style="width:100%">Elegir de compañero${viewShiny ? ' (shiny)' : ''}</button>`}
-      ` : `<p class="center" style="color:var(--muted)">Aún no lo tienes.<br>Consíguelo en el banner de <b class="gold">${GEN_NAMES[p.gen - 1]}</b>
+      ` : p.eventOnly ? '<p class="center" style="color:var(--muted)" translate="no">아직 동료가 되지 않은 포켓몬입니다.</p>' : `<p class="center" style="color:var(--muted)">Aún no lo tienes.<br>Consíguelo en el banner de <b class="gold">${GEN_NAMES[p.gen - 1]}</b>
             o derrotándolo cuando salga shiny.</p>`}
     `;
+    const eventDescription = box.querySelector('[data-event-description]');
+    if (eventDescription) eventDescription.textContent = p.eventDescription || '이벤트를 통해 동료가 되는 포켓몬입니다.';
     for (const [el, t] of scrolls) el.scrollTop = t;
     $('dex-big').style.setProperty('--stage-c', !own ? '#5b83d6' : viewShiny ? '#9ae6ff' : G.U.TYPE_COLOR[p.types[0]]);
     $('dex-big').classList.toggle('shiny', own && viewShiny);
