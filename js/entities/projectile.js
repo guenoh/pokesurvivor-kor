@@ -13,6 +13,10 @@ G.Projectiles = (() => {
   let nextId = 1;
 
   function clear() { list = []; }
+  // Expire without replacing/mutating the list during a combat collision loop.
+  function clearEnemyOwner(owner) {
+    for (const p of list) if (!p.friendly && p.eventOwner === owner) p.life = 0;
+  }
   function all() { return list; }
 
   /** Proyectil del jugador. */
@@ -112,15 +116,18 @@ G.Projectiles = (() => {
     // Sombras primero, todas juntas.
     ctx.fillStyle = 'rgba(0,0,0,.25)';
     for (const p of list) {
+      if (p.t >= p.life) continue;
       ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 0.9, p.r * 0.38, 0, 0, 6.2832); ctx.fill();
     }
     // Los disparos enemigos llevan un aro rojo en el suelo: "esto te hace daño".
     ctx.fillStyle = 'rgba(255,60,80,.35)';
     for (const p of list) {
+      if (p.t >= p.life) continue;
       if (p.friendly) continue;
       ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 1.5, p.r * 0.6, 0, 0, 6.2832); ctx.fill();
     }
     for (const p of list) {
+      if (p.t >= p.life) continue;
       const v = p.vis || G.VFX.forType('normal');
       const shape = v.proj;
       const a = p.orb ? 1 : Math.min(1, (p.life - p.t) * 4);
@@ -134,6 +141,6 @@ G.Projectiles = (() => {
     }
   }
 
-  return { clear, all, spawn, spawnOrb, clearOrbs, update, remove, draw, nearest,
+  return { clear, clearEnemyOwner, all, spawn, spawnOrb, clearOrbs, update, remove, draw, nearest,
            get count() { return list.length; } };
 })();

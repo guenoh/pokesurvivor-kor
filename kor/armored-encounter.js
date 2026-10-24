@@ -40,7 +40,7 @@ G.ArmoredMewtwo = (() => {
   function defeated(time){
     if(stage!=='fight')return;
     stage='recovery';won=true;releaseAt=time+C.recovery;
-    G.Hazards.clearOwner(boss.id);
+    clearAttacks(boss);
     // Reward every participant's own save; repeated victories do not duplicate ownership.
     grant();
     const p=G.Game.player;if(p&&!p.dead)p.heal(p.maxHp*.3);
@@ -48,7 +48,7 @@ G.ArmoredMewtwo = (() => {
   }
   function escape(time){
     stage='escaped';won=false;releaseAt=time+C.recovery;
-    G.Hazards.clearOwner(boss.id);
+    clearAttacks(boss);
     G.EnemyMgr.removeRemote(boss.id,false);
     if(G.Coop.isHost)G.Coop.enemyGone(boss,false);
     G.Spawner.say('제한시간 종료! 아머드뮤츠가 물러났다. 이벤트 보상은 받지 못했습니다.',4);
@@ -57,7 +57,7 @@ G.ArmoredMewtwo = (() => {
     if(e.armoredReleased)return;
     e.armoredReleased=true;e.armoredTransition=C.transition;
     e.armoredAI={cd:1,turn:0,cast:null,label:'힘 해방 · 돌진에 대비하세요'};
-    G.Hazards.clearOwner(e.id);
+    clearAttacks(e);
     const dir=e.anim.dir;
     e.anim=new G.Sprites.Animator(150,e.scale*1.5);e.anim.dir=dir;
     G.FX.burst(e.x,e.y-e.bodyH*.45,'#b2bed2',24,190);
@@ -70,7 +70,7 @@ G.ArmoredMewtwo = (() => {
     if(!e.armoredReleased)breakArmor(e);
     e.armoredFrenzy=true;e.armoredTransition=C.frenzyTransition;e.phase='walk';
     e.armoredAI={cd:0,turn:0,cast:null,label:'폭주! · 공격 예고와 간격이 짧아집니다'};
-    G.Hazards.clearOwner(e.id);
+    clearAttacks(e);
     G.FX.ring(e.x,e.y,20,160,'#ff785d',.6,5);
     G.FX.burst(e.x,e.y-e.bodyH*.45,'#ffb15d',24,190);
     if(!e.remote)G.Spawner.say('아머드뮤츠가 폭주하기 시작했다! 공격 예고와 간격이 짧아진다!',3);
@@ -89,7 +89,18 @@ G.ArmoredMewtwo = (() => {
     renderHud(time);
   }
   function canJudge(time){return time<C.at||stage==='done';}
+  function clearAttacks(e){G.Hazards.clearOwner(e.id);G.Projectiles.clearEnemyOwner(e.id);}
   function hazard(e,h){G.Hazards.add({owner:e.id,respectInvuln:true,type:'psychic',cat:'special',color:'#e08fff',...h});}
+  function rushShot(e,c,index){
+    // Fixed aim and spaced launch positions keep the telegraphed sidestep valid.
+    // Boss damage uses its own scale; the companion's upgrade level is unrelated.
+    const distance=c.length*(index+.5)/C.rushShots,ca=Math.cos(c.angle),sa=Math.sin(c.angle);
+    const shot=G.Projectiles.spawn({x:c.sx+ca*distance,y:c.sy+sa*distance,
+      vx:ca*C.rushShotSpeed,vy:sa*C.rushShotSpeed,r:8,life:C.rushShotLife,
+      dmg:e.def.shotDmg*e.sc.dmg*C.rushShotRatio,friendly:false,color:'#e08fff',
+      mtype:'psychic',cat:'special',vis:G.VFX.forType('psychic'),eventOwner:e.id,eventMove:'psycho-rush'});
+    if(G.Coop.isHost)G.Coop.enemyShot(shot,'psychic');
+  }
   function startCast(e,p,ai){
     const hard=!!e.armoredReleased, turn=ai.turn++;
     // Lead with the new rush after armor breaks, then alternate it with the old patterns.
@@ -100,12 +111,12 @@ G.ArmoredMewtwo = (() => {
     ai.cast={t:0,wind:delay,after:.5/speed};
     e.anim.play('Charge',{speed:1});
     if(pattern===3){
-      ai.cast={id:'rush',t:0,wind:C.rushWarning/speed,after:C.rushRecovery/speed,angle,
+      ai.cast={id:'rush',t:0,wind:C.rushWarning/speed,after:C.rushRecovery/speed,angle,sx:e.x,sy:e.y,shots:0,
         length:C.rushDistance,duration:C.rushDuration};
       // The corridor is a warning only. Damage comes from the moving body, not a second beam hit.
       hazard(e,{kind:'beam',x:e.x,y:e.y,angle,len:C.rushDistance+e.r,w:e.r*2+16,
         delay:ai.cast.wind,end:C.rushDuration,dmg:0,visualOnly:true,color:'#ffad66'});
-      ai.label='돌진 준비 · 표시된 경로 옆으로 피하세요';
+      ai.label='사이코러시 준비 · 경로 옆으로 피하세요';
     }else if(pattern===0){
       const n=hard?5:3;
       for(let i=0;i<n;i++)hazard(e,{kind:'beam',x:e.x,y:e.y,angle:angle+(i-(n-1)/2)*.5,len:460,w:24,delay,dmg:damage});
@@ -136,10 +147,11 @@ G.ArmoredMewtwo = (() => {
         if(c.t>=c.wind&&!c.fired){
           c.fired=true;e.phase='dash';e.dx=Math.cos(c.angle);e.dy=Math.sin(c.angle);
           e.anim.play('Attack',{speed:1.6});G.Audio.sfx('boss');G.Camera.kick(.3);
-          ai.label='돌진! · 옆으로 피하세요';
+          ai.label='사이코러시! · 돌진하며 염동력 탄을 발사합니다';
         }
+        while(c.shots<C.rushShots&&c.t>=c.wind+c.duration*(c.shots+.5)/C.rushShots){rushShot(e,c,c.shots);c.shots++;}
         if(c.t>=c.wind+c.duration){
-          e.phase='walk';ai.label='돌진 후 빈틈 · 지금 공격하세요';
+          e.phase='walk';ai.label='사이코러시 후 빈틈 · 지금 공격하세요';
         }
         if(c.t>=c.wind+c.duration+c.after){ai.cast=null;ai.cd=cooldown(e);}
         // Integrate only the part of this frame within the dash: no overshoot or homing.
@@ -196,7 +208,7 @@ G.ArmoredMewtwo = (() => {
     if(boss&&a[5]===true)enrage(boss);
     if(previous==='waiting'&&stage==='fight'){G.Projectiles.clear();G.Hazards.clear();G.Rift.reset();G.Events.reset();}
     if(previous==='fight'&&['recovery','escaped','done'].includes(stage)){
-      if(boss)G.Hazards.clearOwner(boss.id);
+      if(boss)clearAttacks(boss);
       const p=G.Game.player;if(won&&p&&!p.dead)p.heal(p.maxHp*.3);
     }
     if(stage==='recovery'||(stage==='done'&&won))grant();

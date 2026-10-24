@@ -835,6 +835,7 @@ G.Combat = (() => {
 
     for (let i = projectiles.length - 1; i >= 0; i--) {
       const p = projectiles[i];
+      if (p.t >= p.life) { projectiles.splice(i, 1); continue; }
 
       // --- disparos enemigos: paredes y objetos sólidos dan cobertura ---
       if (!p.friendly) {

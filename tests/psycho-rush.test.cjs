@@ -69,3 +69,11 @@ test('clearing or dying during a dash releases movement, and ordinary dash behav
   assert.equal(p.x,104);assert.equal(p.invuln,.3);assert.equal(hits.length,1);
   assert.equal(G.Projectiles.all().length,0);assert.equal(p.rushActive,undefined);
 });
+test('expired boss-owned bullets cannot hurt a player later in the same collision pass',()=>{
+  const {G,player}=setup(),p=player(1150);let damage=0;p.hurt=()=>damage++;
+  G.World.projectileBlock=()=>false;
+  G.Projectiles.spawn({x:0,y:0,life:1,friendly:false,eventOwner:5});
+  G.Projectiles.spawn({x:400,y:0,life:1,friendly:false,eventOwner:9});
+  G.Projectiles.clearEnemyOwner(5);G.Combat.resolve(0,p,0);
+  assert.equal(damage,0);assert.equal(G.Projectiles.all().length,1);assert.equal(G.Projectiles.all()[0].eventOwner,9);
+});
