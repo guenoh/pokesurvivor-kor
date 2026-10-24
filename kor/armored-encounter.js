@@ -78,7 +78,7 @@ G.ArmoredMewtwo = (() => {
   function hazard(e,h){G.Hazards.add({owner:e.id,respectInvuln:true,type:'psychic',cat:'special',color:'#e08fff',...h});}
   function startCast(e,p,ai){
     const hard=!!e.armoredReleased, pattern=ai.turn++%3;
-    const delay=hard?1.05:1.25;
+    const delay=hard?1.2:1.25;
     const damage=e.def.shotDmg*e.sc.dmg;
     const angle=Math.atan2(p.y-e.y,p.x-e.x);
     ai.cast={t:0,wind:delay,after:.5};
@@ -111,7 +111,7 @@ G.ArmoredMewtwo = (() => {
     }
     ai.cd-=dt;
     if(ai.cd<=0&&dist<500)startCast(e,p,ai);
-    const k=e.armoredReleased?1.3:1;
+    const k=e.armoredReleased?1.2:1;
     const approach=dist>160?1:dist<100?-.55:0;
     return [dx*spd*k*approach,dy*spd*k*approach,'Walk'];
   }

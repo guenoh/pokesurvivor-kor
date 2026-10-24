@@ -37,13 +37,27 @@ test('28-minute spawn waits for a rift, replaces an old boss without loot, and b
   E.updateSpawn(.1,[player],1700);assert.equal(E.stage,'fight');assert.equal(G.EnemyMgr.get(99),undefined);
   const id=E.boss.id;E.updateSpawn(1,[player],1750);assert.equal(E.boss.id,id);assert.equal(G.EnemyMgr.all().length,1);
 });
+test('normal waves stay paused throughout the event fight and recovery',()=>{
+  const {G,player,load}=setup();load('js/systems/spawner.js');
+  G.EnemyMgr.add({id:99,boss:false,dead:false});
+  G.Hazards.add({owner:99});
+  G.Spawner.update(.1,[player],1680);
+  const boss=G.ArmoredMewtwo.boss;
+  assert.equal(G.EnemyMgr.all().length,1);assert.equal(G.EnemyMgr.all()[0],boss);
+  assert.equal(G.Hazards.all.length,0);
+  // With the real spawner, any ordinary wave would enter unsupported world/loot code.
+  for(let t=1681;t<1700;t++)G.Spawner.update(1,[player],t);
+  assert.equal(G.EnemyMgr.all().length,1);
+  boss.dead=true;G.ArmoredMewtwo.tick(.1,1700);
+  G.Spawner.update(10,[player],1710);assert.equal(G.EnemyMgr.all().length,1);
+});
 test('solo and co-op stat multipliers match the same-time normal final boss',()=>{
   for(const n of [1,2,4]){
     const {G,player}=setup(),E=G.ArmoredMewtwo,t=1680;
     const team=Array.from({length:n},()=>({...player}));E.updateSpawn(.1,team,t);
     const hp=21600*(1+t/600)*G.Coop.scaleHp(n)*(n>1?1.4:1);
-    assert.equal(E.boss.maxHp,Math.round(hp*3));assert.ok(Math.abs(E.boss.dmg-82*(1+t/600)*1.25)<1e-8);
-    if(n===1)assert.equal(E.boss.maxHp,246240);
+    assert.equal(E.boss.maxHp,Math.round(hp*1.5));assert.ok(Math.abs(E.boss.dmg-82*(1+t/600)*1.1)<1e-8);
+    if(n===1)assert.equal(E.boss.maxHp,123120);
   }
 });
 test('large hits stop at half HP, the transition clears old hazards and cannot be burst-skipped',()=>{
