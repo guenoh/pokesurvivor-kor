@@ -1,8 +1,8 @@
 /* Korean event species. Internal id 1150 is separate from National Dex #150. */
 (() => {
   const id = 1150, base = G.DEX_BY[150];
-  G.ARMORED_EVENT = Object.freeze({ id, at: 28 * 60, hpMultiplier: 3, damageMultiplier: 1.25,
-    breakAt: .5, recovery: 15, fightLimit: 180, transition: 2, warning: 1, cooldown: 2.8, releasedCooldown: 2.1 });
+  G.ARMORED_EVENT = Object.freeze({ id, at: 28 * 60, hpMultiplier: 1.5, damageMultiplier: 1.1,
+    breakAt: .5, recovery: 15, fightLimit: 180, transition: 2, warning: 1, cooldown: 2.8, releasedCooldown: 2.4 });
   const mon = { ...base, dex: id, name: '아머드뮤츠', eventOnly: true, nationalDex: 150,
     hp: 128, spd: 117, pa: 1.2, sa: 1.4, atk: 1.4, df: 126, sd: 117 };
   G.DEX.push(mon); G.DEX_BY[id] = mon;

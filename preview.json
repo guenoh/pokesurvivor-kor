@@ -1,5 +1,12 @@
 {
   "mode": "guest-only-public-test",
   "productionAccounts": false,
+  "revision": "4231dac6f902",
+  "balance": {
+    "soloHpAt28Minutes": 123120,
+    "hpMultiplier": 1.5,
+    "damageMultiplier": 1.1,
+    "normalWaves": false
+  },
   "source": "https://github.com/guenoh/pokesurvivor-kor/tree/feature/armored-mewtwo-local"
 }
