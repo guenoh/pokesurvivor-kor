@@ -111,6 +111,10 @@ html[lang="ko"] #scr-upgrades #upg-mon { min-width: 0 !important; width: min(280
 /* Scale DOM menus, never the world canvas or touch controls. Compensated layout
    dimensions keep every screen and its scroll area inside Safari's visible area. */
 :root { --kor-vw: 100vw; --kor-vh: 100dvh; --kor-vleft: 0px; --kor-vtop: 0px; --kor-ui-scale: 1; }
+.kor-viewport-probe {
+  position: fixed; left: 0; top: 0; width: 100vw; width: 100dvw; height: 100vh; height: 100dvh;
+  visibility: hidden; pointer-events: none; contain: strict;
+}
 /* A fixed 100% canvas can retain Safari's old containing-block height on
    rotation. Its CSS box and the DOM menus share the same measured viewport;
    game.js's ResizeObserver updates the drawing buffer and camera to match. */

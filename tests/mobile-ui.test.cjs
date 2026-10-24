@@ -23,6 +23,7 @@ test('available viewport follows toolbar changes and does not fight pinch zoom o
     innerWidth: 844, innerHeight: 390, visualViewport: view, addEventListener() {}, requestAnimationFrame: fn => fn(),
     setTimeout: () => 1, clearTimeout() {},
     document: { addEventListener: (event, fn) => { if (event === 'DOMContentLoaded') boot = fn; },
+      createElement: () => ({ setAttribute() {}, getBoundingClientRect: () => ({ width: s.innerWidth, height: s.innerHeight }) }), body: { append() {} },
       documentElement: { classList: { toggle() {} }, style: { setProperty: (k,v) => values.set(k,v) } } } };
   s.window = s; vm.createContext(s); vm.runInContext(read('kor/mobile-ui.js'), s); boot();
   assert.equal(values.get('--kor-vh'), '305px'); assert.equal(values.get('--kor-ui-scale'), .85);
@@ -40,6 +41,7 @@ test('Safari rotation settles without a second resize event and shares one viewp
     addEventListener: (event, fn) => { events[event] = fn; }, requestAnimationFrame: fn => fn(),
     setTimeout: fn => { timers.set(++timerId, fn); return timerId; }, clearTimeout: id => timers.delete(id),
     document: { hidden: false, addEventListener: (event, fn) => { documentEvents[event] = fn; },
+      createElement: () => ({ setAttribute() {}, getBoundingClientRect: () => ({ width: s.innerWidth, height: s.innerHeight }) }), body: { append() {} },
       documentElement: { classList: { toggle: (k,v) => classes.set(k,v) }, style: { setProperty: (k,v) => values.set(k,v) } } } };
   s.window = s; vm.createContext(s); vm.runInContext(read('kor/mobile-ui.js'), s); documentEvents.DOMContentLoaded();
   assert.equal(classes.get('kor-menu-stacked'), true);
@@ -64,6 +66,39 @@ test('Safari rotation settles without a second resize event and shares one viewp
   view.scale = 2; view.width = 195; view.height = 332; events.orientationchange();
   for (const fn of timers.values()) fn();
   assert.equal(values.get('--kor-vw'), '390px'); assert.equal(values.get('--kor-vh'), '664px');
+});
+test('CSS viewport observer recovers a landscape menu when Safari APIs keep the old portrait width and zoom', () => {
+  const values = new Map(), classes = new Map(), callbacks = {};
+  const layout = { width: 393, height: 759 };
+  const view = { width: 393, height: 759, scale: 1, offsetLeft: 0, offsetTop: 0, addEventListener() {} };
+  const probe = { setAttribute() {}, getBoundingClientRect: () => layout };
+  let boot, observed;
+  const s = { G: { Settings: { get: () => 'auto', touch: true, on() {} }, Slots: { play() {} } },
+    innerWidth: 393, innerHeight: 759, visualViewport: view,
+    addEventListener: (event, fn) => { callbacks[event] = fn; }, requestAnimationFrame: fn => fn(),
+    setTimeout: () => 1, clearTimeout() {},
+    ResizeObserver: class { constructor(fn) { callbacks.observer = fn; } observe(element) { observed = element; } },
+    document: { createElement: () => probe, body: { append() {} }, addEventListener: (event, fn) => { if (event === 'DOMContentLoaded') boot = fn; },
+      documentElement: { classList: { toggle: (k,v) => classes.set(k,v) }, style: { setProperty: (k,v) => values.set(k,v) } } } };
+  s.window = s; vm.createContext(s); vm.runInContext(read('kor/mobile-ui.js'), s); boot();
+  assert.equal(observed, probe); assert.equal(classes.get('kor-menu-stacked'), true);
+  // Native viewport and rendering are landscape, but both JS size APIs still
+  // report portrait. The old scale guard used to freeze that entire layout.
+  layout.width = 852; layout.height = 393; view.scale = 2;
+  callbacks.observer();
+  assert.equal(values.get('--kor-vw'), '852px'); assert.equal(values.get('--kor-vh'), '393px');
+  assert.equal(classes.get('kor-menu-stacked'), false); assert.equal(classes.get('kor-menu-compact'), true);
+  assert.equal(values.get('--kor-ui-scale'), .85);
+  // Pinching without a layout change keeps the recovered layout intact.
+  view.width = 196; view.height = 189; callbacks.observer();
+  assert.equal(values.get('--kor-vw'), '852px'); assert.equal(values.get('--kor-vh'), '393px');
+  // Safari catches up, then the address bar reduces only the visible height.
+  s.innerWidth = 852; s.innerHeight = 393; view.width = 852; view.height = 305; view.scale = 1;
+  callbacks.resize();
+  assert.equal(values.get('--kor-vh'), '305px');
+  // Returning to portrait works through the observer without a window event.
+  layout.width = 393; layout.height = 759; view.scale = 2;
+  callbacks.observer(); assert.equal(values.get('--kor-vw'), '393px'); assert.equal(classes.get('kor-menu-stacked'), true);
 });
 test('slot status reports all ten results, progress and shiny suspense without changing the results', async () => {
   let time = 0;
