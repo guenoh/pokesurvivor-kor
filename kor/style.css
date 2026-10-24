@@ -111,6 +111,13 @@ html[lang="ko"] #scr-upgrades #upg-mon { min-width: 0 !important; width: min(280
 /* Scale DOM menus, never the world canvas or touch controls. Compensated layout
    dimensions keep every screen and its scroll area inside Safari's visible area. */
 :root { --kor-vw: 100vw; --kor-vh: 100dvh; --kor-vleft: 0px; --kor-vtop: 0px; --kor-ui-scale: 1; }
+/* A fixed 100% canvas can retain Safari's old containing-block height on
+   rotation. Its CSS box and the DOM menus share the same measured viewport;
+   game.js's ResizeObserver updates the drawing buffer and camera to match. */
+html[lang="ko"] #game {
+  inset: auto; left: var(--kor-vleft); top: var(--kor-vtop);
+  width: var(--kor-vw); height: var(--kor-vh);
+}
 html[lang="ko"] .scr {
   inset: auto; left: var(--kor-vleft); top: var(--kor-vtop);
   width: calc(var(--kor-vw) / var(--kor-ui-scale));
@@ -124,6 +131,42 @@ html[lang="ko"] #scr-menu {
   padding-left: calc(env(safe-area-inset-left) / var(--kor-ui-scale));
   padding-right: calc(env(safe-area-inset-right) / var(--kor-ui-scale));
 }
+/* Menu columns are relative to their compensated screen, not a different vw
+   snapshot. Keep the logo on one line even during an intermediate rotation. */
+html[lang="ko"] #scr-menu { flex-direction: row; overflow: hidden; }
+html[lang="ko"] .menu-left { flex: 1 1 0; min-width: 0; overflow: hidden; }
+html[lang="ko"] .menu-left .logo .t1 { white-space: nowrap; overflow-wrap: normal; word-break: normal; }
+html[lang="ko"] .menu-right { width: min(380px, 48%); flex: 0 0 auto; min-width: 0; }
+html[lang="ko"].kor-menu-wide .menu-right { width: min(500px, 52%); }
+html[lang="ko"] #menu-partner { height: min(calc(var(--kor-vh) * .3 / var(--kor-ui-scale)), 200px); width: auto; }
+html[lang="ko"].kor-menu-stacked #scr-menu { flex-direction: column; overflow-y: auto; }
+html[lang="ko"].kor-menu-stacked .menu-left { flex: 0 0 auto; overflow: visible; }
+html[lang="ko"].kor-menu-stacked .menu-right { width: 100%; }
+html[lang="ko"].kor-menu-compact .menu-left { padding: 50px 8px 6px; }
+html[lang="ko"].kor-menu-compact .menu-left .logo { margin-bottom: 2px; }
+html[lang="ko"].kor-menu-compact .menu-left .logo .t1 { font-size: clamp(18px, calc(var(--kor-vw) * .033 / var(--kor-ui-scale)), 32px); }
+html[lang="ko"].kor-menu-compact .splash { top: 50%; font-size: 9px; max-width: 10em; margin-right: -3.6em; }
+html[lang="ko"].kor-menu-compact .logo .t2 { font-size: 10px; margin-top: 2px; letter-spacing: 2px; }
+html[lang="ko"].kor-menu-compact .partner-card { margin-top: 2px; }
+html[lang="ko"].kor-menu-compact .partner-card .nm { font-size: 17px; }
+html[lang="ko"].kor-menu-compact .partner-card .lv { font-size: 12px; }
+html[lang="ko"].kor-menu-compact #menu-partner { height: min(calc(var(--kor-vh) * .34 / var(--kor-ui-scale)), 130px); }
+html[lang="ko"].kor-menu-compact .menu-right { width: min(54%, 500px); padding: 50px 8px 6px; gap: 6px; justify-content: flex-start; overflow-y: auto; }
+html[lang="ko"].kor-menu-compact .menu-right .box { padding: 6px 8px; }
+html[lang="ko"].kor-menu-compact .menu-right > .box:last-child { display: none; }
+html[lang="ko"].kor-menu-compact .menu-right > :first-child { margin-top: 0; }
+html[lang="ko"].kor-menu-compact .menu-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2px 4px; }
+html[lang="ko"].kor-menu-compact .menu-item { min-width: 0; font-size: 15px; padding: 4px 6px; grid-template-columns: 22px minmax(0, 1fr); column-gap: 6px; }
+html[lang="ko"].kor-menu-compact .menu-item small { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html[lang="ko"].kor-menu-compact .menu-item.play { grid-column: span 2; font-size: 21px; }
+html[lang="ko"].kor-menu-compact .menu-item::before { display: none; }
+html[lang="ko"].kor-menu-compact .mi-ico img { width: 20px; height: 20px; }
+html[lang="ko"].kor-menu-short .menu-right { padding-top: 48px; }
+html[lang="ko"].kor-menu-short .menu-item small { display: none; }
+html[lang="ko"].kor-menu-short .menu-item { font-size: 14px; padding: 5px 6px; }
+html[lang="ko"].kor-menu-short .menu-item.play { font-size: 19px; }
+html[lang="ko"].kor-menu-short .menu-item.play small { display: block; }
+html[lang="ko"].kor-menu-short #menu-partner { height: min(calc(var(--kor-vh) * .3 / var(--kor-ui-scale)), 110px); }
 /* Keep login fields at readable native size, avoiding Safari's focus auto zoom. */
 html[lang="ko"] #scr-login { transform: none; width: var(--kor-vw); height: var(--kor-vh); }
 html[lang="ko"] #scr-login input { font-size: max(16px, 1em); }
