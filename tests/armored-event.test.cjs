@@ -69,11 +69,50 @@ test('large hits stop at half HP, the transition clears old hazards and cannot b
 });
 test('both phases telegraph every pattern for at least one second, and phase two has more beams',()=>{
   const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
-  const run=()=>{for(let i=0;i<3;i++){e.armoredAI={cd:0,turn:i,cast:null};e.bossMove(.01,player,200,1,0,72);}};
+  const run=(start=0)=>{for(let i=0;i<3;i++){e.armoredAI={cd:0,turn:start+i,cast:null};e.bossMove(.01,player,200,1,0,72);}};
   run();const initial=G.Hazards.all.length;assert.equal(initial,7);
   for(const h of G.Hazards.all){assert.ok(h.delay>=1);assert.equal(h.respectInvuln,true);assert.equal(h.cat,'special');assert.equal(h.owner,e.id);}
-  e.hp=e.maxHp/2;E.breakArmor(e);e.armoredTransition=0;G.Hazards.clear();run();assert.equal(G.Hazards.all.length,11);
+  e.hp=e.maxHp/2;E.breakArmor(e);e.armoredTransition=0;G.Hazards.clear();run(1);assert.equal(G.Hazards.all.length,11);
   for(const h of G.Hazards.all)assert.ok(h.delay>=1);
+});
+test('armor break leads with a fixed-direction rush, then stops for a punish window',()=>{
+  for(const step of [1/60,.13]){
+    const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
+    e.hp=e.maxHp/2;E.breakArmor(e);
+    e.bossMove(2.1,player,150,1,0,72); // Armor break animation.
+    e.bossMove(1.01,player,150,1,0,72);
+    const c=e.armoredAI.cast;assert.equal(c.id,'rush');
+    const warning=G.Hazards.all[0];assert.equal(warning.visualOnly,true);assert.equal(warning.delay,1.2);
+    assert.equal(warning.dmg,0);assert.equal(warning.len,320+e.r);
+    const sx=e.x,sy=e.y;let elapsed=0;
+    player.x=e.x+100;player.y=e.y+400; // Moving the target must never steer the locked charge.
+    const advance=dt=>{const [vx,vy]=e.bossMove(dt,player,150,0,1,72);e.x+=vx*dt;e.y+=vy*dt;elapsed+=dt;return [vx,vy];};
+    e.applyStun(10);assert.equal(e.stunT,undefined);
+    while(elapsed<c.wind-.001)advance(Math.min(step,c.wind-.001-elapsed));
+    assert.equal(e.x,sx);assert.equal(e.y,sy); // No movement during the warning.
+    while(elapsed<c.wind+c.duration+.01)advance(step);
+    assert.ok(Math.abs(e.x-(sx+Math.cos(c.angle)*320))<1e-7);
+    assert.ok(Math.abs(e.y-(sy+Math.sin(c.angle)*320))<1e-7);
+    assert.equal(e.phase,'walk');assert.match(e.armoredAI.label,/빈틈/);
+    e.applyStun(10);assert.equal(e.stunT,.35); // Interrupt immunity ends with the dash.
+    assert.deepEqual(Array.from(advance(.25)),[0,0]);
+    while(e.armoredAI.cast)advance(step);
+    assert.equal(e.armoredAI.cd,2.4);
+  }
+});
+test('phase one never rushes, and the new corridor cannot inflict an extra beam hit',()=>{
+  const {G,player,load}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
+  for(let turn=0;turn<12;turn++){
+    e.armoredAI={cd:0,turn,cast:null};e.bossMove(.01,player,150,1,0,72);
+    assert.notEqual(e.armoredAI.cast.id,'rush');
+  }
+  G.VFX={forType:()=>null};load('js/systems/hazards.js');
+  let hits=0;player.r=10;player.hurt=()=>{hits++;};
+  let sent;G.Coop.isHost=true;G.Coop.broadcast=ev=>{sent=ev;};
+  G.Hazards.add({kind:'beam',x:-100,y:0,angle:0,len:320,w:60,delay:1.2,end:.55,dmg:0,visualOnly:true});
+  assert.equal(sent[1].visualOnly,true);
+  G.Hazards.update(1.2);assert.equal(hits,0);
+  G.Hazards.update(.56);assert.equal(G.Hazards.count,0);assert.equal(hits,0);
 });
 test('crowd control cannot permanently freeze the event boss',()=>{
   const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;

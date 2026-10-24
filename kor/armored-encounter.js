@@ -55,7 +55,7 @@ G.ArmoredMewtwo = (() => {
   function breakArmor(e){
     if(e.armoredReleased)return;
     e.armoredReleased=true;e.armoredTransition=C.transition;
-    if(e.armoredAI)e.armoredAI.cast=null;
+    e.armoredAI={cd:1,turn:0,cast:null,label:'힘 해방 · 돌진에 대비하세요'};
     G.Hazards.clearOwner(e.id);
     const dir=e.anim.dir;
     e.anim=new G.Sprites.Animator(150,e.scale*1.5);e.anim.dir=dir;
@@ -77,13 +77,22 @@ G.ArmoredMewtwo = (() => {
   function canJudge(time){return time<C.at||stage==='done';}
   function hazard(e,h){G.Hazards.add({owner:e.id,respectInvuln:true,type:'psychic',cat:'special',color:'#e08fff',...h});}
   function startCast(e,p,ai){
-    const hard=!!e.armoredReleased, pattern=ai.turn++%3;
+    const hard=!!e.armoredReleased, turn=ai.turn++;
+    // Lead with the new rush after armor breaks, then alternate it with the old patterns.
+    const pattern=hard?(turn%4===0?3:(turn%4)-1):turn%3;
     const delay=hard?1.2:1.25;
     const damage=e.def.shotDmg*e.sc.dmg;
     const angle=Math.atan2(p.y-e.y,p.x-e.x);
     ai.cast={t:0,wind:delay,after:.5};
     e.anim.play('Charge',{speed:1});
-    if(pattern===0){
+    if(pattern===3){
+      ai.cast={id:'rush',t:0,wind:C.rushWarning,after:C.rushRecovery,angle,
+        length:C.rushDistance,duration:C.rushDuration};
+      // The corridor is a warning only. Damage comes from the moving body, not a second beam hit.
+      hazard(e,{kind:'beam',x:e.x,y:e.y,angle,len:C.rushDistance+e.r,w:e.r*2+16,
+        delay:C.rushWarning,end:C.rushDuration,dmg:0,visualOnly:true,color:'#ffad66'});
+      ai.label='돌진 준비 · 표시된 경로 옆으로 피하세요';
+    }else if(pattern===0){
       const n=hard?5:3;
       for(let i=0;i<n;i++)hazard(e,{kind:'beam',x:e.x,y:e.y,angle:angle+(i-(n-1)/2)*.5,len:460,w:24,delay,dmg:damage});
       ai.label='사이코브레이크 · 빛줄기 사이로 피하세요';
@@ -104,13 +113,29 @@ G.ArmoredMewtwo = (() => {
     if(released(e))breakArmor(e);
     if(e.armoredTransition>0){e.armoredTransition-=dt;return [0,0,'Idle'];}
     if(ai.cast){
-      ai.cast.t+=dt;
+      const c=ai.cast,previous=c.t;
+      c.t+=dt;
+      if(c.id==='rush'){
+        const progress=t=>G.U.clamp((t-c.wind)/c.duration,0,1);
+        const distance=c.length*(progress(c.t)-progress(previous));
+        if(c.t>=c.wind&&!c.fired){
+          c.fired=true;e.phase='dash';e.dx=Math.cos(c.angle);e.dy=Math.sin(c.angle);
+          e.anim.play('Attack',{speed:1.6});G.Audio.sfx('boss');G.Camera.kick(.3);
+          ai.label='돌진! · 옆으로 피하세요';
+        }
+        if(c.t>=c.wind+c.duration){
+          e.phase='walk';ai.label='돌진 후 빈틈 · 지금 공격하세요';
+        }
+        if(c.t>=c.wind+c.duration+c.after){ai.cast=null;ai.cd=C.releasedCooldown;}
+        // Integrate only the part of this frame within the dash: no overshoot or homing.
+        return distance>0?[Math.cos(c.angle)*distance/dt,Math.sin(c.angle)*distance/dt,'Walk']:[0,0,'Idle'];
+      }
       if(ai.cast.t>=ai.cast.wind&&!ai.cast.fired){ai.cast.fired=true;e.anim.play('Shoot');}
       if(ai.cast.t>=ai.cast.wind+ai.cast.after){ai.cast=null;ai.cd=e.armoredReleased?C.releasedCooldown:C.cooldown;}
       return [0,0,'Idle'];
     }
     ai.cd-=dt;
-    if(ai.cd<=0&&dist<500)startCast(e,p,ai);
+    if(ai.cd<=0&&dist<500){startCast(e,p,ai);return [0,0,'Idle'];}
     const k=e.armoredReleased?1.2:1;
     const approach=dist>160?1:dist<100?-.55:0;
     return [dx*spd*k*approach,dy*spd*k*approach,'Walk'];
@@ -134,6 +159,9 @@ G.ArmoredMewtwo = (() => {
   const stun=G.Enemy.prototype.applyStun;
   G.Enemy.prototype.applyStun=function(dur){
     if(this.dex===ID&&!this.remote){
+      // Keep the visible warning and the actual dash in sync; crowd control works again in recovery.
+      const cast=this.armoredAI?.cast;
+      if(cast?.id==='rush'&&cast.t<cast.wind+cast.duration)return;
       if((this.armoredStunUntil||0)>G.Game.st.time)return;
       this.armoredStunUntil=G.Game.st.time+3;dur=Math.min(.35,dur);
     }

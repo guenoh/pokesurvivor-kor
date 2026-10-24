@@ -21,7 +21,7 @@ G.Hazards = (() => {
     if (!fromNet && G.Coop.isHost) {
       G.Coop.broadcast(['hz', { kind: o.kind, x: Math.round(o.x), y: Math.round(o.y), r: o.r, angle: o.angle, len: o.len, w: o.w,
                                 delay: o.delay, dmg: Math.round(o.dmg), type: o.type, color: o.color, pct: o.pct, pure: o.pure, vis: o.vis, cat: o.cat,
-                                boom: o.boom ? 1 : 0, owner: o.owner, respectInvuln: o.respectInvuln }]);
+                                boom: o.boom ? 1 : 0, owner: o.owner, respectInvuln: o.respectInvuln, visualOnly: o.visualOnly, end: o.end }]);
     }
     return o;
   }
@@ -45,6 +45,7 @@ G.Hazards = (() => {
       h.t += dt;
       if (!h.hit && h.t >= h.delay) {
         h.hit = true;
+        if (h.visualOnly) continue; // Moving-body attacks use this corridor only as a warning.
         detonate(h);
         // (Humedad: la explosión de un kamikaze no le daña, ver data/ability-fx.js.)
         if (pl && !pl.dead && inside(h, pl.x, pl.y, pl.r) && !(h.boom && pl.abil && pl.abil.damp)) {
@@ -103,6 +104,13 @@ G.Hazards = (() => {
         ctx.strokeStyle = h.color; ctx.lineWidth = 2;
         ctx.setLineDash([6, 4]);
         ctx.strokeRect(0, -h.w / 2, h.len, h.w);
+        if (h.visualOnly) {
+          ctx.globalAlpha = 0.9; ctx.strokeStyle = '#fff1cb'; ctx.lineWidth = 3; ctx.setLineDash([]);
+          for (const part of [0.25, 0.5, 0.75]) {
+            const x = h.len * part;
+            ctx.beginPath(); ctx.moveTo(x - 10, -8); ctx.lineTo(x, 0); ctx.lineTo(x - 10, 8); ctx.stroke();
+          }
+        }
       }
       ctx.restore();
     }
