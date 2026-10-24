@@ -33,7 +33,7 @@
   document.addEventListener('DOMContentLoaded',()=>{
     document.title='아머드뮤츠 공개 테스트 · PokéSurvivor';
     intro=document.createElement('section');intro.className='scr dim hidden preview-intro';intro.setAttribute('translate','no');
-    intro.innerHTML='<div class="box center"><h1>아머드뮤츠 공개 테스트</h1><p>28분에 등장하는 이벤트 보스를 바로 만나 보세요.</p><p class="preview-note">로그인 없이 플레이 · 실제 계정에 저장되지 않음<br>시험용 Lv.100 · 최대 영구 강화<br>염동력·미스트볼·사이코키네시스·환상빔: 모두 Lv.5, 4개 연결<br>기술 진화 전 · 일반 적 등장 중지 · 체력 10%에서 폭주<br>무적 기본 ON · 휴대폰은 가로 화면으로 플레이하세요.</p><button class="btn gold" data-start>뮤츠로 전투 시작</button><button class="btn ghost" data-armored>아머드뮤츠로 플레이</button><p class="preview-credit">원작 JPTER78 · 한글화·한국판 개발 박근오<br>비공식·비상업 팬 게임 · 도트·밸런스 시험 버전</p></div>';
+    intro.innerHTML='<div class="box center"><h1>아머드뮤츠 공개 테스트</h1><p>28분에 등장하는 이벤트 보스를 바로 만나 보세요.</p><p class="preview-note">로그인 없이 플레이 · 실제 계정에 저장되지 않음<br>시험용 Lv.100 · 최대 영구 강화<br>염동력·미스트볼·사이코키네시스·환상빔: 모두 Lv.5, 4개 연결<br>기술 진화 전 · 일반 적 등장 중지 · 체력 15%에서 폭주<br>무적 기본 ON · 휴대폰은 가로 화면으로 플레이하세요.</p><button class="btn gold" data-start>뮤츠로 전투 시작</button><button class="btn ghost" data-armored>아머드뮤츠로 플레이</button><p class="preview-credit">원작 JPTER78 · 한글화·한국판 개발 박근오<br>비공식·비상업 팬 게임 · 도트·밸런스 시험 버전</p></div>';
     intro.querySelector('[data-start]').onclick=()=>start(150);intro.querySelector('[data-armored]').onclick=()=>start(1150);
     tools=document.createElement('details');tools.className='preview-controls';tools.hidden=true;tools.setAttribute('translate','no');
     note=document.createElement('summary');tools.append(note);
@@ -41,7 +41,7 @@
     const button=(text,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn small';b.textContent=text;b.onclick=e=>{e.stopPropagation();fn();};actions.append(b);};
     button('다시 시작',()=>start());
     button('갑옷 파괴',()=>{const e=G.ArmoredMewtwo.boss;if(e&&!e.dead)e.hurt(e.maxHp);});
-    button('폭주 단계 · 체력 10%',()=>{const e=G.ArmoredMewtwo.boss;if(e&&!e.dead){e.hp=Math.floor(e.maxHp*G.ARMORED_EVENT.frenzyAt);G.ArmoredMewtwo.enrage(e);}});
+    button('폭주 단계 · 체력 15%',()=>{const e=G.ArmoredMewtwo.boss;if(e&&!e.dead){e.hp=Math.floor(e.maxHp*G.ARMORED_EVENT.frenzyAt);G.ArmoredMewtwo.enrage(e);}});
     button('격파·보상 확인',()=>{const e=G.ArmoredMewtwo.boss;if(e?.armoredReleased&&!(e.armoredTransition>0)){e.hp=1;e.hurt(e.maxHp*2);}});
     button('제한시간 종료',()=>{const deadline=G.ArmoredMewtwo.netState()[3];if(deadline)G.Game.debugTime(deadline+.1);});
     button('무적 ON/OFF',()=>{invincible=!invincible;if(!invincible&&G.Game.player)G.Game.player.invuln=0;refresh();});

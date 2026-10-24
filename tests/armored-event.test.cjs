@@ -66,7 +66,7 @@ test('large hits stop at both phase gates and transitions cannot be burst-skippe
   assert.equal(e.hp,e.maxHp/2);assert.equal(e.dead,false);assert.equal(e.armoredReleased,true);assert.equal(e.anim.dex,150);
   assert.equal(G.Hazards.all.length,1);assert.equal(G.Hazards.all[0].owner,999);
   e.hurt(1e9);assert.equal(e.dead,false);e.bossMove(2.1,player,150,1,0,72);e.hurt(1e9);
-  assert.equal(e.dead,false);assert.equal(e.hp,Math.floor(e.maxHp*.1));assert.equal(e.armoredFrenzy,true);
+  assert.equal(e.dead,false);assert.equal(e.hp,Math.floor(e.maxHp*.15));assert.equal(e.armoredFrenzy,true);
   e.hurt(1e9);assert.equal(e.dead,false);e.bossMove(.61,player,150,1,0,72);e.hurt(1e9);assert.equal(e.dead,true);
 });
 test('both phases telegraph every pattern for at least one second, and phase two has more beams',()=>{
@@ -116,13 +116,13 @@ test('phase one never rushes, and the new corridor cannot inflict an extra beam 
   G.Hazards.update(1.2);assert.equal(hits,0);
   G.Hazards.update(.56);assert.equal(G.Hazards.count,0);assert.equal(hits,0);
 });
-test('frenzy starts exactly at ten percent, clears only its old warnings, and never increases damage',()=>{
+test('frenzy starts exactly at fifteen percent, clears only its old warnings, and never increases damage',()=>{
   const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
   e.hp=e.maxHp/2;E.breakArmor(e);e.armoredTransition=0;
   const damage=e.dmg,shot=e.def.shotDmg,speed=e.spd;
-  e.hp=Math.floor(e.maxHp*.1)+2;e.hurt(1);assert.equal(e.armoredFrenzy,undefined);
+  e.hp=Math.floor(e.maxHp*.15)+2;e.hurt(1);assert.equal(e.armoredFrenzy,undefined);
   G.Hazards.add({owner:e.id});G.Hazards.add({owner:999});e.hurt(1);
-  assert.equal(e.hp,e.maxHp*.1);assert.equal(e.armoredFrenzy,true);
+  assert.equal(e.hp,e.maxHp*.15);assert.equal(e.armoredFrenzy,true);
   assert.equal(e.dmg,damage);assert.equal(e.def.shotDmg,shot);assert.equal(e.spd,speed);
   assert.equal(G.Hazards.all.length,1);assert.equal(G.Hazards.all[0].owner,999);
   assert.equal(E.netState()[5],true);
@@ -134,7 +134,7 @@ test('frenzy divides all four pattern warnings, waits and recoveries by 2.5 with
   for(let turn=0;turn<4;turn++){
     function pattern(frenzy){
       const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1680);const e=E.boss;
-      e.hp=e.maxHp*(frenzy?.1:.4);E.breakArmor(e);if(frenzy)E.enrage(e);
+      e.hp=e.maxHp*(frenzy ? .15 : .4);E.breakArmor(e);if(frenzy)E.enrage(e);
       e.armoredTransition=0;e.armoredAI={cd:0,turn,cast:null};
       e.bossMove(.01,player,150,1,0,72);
       return {G,e,player,cast:e.armoredAI.cast,hazards:G.Hazards.all};
