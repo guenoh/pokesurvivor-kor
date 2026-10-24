@@ -6,6 +6,7 @@
     rushWarning: 1.2, rushDistance: 320, rushDuration: .55, rushRecovery: 1.1,
     frenzyAt: .15, frenzyTempo: 2.5, frenzyTransition: .6 });
   const mon = { ...base, dex: id, name: '아머드뮤츠', eventOnly: true, nationalDex: 150,
+    eventDescription: `탐험 ${G.ARMORED_EVENT.at / 60}분부터 등장하는 이벤트 보스를 제한시간 ${G.ARMORED_EVENT.fightLimit / 60}분 안에 쓰러뜨리면 동료가 됩니다. 뽑기나 일반 야생 포켓몬 포획으로는 얻을 수 없습니다.`,
     hp: 128, spd: 117, pa: 1.2, sa: 1.4, atk: 1.4, df: 126, sd: 117 };
   G.DEX.push(mon); G.DEX_BY[id] = mon;
   // Timings animate a single eight-view pose procedurally until articulated frames are ready.
