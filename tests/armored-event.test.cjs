@@ -84,9 +84,10 @@ test('armor break leads with a fixed-direction rush, then stops for a punish win
     e.hp=e.maxHp/2;E.breakArmor(e);
     e.bossMove(2.1,player,150,1,0,72); // Armor break animation.
     e.bossMove(1.01,player,150,1,0,72);
-    const c=e.armoredAI.cast;assert.equal(c.id,'rush');
+    const c=e.armoredAI.cast;assert.equal(c.id,'rush');assert.equal(c.duration,.825);
+    assert.ok(Math.abs(c.length/c.duration-320/.55)<1e-7);
     const warning=G.Hazards.all[0];assert.equal(warning.visualOnly,true);assert.equal(warning.delay,1.2);
-    assert.equal(warning.dmg,0);assert.equal(warning.len,320+e.r);
+    assert.equal(warning.dmg,0);assert.equal(warning.len,480+e.r);
     const sx=e.x,sy=e.y;let elapsed=0;
     player.x=e.x+100;player.y=e.y+400; // Moving the target must never steer the locked charge.
     const advance=dt=>{const [vx,vy]=e.bossMove(dt,player,150,0,1,72);e.x+=vx*dt;e.y+=vy*dt;elapsed+=dt;return [vx,vy];};
@@ -94,8 +95,8 @@ test('armor break leads with a fixed-direction rush, then stops for a punish win
     while(elapsed<c.wind-.001)advance(Math.min(step,c.wind-.001-elapsed));
     assert.equal(e.x,sx);assert.equal(e.y,sy); // No movement during the warning.
     while(elapsed<c.wind+c.duration+.01)advance(step);
-    assert.ok(Math.abs(e.x-(sx+Math.cos(c.angle)*320))<1e-7);
-    assert.ok(Math.abs(e.y-(sy+Math.sin(c.angle)*320))<1e-7);
+    assert.ok(Math.abs(e.x-(sx+Math.cos(c.angle)*480))<1e-7);
+    assert.ok(Math.abs(e.y-(sy+Math.sin(c.angle)*480))<1e-7);
     assert.equal(e.phase,'walk');assert.match(e.armoredAI.label,/빈틈/);
     e.applyStun(10);assert.equal(e.stunT,.35); // Interrupt immunity ends with the dash.
     assert.deepEqual(Array.from(advance(.25)),[0,0]);
@@ -127,8 +128,8 @@ test('boss Psycho Rush fires exactly three fixed-direction shots from its moving
     while(c.t<c.wind+c.duration+.01){const [vx,vy]=e.bossMove(step,player,150,1,0,72);e.x+=vx*step;e.y+=vy*step;}
     assert.equal(calls.shots.length,3);
     calls.shots.forEach((p,i)=>{
-      assert.ok(Math.abs(p.x-(c.sx+Math.cos(c.angle)*320*(i+.5)/3))<1e-7);
-      assert.ok(Math.abs(p.y-(c.sy+Math.sin(c.angle)*320*(i+.5)/3))<1e-7);
+      assert.ok(Math.abs(p.x-(c.sx+Math.cos(c.angle)*480*(i+.5)/3))<1e-7);
+      assert.ok(Math.abs(p.y-(c.sy+Math.sin(c.angle)*480*(i+.5)/3))<1e-7);
       assert.ok(Math.abs(p.vx-Math.cos(c.angle)*340)<1e-7);
       assert.equal(p.friendly,false);assert.equal(p.cat,'special');assert.equal(p.mtype,'psychic');
       assert.equal(p.eventOwner,e.id);assert.equal(p.eventMove,'psycho-rush');assert.equal(p.homing,undefined);
@@ -141,7 +142,7 @@ test('host alone creates boss shots and phase changes, defeat and escape clear o
     const {G,player,calls}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
     E.breakArmor(e);e.armoredTransition=0;e.armoredAI.cd=0;
     G.Coop.isHost=true;G.Coop.enemyShot=p=>calls.events.push(p);
-    e.bossMove(.01,player,150,1,0,72);e.bossMove(1.8,player,150,1,0,72);
+    e.bossMove(.01,player,150,1,0,72);e.bossMove(2.1,player,150,1,0,72);
     assert.equal(calls.events.length,3);assert.equal(calls.shots.length,3);
     calls.shots.push({friendly:true,eventOwner:e.id},{friendly:false,eventOwner:999});
     if(ending==='enrage')E.enrage(e);
