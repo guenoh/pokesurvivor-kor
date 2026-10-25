@@ -1,7 +1,7 @@
 /* Korean event species. Internal id 1150 is separate from National Dex #150. */
 (() => {
   const id = 1150, base = G.DEX_BY[150];
-  G.ARMORED_EVENT = Object.freeze({ id, at: 23 * 60, balanceAt: 28 * 60, hpMultiplier: .75, damageMultiplier: 1.1,
+  G.ARMORED_EVENT = Object.freeze({ id, at: 23 * 60, balanceAt: 28 * 60, hpMultiplier: 15, damageMultiplier: 1.1,
     breakAt: .5, recovery: 15, fightLimit: 7 * 60, transition: 2, warning: 1, cooldown: 2.8, releasedCooldown: 2.4,
     rushWarning: 1.2, rushDistance: 320, rushDuration: .55, rushRecovery: 1.1,
     rushShots: 3, rushShotSpeed: 340, rushShotLife: 1.6, rushShotRatio: .45,

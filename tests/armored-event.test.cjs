@@ -51,13 +51,14 @@ test('normal waves stay paused throughout the event fight and recovery',()=>{
   boss.dead=true;G.ArmoredMewtwo.tick(.1,1400);
   G.Spawner.update(10,[player],1410);assert.equal(G.EnemyMgr.all().length,1);
 });
-test('earlier spawn preserves the tested health and damage for solo and co-op',()=>{
+test('boss health is twenty times the previous balance while damage and companion stats stay unchanged',()=>{
   for(const n of [1,2,4]){
     const {G,player}=setup(),E=G.ArmoredMewtwo,t=1380;
     const team=Array.from({length:n},()=>({...player}));E.updateSpawn(.1,team,t);
     const hp=21600*(1+28*60/600)*G.Coop.scaleHp(n)*(n>1?1.4:1);
-    assert.equal(E.boss.maxHp,Math.round(hp*.75));assert.ok(Math.abs(E.boss.dmg-82*(1+28*60/600)*1.1)<1e-8);
-    if(n===1)assert.equal(E.boss.maxHp,61560);
+    assert.equal(E.boss.maxHp,Math.round(hp*.75*20));assert.ok(Math.abs(E.boss.dmg-82*(1+28*60/600)*1.1)<1e-8);
+    if(n===1)assert.equal(E.boss.maxHp,1231200);
+    assert.equal(G.DEX_BY[1150].hp,128);
   }
 });
 test('large hits stop at both phase gates and transitions cannot be burst-skipped',()=>{
