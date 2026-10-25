@@ -453,3 +453,73 @@ dialog.kor-tier-dialog::backdrop { background: #081022ed; }
 #kor-logout-dialog p{font-size:15px;line-height:1.7;margin:0 0 20px;color:#e9efff;word-break:keep-all}
 .kor-logout-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.kor-logout-actions .btn{flex:1 1 125px;min-height:44px;white-space:normal}
 @media(max-height:350px){#kor-logout-dialog{padding:16px}#kor-logout-dialog h2{font-size:19px;margin-bottom:8px}#kor-logout-dialog p{font-size:14px;margin-bottom:14px}}
+
+/* The dex sidebar stays narrow even on a landscape phone. Never share the
+   full-screen picker grid here, or pin nested action buttons over its content. */
+html[lang="ko"] #dex-detail { overflow-x: hidden; }
+html[lang="ko"] #dex-detail .btn { position: static; order: initial; box-shadow: none; flex-shrink: 0; }
+html[lang="ko"] #dex-detail > .btn { margin-top: 12px; }
+html[lang="ko"] #mx-picker .kor-rated-option { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; min-width: 0; }
+html[lang="ko"] #mx-picker .ban-moves { min-width: 0; }
+html[lang="ko"] #mx-picker .kor-rated-option > .chip { flex-wrap: wrap; justify-content: flex-start; font-size: 15px; line-height: 1.5; padding: 8px; word-break: keep-all; }
+html[lang="ko"] #mx-picker .chip[aria-pressed="true"] { border-color: #ffe17d; background: #354e85; }
+html[lang="ko"] #mx-picker .kor-tm-description { color: #e0eaff; line-height: 1.6; word-break: keep-all; }
+html[lang="ko"] #mx-picker .kor-move-ratings { margin: 0; gap: 6px; }
+html[lang="ko"] #mx-picker .kor-rating-badge { font-size: 12px; }
+html[lang="ko"] #mx-picker .kor-tm-confirm { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #9db6e5; padding-top: 8px; }
+html[lang="ko"] #mx-picker .kor-tm-confirm .btn { width: 100%; white-space: normal; line-height: 1.5; margin: 0; }
+html[lang="ko"] #mx-picker .kor-move-help { position: static; }
+html[lang="ko"] #mx-picker .kor-rated-option > .chip::after { content: '선택 ›'; margin-left: auto; color: #ffe17d; font-size: 12px; white-space: nowrap; }
+html[lang="ko"] #mx-picker .kor-rated-option > .chip:focus-visible { outline: 2px solid #ffe17d; outline-offset: 2px; }
+
+dialog.kor-mon-settings { width: min(700px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); margin: auto; padding: 16px; color: #f4f8ff; overflow: hidden; }
+dialog.kor-mon-settings[open] { display: flex; flex-direction: column; gap: 10px; }
+dialog.kor-mon-settings::backdrop { background: #050b1cce; }
+.kor-mon-settings-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-shrink: 0; }
+.kor-mon-settings-header h2 { margin: 0; font-size: 22px; }
+.kor-mon-settings-header .btn { flex-shrink: 0; }
+.kor-mon-settings-current { flex-shrink: 0; background: #101e435c; padding: 8px 12px; border-radius: 8px; }
+.kor-mon-settings-current p { margin: 3px 0 0; color: #d7e6ff; font-size: 14px; }
+.kor-mon-settings-filter { flex-shrink: 0; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.kor-mon-settings-filter select { width: auto; min-width: 160px; padding: 5px 8px; }
+.kor-mon-settings-list { min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 8px; padding: 3px; }
+.kor-mon-settings-option { flex-shrink: 0; width: 100%; min-height: 58px; padding: 10px 12px; text-align: left; border: 2px solid #8da6d47a; border-radius: 9px; background: #152852; cursor: pointer; line-height: 1.5; }
+.kor-mon-settings-option.on { border-color: #ffe17d; background: #314b7b; }
+.kor-mon-settings-option:disabled { cursor: default; background: #15213b; }
+.kor-mon-settings-option:focus-visible, .kor-mon-settings-filter select:focus-visible { outline: 3px solid #ffe17d; outline-offset: 1px; }
+.kor-mon-settings-name { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 18px; font-weight: 700; }
+.kor-mon-settings-description { display: block; color: #d7e6ff; font-size: 14px; margin-top: 3px; }
+.kor-mon-settings-badge, .kor-mon-settings-hidden { font-size: 12px; font-weight: 400; padding: 1px 7px; border-radius: 5px; background: #415784; color: #fff; }
+.kor-mon-settings-option.on .kor-mon-settings-badge { background: #ffe17d; color: #342500; }
+.kor-mon-settings-hidden { color: #ffe17d; background: #403457; }
+.kor-mon-settings-footer { flex-shrink: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center; padding-top: 8px; border-top: 1px solid #8ba9dc66; }
+.kor-mon-settings-preview { margin: 0; color: #ffe17d; grid-column: 1; grid-row: 1; font-size: 14px; }
+.kor-mon-settings-footer small { grid-column: 1; grid-row: 2; font-size: 13px; color: #d7e6ff; }
+.kor-mon-settings-footer .btn { grid-column: 2; grid-row: 1 / span 2; min-height: 44px; font-size: 15px; padding: 8px 12px; }
+@media (min-width: 640px) { .kor-mon-settings-list[data-kind="nat"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; } }
+@media (max-width: 480px) {
+  .kor-mon-settings-footer { grid-template-columns: minmax(0, 1fr); }
+  .kor-mon-settings-footer .btn { grid-column: 1; grid-row: 3; }
+}
+@media (max-height: 430px) {
+  dialog.kor-mon-settings { padding: 10px 14px; gap: 6px; }
+  .kor-mon-settings-header h2 { font-size: 19px; }
+  .kor-mon-settings-current { padding: 5px 10px; display: flex; flex-wrap: wrap; gap: 3px 12px; align-items: center; }
+  .kor-mon-settings-current p { margin: 0; }
+  .kor-mon-settings-option { padding: 7px 10px; }
+}
+.kor-mon-settings-filter input { min-width: 0; flex: 1; padding: 7px 10px; }
+.kor-mon-settings-filter select { max-width: 100%; }
+.kor-mon-settings-option { color: #f4f8ff; font-family: inherit; }
+.kor-mon-settings-option .kor-move-ratings { margin-top: 8px; }
+.kor-mon-settings-list { flex: 1 1 auto; min-height: 90px; }
+.kor-mon-settings-footer .btn { white-space: normal; }
+@media (max-width: 480px) { .kor-mon-settings-filter { flex-wrap: wrap; } .kor-mon-settings-filter input { width: 100%; flex-basis: 100%; } }
+.kor-mon-settings-current summary { cursor: pointer; font-size: 14px; color: #d7e6ff; }
+.kor-mon-settings-current summary:focus-visible { outline: 2px solid #ffe17d; }
+@media (max-height: 430px) {
+  details.kor-mon-settings-current { display: block; }
+  .kor-mon-settings-list[data-kind="tm"] .kor-mon-settings-name { font-size: 16px; }
+  .kor-mon-settings-list[data-kind="tm"] .kor-rating-badge { padding: 2px 6px; font-size: 12px; }
+  .kor-mon-settings-list[data-kind="tm"] .kor-rating-badge strong { font-size: 17px; min-width: 22px; }
+}

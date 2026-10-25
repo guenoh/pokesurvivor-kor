@@ -386,7 +386,13 @@ G.MenuUI = (() => {
 
   function wireExtras(dex, box) {
     box.querySelectorAll('[data-extra]').forEach(b => {
-      b.onclick = () => { extraOpen = extraOpen === b.dataset.extra ? '' : b.dataset.extra; G.Audio.sfx('select'); showDetail(dex); };
+      b.onclick = () => {
+        if (G.I18n.lang === 'ko' && G.MonSettings) {
+          extraOpen = ''; G.Audio.sfx('select');
+          G.MonSettings.open(dex, b.dataset.extra, () => showDetail(dex), b); return;
+        }
+        extraOpen = extraOpen === b.dataset.extra ? '' : b.dataset.extra; G.Audio.sfx('select'); showDetail(dex);
+      };
     });
     const host = box.querySelector('#mx-picker');
     if (!host || !extraOpen) return;

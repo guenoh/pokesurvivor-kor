@@ -227,10 +227,23 @@ G.MoveRatings = (() => {
   function decoratePicker(host,dex,attribute='data-id') {
     if(G.I18n.lang!=='ko')return;
     const ctx=contextForDex(dex);
+    if(host.id==='mx-picker') {
+      const intro=document.createElement('p');intro.setAttribute('translate','no');intro.textContent='배울 기술을 선택하세요. 내용을 확인한 뒤 배우기를 누르면 기술머신 1개가 사용됩니다.';host.prepend(intro);
+    }
     host.querySelectorAll('button['+attribute+']').forEach(button=>{
       const id=button.getAttribute(attribute);if(!G.Moves.BY_ID[id])return;
       const wrapper=document.createElement('div');wrapper.className='kor-rated-option';
       button.before(wrapper);wrapper.append(button);mount(wrapper,G.Moves.instance(id),ctx);
+      if(host.id==='mx-picker') {
+        button.setAttribute('aria-pressed','false');
+        const description=document.createElement('p');description.className='kor-tm-description';description.setAttribute('translate','no');
+        description.textContent=G.T(G.Moves.instance(id).desc);button.after(description);
+        wrapper.querySelectorAll('.kor-rating-badge').forEach(b=>{
+          const label=document.createElement('span');label.textContent=b.getAttribute('aria-label').split(' ')[0];
+          if(label.textContent==='무리')label.textContent='무리 사냥';
+          b.querySelector('.kor-rating-icons').replaceWith(label);
+        });
+      }
     });
     mountHelp(host);
   }
