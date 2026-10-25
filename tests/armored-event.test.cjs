@@ -14,7 +14,7 @@ function setup(){
     Judgment:{active:false,noteDmg:noop},Rift:{inArena:false,reset:noop},Events:{reset:noop},
     Hazards:{all:[],add(h){this.all.push(h);},clearOwner(id){this.all=this.all.filter(h=>h.owner!==id);},clear(){this.all=[];}},
     Projectiles:{clear(){calls.clears++;calls.shots=[];},spawn(p){calls.shots.push(p);return p;},clearEnemyOwner(id){calls.shots=calls.shots.filter(p=>p.friendly!==false||p.eventOwner!==id);}},Spawner:{say:noop},UI:{toast:noop},Types:{},
-    Items:{roll:()=> 'leftovers'},Pickups:{drop:noop,dropXp:noop},DB:{save:{owned:{}},owns:id=>!!G.DB.save.owned[id],grant(id,from){calls.grants++;G.DB.save.owned[id]={from};},commit(){calls.commits++;}}});
+    World:{isFree:()=>true},Items:{roll:()=> 'leftovers'},Pickups:{drop:noop,dropXp:noop},DB:{save:{owned:{}},owns:id=>!!G.DB.save.owned[id],grant(id,from){calls.grants++;G.DB.save.owned[id]={from};},commit(){calls.commits++;}}});
   const player={x:0,y:0,dead:false,hp:400,maxHp:800,heal(amount){this.hp=Math.min(this.maxHp,this.hp+amount);calls.heal++;}};
   G.Game={state:'playing',player,st:{time:1380},everyone:()=>[player]};
   load('js/entities/enemy.js');
@@ -70,13 +70,13 @@ test('large hits stop at both phase gates and transitions cannot be burst-skippe
   assert.equal(e.dead,false);assert.equal(e.hp,Math.floor(e.maxHp*.15));assert.equal(e.armoredFrenzy,true);
   e.hurt(1e9);assert.equal(e.dead,false);e.bossMove(.61,player,150,1,0,72);e.hurt(1e9);assert.equal(e.dead,true);
 });
-test('both phases telegraph every pattern for at least one second, and phase two has more beams',()=>{
+test('base casts run at 1.5 times tempo and phase two has more beams',()=>{
   const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
   const run=(start=0)=>{for(let i=0;i<3;i++){e.armoredAI={cd:0,turn:start+i,cast:null};e.bossMove(.01,player,200,1,0,72);}};
   run();const initial=G.Hazards.all.length;assert.equal(initial,7);
-  for(const h of G.Hazards.all){assert.ok(h.delay>=1);assert.equal(h.respectInvuln,true);assert.equal(h.cat,'special');assert.equal(h.owner,e.id);}
+  for(const h of G.Hazards.all){assert.ok(h.delay>=.8-1e-8);assert.equal(h.respectInvuln,true);assert.equal(h.cat,'special');assert.equal(h.owner,e.id);}
   e.hp=e.maxHp/2;E.breakArmor(e);e.armoredTransition=0;G.Hazards.clear();run(1);assert.equal(G.Hazards.all.length,11);
-  for(const h of G.Hazards.all)assert.ok(h.delay>=1);
+  for(const h of G.Hazards.all)assert.ok(h.delay>=.8-1e-8);
 });
 test('armor break leads with a fixed-direction rush, then stops for a punish window',()=>{
   for(const step of [1/60,.13]){
@@ -86,7 +86,7 @@ test('armor break leads with a fixed-direction rush, then stops for a punish win
     e.bossMove(1.01,player,150,1,0,72);
     const c=e.armoredAI.cast;assert.equal(c.id,'rush');assert.equal(c.duration,.825);
     assert.ok(Math.abs(c.length/c.duration-320/.55)<1e-7);
-    const warning=G.Hazards.all[0];assert.equal(warning.visualOnly,true);assert.equal(warning.delay,1.2);
+    const warning=G.Hazards.all[0];assert.equal(warning.visualOnly,true);assert.ok(Math.abs(warning.delay-.8)<1e-8);
     assert.equal(warning.dmg,0);assert.equal(warning.len,480+e.r);
     const sx=e.x,sy=e.y;let elapsed=0;
     player.x=e.x+100;player.y=e.y+400; // Moving the target must never steer the locked charge.
@@ -101,7 +101,7 @@ test('armor break leads with a fixed-direction rush, then stops for a punish win
     e.applyStun(10);assert.equal(e.stunT,.35); // Interrupt immunity ends with the dash.
     assert.deepEqual(Array.from(advance(.25)),[0,0]);
     while(e.armoredAI.cast)advance(step);
-    assert.equal(e.armoredAI.cd,2.4);
+    assert.ok(Math.abs(e.armoredAI.cd-1.6)<1e-8);
   }
 });
 test('phase one never rushes, and the new corridor cannot inflict an extra beam hit',()=>{
@@ -118,7 +118,7 @@ test('phase one never rushes, and the new corridor cannot inflict an extra beam 
   G.Hazards.update(1.2);assert.equal(hits,0);
   G.Hazards.update(.56);assert.equal(G.Hazards.count,0);assert.equal(hits,0);
 });
-test('boss Psycho Rush fires exactly three fixed-direction shots from its moving path after the warning',()=>{
+test('boss Psycho Rush launches exactly three homing Confusion shots from its moving path after the warning',()=>{
   for(const frenzy of [false,true])for(const step of [1/60,.13,2]){
     const {G,player,calls}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
     E.breakArmor(e);if(frenzy)E.enrage(e);e.armoredTransition=0;e.armoredAI.cd=0;
@@ -130,9 +130,9 @@ test('boss Psycho Rush fires exactly three fixed-direction shots from its moving
     calls.shots.forEach((p,i)=>{
       assert.ok(Math.abs(p.x-(c.sx+Math.cos(c.angle)*480*(i+.5)/3))<1e-7);
       assert.ok(Math.abs(p.y-(c.sy+Math.sin(c.angle)*480*(i+.5)/3))<1e-7);
-      assert.ok(Math.abs(p.vx-Math.cos(c.angle)*340)<1e-7);
+      assert.ok(Math.abs(p.vx-Math.cos(c.angle)*280)<1e-7);
       assert.equal(p.friendly,false);assert.equal(p.cat,'special');assert.equal(p.mtype,'psychic');
-      assert.equal(p.eventOwner,e.id);assert.equal(p.eventMove,'psycho-rush');assert.equal(p.homing,undefined);
+      assert.equal(p.eventOwner,e.id);assert.equal(p.eventMove,'psycho-rush');assert.equal(p.homing,2);assert.equal(p.life,2.2);
       assert.equal(p.dmg,e.def.shotDmg*e.sc.dmg*.45);
     });
   }
@@ -167,8 +167,8 @@ test('frenzy starts exactly at fifteen percent, clears only its old warnings, an
   const cast=e.armoredAI.cast;assert.equal(cast.id,'rush');
   e.hurt(1);assert.equal(e.armoredAI.cast,cast);assert.equal(e.armoredTransition<0,true);
 });
-test('frenzy divides all four pattern warnings, waits and recoveries by 2.5 with identical damage',()=>{
-  for(let turn=0;turn<4;turn++){
+test('frenzy divides all five pattern warnings, waits and recoveries by 2.5 with identical damage',()=>{
+  for(let turn=0;turn<5;turn++){
     function pattern(frenzy){
       const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
       e.hp=e.maxHp*(frenzy ? .15 : .4);E.breakArmor(e);if(frenzy)E.enrage(e);
@@ -183,7 +183,7 @@ test('frenzy divides all four pattern warnings, waits and recoveries by 2.5 with
     if(turn===0){assert.equal(rage.cast.duration,normal.cast.duration);assert.equal(rage.cast.length,normal.cast.length);}
     const recovery=rage.cast.wind+(rage.cast.duration||0)+rage.cast.after+.001;
     rage.e.bossMove(recovery,rage.player,150,1,0,72);
-    assert.equal(rage.e.armoredAI.cast,null);close(rage.e.armoredAI.cd,.96);
+    assert.equal(rage.e.armoredAI.cast,null);close(rage.e.armoredAI.cd,.64);
   }
 });
 test('guests use the host frenzy flag and never trigger it from speculative local damage',()=>{
@@ -234,4 +234,25 @@ test('a guest never receives a victory reward for a timeout or its later done sn
   const {G,calls}=setup(),E=G.ArmoredMewtwo;G.Coop.active=true;
   E.netApply(['fight',77,0,1800,false]);E.netApply(['escaped',77,1815,1800,false]);E.netApply(['done',77,1815,1800,false]);
   assert.equal(calls.grants,0);assert.equal(calls.heal,0);assert.equal(E.canJudge(1900),true);
+});
+
+test('teleport marks a safe destination, waits for the warning and does not teleport onto a player',()=>{
+  for(const blocked of [false,true]){
+    const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
+    e.armoredAI={cd:0,turn:3,cast:null};e.bossMove(.01,player,150,1,0,e.spd);
+    const cast=e.armoredAI.cast,from={x:e.x,y:e.y};assert.equal(cast.id,'teleport');assert.equal(cast.wind,1);
+    const marker=G.Hazards.all.at(-1);assert.equal(marker.visualOnly,true);assert.equal(marker.dmg,0);
+    e.bossMove(.99,player,150,1,0,e.spd);assert.equal(e.x,from.x);assert.equal(e.y,from.y);
+    if(blocked){player.x=cast.landing.x;player.y=cast.landing.y;}
+    e.bossMove(.02,player,150,1,0,e.spd);
+    if(blocked){assert.equal(e.x,from.x);assert.equal(e.y,from.y);}else{assert.equal(e.x,cast.landing.x);assert.equal(e.y,cast.landing.y);}
+  }
+});
+test('teleport cancels when all landing spots or the marked spot become blocked',()=>{
+  for(const allBlocked of [true,false]){
+    const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
+    G.World.isFree=()=>!allBlocked;e.armoredAI={cd:0,turn:3,cast:null};e.bossMove(.01,player,150,1,0,e.spd);
+    const from={x:e.x,y:e.y};G.World.isFree=()=>false;e.bossMove(2,player,150,1,0,e.spd);
+    assert.equal(e.x,from.x);assert.equal(e.y,from.y);
+  }
 });

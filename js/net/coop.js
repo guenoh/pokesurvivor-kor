@@ -420,7 +420,7 @@ G.Coop = (() => {
       case 'es':
         G.Projectiles.spawn({ x: ev[1], y: ev[2], vx: ev[3], vy: ev[4], dmg: ev[5], r: ev[6], life: ev[7],
                               friendly: false, color: ev[11] === 'psycho-rush' ? '#e08fff' : '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8], cat: ev[9],
-                              eventOwner: Number.isSafeInteger(ev[10]) ? ev[10] : undefined, eventMove: ev[11] });
+                              eventOwner: Number.isSafeInteger(ev[10]) ? ev[10] : undefined, eventMove: ev[11], homing: Number.isFinite(ev[12]) ? Math.max(0, Math.min(4, ev[12])) : 0, homingUid: typeof ev[13] === 'string' ? ev[13] : undefined });
         break;
       case 'c': { const m = mates.get(ev[1]); if (m) G.Combat.ghostCast(m.pl, ev[2], ev[3], ev[4], ev[5]); break; }
       case 'item': api.item(ev[1]); break;
@@ -474,7 +474,7 @@ G.Coop = (() => {
   function enemyGone(e, died) { emit([died ? 'ed' : 'eg', e.id]); }
   function enemyShot(p, type) {
     const event = ['es', r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), r2(p.dmg), p.r, p.life, type, p.cat];
-    if (Number.isSafeInteger(p.eventOwner)) event.push(p.eventOwner, p.eventMove);
+    if (Number.isSafeInteger(p.eventOwner)) event.push(p.eventOwner, p.eventMove, p.homing || 0, p.homingUid || null);
     emit(event);
   }
   function pickupAdded(o) { emit(['pk', o.id, o.kind, r1(o.x), r1(o.y), o.value]); }

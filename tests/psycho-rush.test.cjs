@@ -14,7 +14,7 @@ function setup(wall=Infinity){
     EnemyMgr:{all:()=>[enemy],queryCircle:(x,y,r)=>Math.hypot(enemy.x-x,enemy.y-y)<=r+enemy.r?[enemy]:[]}});
   load('js/entities/player.js');load('js/entities/projectile.js');load('js/systems/combat.js');
   const player=dex=>{const p=new G.Player(G.DEX_BY[dex]);p.aim=0;p.target=enemy;p.cast=noop;return p;};
-  return {G,player,hits};
+  return {G,player,hits,enemy};
 }
 test('only Armored Mewtwo learns the signature, including when a foreign saved TM lists it',()=>{
   const {G,player}=setup();
@@ -76,4 +76,47 @@ test('expired boss-owned bullets cannot hurt a player later in the same collisio
   G.Projectiles.spawn({x:400,y:0,life:1,friendly:false,eventOwner:9});
   G.Projectiles.clearEnemyOwner(5);G.Combat.resolve(0,p,0);
   assert.equal(damage,0);assert.equal(G.Projectiles.all().length,1);assert.equal(G.Projectiles.all()[0].eventOwner,9);
+});
+
+test('hostile Confusion curves toward its locked living target and stops steering after target death',()=>{
+  const {G}=setup(),target={uid:'guest',x:0,y:200,hp:100,dead:false};G.Game.everyone=()=>[target];
+  const shot=G.Projectiles.spawn({x:0,y:0,vx:280,vy:0,life:2.2,friendly:false,eventMove:'psycho-rush',homing:2,homingUid:'guest'});
+  G.Camera.sees=()=>true;G.Projectiles.update(.1,{x:999,y:999,hp:100},[]);
+  assert.ok(shot.vy>0);assert.ok(shot.vx<280);
+  target.dead=true;const before=[shot.vx,shot.vy];G.Projectiles.update(.1,{x:-999,y:-999,hp:100},[]);
+  assert.deepEqual([shot.vx,shot.vy],before);
+});
+test('hostile Confusion targets the solo player without changing ordinary enemy shots',()=>{
+  const {G}=setup();G.Camera.sees=()=>true;
+  const spawn=extra=>G.Projectiles.spawn({x:0,y:0,vx:280,vy:0,life:2.2,friendly:false,...extra});
+  const homing=spawn({eventMove:'psycho-rush',homing:2}),normal=spawn({});
+  G.Projectiles.update(.1,{x:0,y:200,hp:100},[]);assert.ok(homing.vy>0);assert.equal(normal.vy,0);assert.equal(normal.vx,280);
+});
+
+test('exclusive level-five evolution adds seven homing shots and a wider actual path',()=>{
+  const {G,player}=setup(),p=player(1150);p.addMove('psycho-rush');const m=p.moves[0];
+  assert.equal(G.Moves.evoInfo(m,{cd:1}),null);
+  while(G.Moves.levelUp(m)){}
+  assert.equal(G.Moves.evoInfo(m,{}).ready,false);assert.equal(G.Moves.evoInfo(m,{cd:1}).ready,true);
+  assert.equal(G.Moves.evolve(m),true);assert.equal(m.name,'사이코오버드라이브');assert.equal(m.rushShots,7);assert.equal(m.width,54);assert.ok(Math.abs(m.radius-220.8)<1e-8);
+  assert.equal(G.Moves.evolve(m),false);
+  G.Combat.tick(.001,p,0);G.Combat.updateFields(.5);assert.equal(G.Projectiles.count,7);
+  assert.ok(G.Projectiles.all().every(s=>s.homing===2&&s.mcat==='special'));
+});
+
+test('evolved Psycho Rush hits a flank enemy outside the ordinary path width exactly once',()=>{
+  for(const evolved of [false,true]){
+    const {G,player,hits,enemy}=setup(),p=player(1150);enemy.y=36;p.addMove('psycho-rush');const m=p.moves[0];while(G.Moves.levelUp(m)){};
+    if(evolved)G.Moves.evolve(m);G.Combat.tick(.001,p,0);G.Combat.updateFields(.5);
+    assert.equal(hits.length,evolved?1:0);
+  }
+});
+
+test('signature evolution limits extra damage to two bullets and keeps cooldown and invulnerability unchanged',()=>{
+  const {G,player}=setup(),p=player(1150);p.addMove('psycho-rush');const m=p.moves[0];while(G.Moves.levelUp(m)){};
+  const before={...m};G.Moves.evolve(m);
+  for(const key of ['dmg','cd','rushShotRatio','rushDuration','homing','pierce'])assert.equal(m[key],before[key],key);
+  const burst=x=>x.dmg*(1+x.rushShots*x.rushShotRatio);
+  assert.ok(burst(m)/burst(before)<1.28);
+  assert.equal(m.bleed,undefined);
 });

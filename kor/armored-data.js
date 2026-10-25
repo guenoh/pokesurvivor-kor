@@ -4,7 +4,8 @@
   G.ARMORED_EVENT = Object.freeze({ id, at: 23 * 60, balanceAt: 28 * 60, hpMultiplier: 15, damageMultiplier: 1.1,
     breakAt: .5, recovery: 15, fightLimit: 7 * 60, transition: 2, warning: 1, cooldown: 2.8, releasedCooldown: 2.4,
     rushWarning: 1.2, rushDistance: 480, rushDuration: .825, rushRecovery: 1.1,
-    rushShots: 3, rushShotSpeed: 340, rushShotLife: 1.6, rushShotRatio: .45,
+    castTempo: 1.5, walkSpeed: 54, teleportWarning: 1.5, teleportDistance: 240,
+    rushShots: 3, rushShotSpeed: 280, rushShotLife: 2.2, rushShotHoming: 2, rushShotRatio: .45,
     frenzyAt: .15, frenzyTempo: 2.5, frenzyTransition: .6 });
   const mon = { ...base, dex: id, name: '아머드뮤츠', eventOnly: true, nationalDex: 150, start: 'psycho-rush',
     eventDescription: `탐험 ${G.ARMORED_EVENT.at / 60}분부터 등장하는 이벤트 보스를 제한시간 ${G.ARMORED_EVENT.fightLimit / 60}분 안에 쓰러뜨리면 동료가 됩니다. 뽑기나 일반 야생 포켓몬 포획으로는 얻을 수 없습니다.`,
