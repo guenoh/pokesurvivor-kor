@@ -186,8 +186,11 @@ G.Coop = (() => {
     for (const e of G.EnemyMgr.all()) {
       if (e.dead || G.U.dist2(e.x, e.y, near.x, near.y) > r2n) continue;
       const a = ANIMS.indexOf(e.anim.cur);
-      out.push([e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
-                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.slow > 0 ? 8 : 0)]);
+      const snapshot = [e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
+                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.slow > 0 ? 8 : 0)];
+      // Persist the warp revision so a dropped first frame or a late join still snaps.
+      if (G.ARMORED_EVENT && e.dex === G.ARMORED_EVENT.id) snapshot.push(e.armoredTeleportSeq || 0);
+      out.push(snapshot);
     }
     return out;
   }
@@ -398,12 +401,19 @@ G.Coop = (() => {
       const e = G.EnemyMgr.get(a[0]);
       if (!e || !e.remote || e.dead) continue;
       const n = e.net;
+      const teleportSeq = G.ARMORED_EVENT && e.dex === G.ARMORED_EVENT.id && Number.isSafeInteger(a[7]) && a[7] >= 0 ? a[7] : null;
+      if (teleportSeq !== null && teleportSeq < (n.armoredTeleportSeq || 0)) continue;
+      const teleported = teleportSeq !== null && teleportSeq > (n.armoredTeleportSeq || 0);
       const dts = (now - (n.last || now)) / 1000;
-      if (dts > 0.02 && dts < 1) {
+      if (teleported) {
+        // A teleport is discontinuous, not velocity: never extrapolate it into a contact hit.
+        e.x = a[1]; e.y = a[2]; n.vx = 0; n.vy = 0;
+      } else if (dts > 0.02 && dts < 1) {
         n.vx = G.U.clamp((a[1] - n.x) / dts, -600, 600);
         n.vy = G.U.clamp((a[2] - n.y) / dts, -600, 600);
       } else { n.vx = 0; n.vy = 0; }
       n.x = a[1]; n.y = a[2]; n.age = 0; n.last = now;
+      if (teleportSeq !== null) n.armoredTeleportSeq = teleportSeq;
       e.hp = Math.min(e.maxHp, a[3]);
       n.anim = a[4]; n.dir = a[5]; n.st = a[6];
     }

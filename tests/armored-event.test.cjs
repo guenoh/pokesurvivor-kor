@@ -246,6 +246,7 @@ test('teleport marks a safe destination, waits for the warning and does not tele
     if(blocked){player.x=cast.landing.x;player.y=cast.landing.y;}
     e.bossMove(.02,player,150,1,0,e.spd);
     if(blocked){assert.equal(e.x,from.x);assert.equal(e.y,from.y);}else{assert.equal(e.x,cast.landing.x);assert.equal(e.y,cast.landing.y);}
+    assert.equal(e.armoredTeleportSeq||0,blocked?0:1);
   }
 });
 test('teleport cancels when all landing spots or the marked spot become blocked',()=>{
@@ -253,6 +254,6 @@ test('teleport cancels when all landing spots or the marked spot become blocked'
     const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
     G.World.isFree=()=>!allBlocked;e.armoredAI={cd:0,turn:3,cast:null};e.bossMove(.01,player,150,1,0,e.spd);
     const from={x:e.x,y:e.y};G.World.isFree=()=>false;e.bossMove(2,player,150,1,0,e.spd);
-    assert.equal(e.x,from.x);assert.equal(e.y,from.y);
+    assert.equal(e.x,from.x);assert.equal(e.y,from.y);assert.equal(e.armoredTeleportSeq||0,0);
   }
 });

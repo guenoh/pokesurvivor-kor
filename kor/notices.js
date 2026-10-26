@@ -48,7 +48,7 @@
       if (!parent) continue;
       const actions = make('nav', 'kor-server-actions');
       actions.setAttribute('aria-label', '한국어 서버 안내'); actions.setAttribute('translate', 'no');
-      const button = make('button', 'btn small ghost', '공지사항 · 오픈 선물');
+      const button = make('button', 'btn small ghost', '공지사항');
       button.type = 'button'; button.setAttribute('translate', 'no'); button.onclick = () => open();
       const support = make('a', 'btn small gold kor-support-shortcut', '서버 후원');
       support.hidden = true; support.target = '_blank'; support.rel = 'noopener noreferrer';
@@ -66,7 +66,8 @@
     // Reward identity, eligibility and claim flow remain server-owned.
     const notices = [...data.notices].sort((a, b) => (Number(b.priority) || 0) - (Number(a.priority) || 0) || Number(!!b.reward) - Number(!!a.reward) || (Date.parse(b.publishedAt) || 0) - (Date.parse(a.publishedAt) || 0));
     for (const notice of notices) {
-      const archived = notice.collapsed === true && !notice.reward;
+      const showReward = !!notice.reward && notice.hideReward !== true;
+      const archived = notice.collapsed === true && !showReward;
       const article = make(archived ? 'details' : 'article', archived ? 'kor-notice kor-notice-archive' : 'kor-notice');
       const contents = archived ? make('div') : article;
       if (archived) article.append(make('summary', '', notice.title), contents);
@@ -83,7 +84,7 @@
         for (const paragraph of notice.history) historyBody.append(make('p', '', paragraph));
         history.append(historyBody); contents.append(history);
       }
-      if (notice.reward) {
+      if (showReward) {
         const reward = notice.reward;
         const gift = make('div', 'kor-notice-gift');
         gift.append(make('strong', '', rewardLabel(reward)));

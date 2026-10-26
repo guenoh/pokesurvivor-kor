@@ -176,7 +176,8 @@ G.ArmoredMewtwo = (() => {
           // Recheck at arrival: moving into a marker must not cause an unavoidable contact hit.
           if(q&&G.World.isFree(q.x,q.y,e.r)&&players.every(p=>G.U.dist2(q.x,q.y,p.x,p.y)>(e.r+(p.r||16)+80)**2)){
             G.FX.burst(e.x,e.y-e.bodyH*.45,'#e08fff',16,120);
-            e.x=q.x;e.y=q.y;G.FX.ring(e.x,e.y,12,e.r+36,'#e08fff',.4,3);
+            e.x=q.x;e.y=q.y;e.armoredTeleportSeq=(e.armoredTeleportSeq||0)+1;
+            G.FX.ring(e.x,e.y,12,e.r+36,'#e08fff',.4,3);
             ai.label='순간이동 후 빈틈 · 지금 공격하세요';
           }else ai.label='순간이동 취소 · 도착 지점이 막혔습니다';
         }else e.anim.play('Shoot');
