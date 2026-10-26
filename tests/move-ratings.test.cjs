@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 function setup(){
   const s={console};s.window=s;vm.createContext(s);
-  for(const f of ['js/core/util.js','js/data/moves.js','js/systems/stats.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..',f),'utf8'),s);
+  for(const f of ['js/core/util.js','js/data/moves.js','js/systems/stats.js'])vm.runInContext(require('../kor/module-source.cjs').isolatedSource(f),s);
   const G=s.G;G.Weather={current:null};G.Types={mult:()=>1};G.T=x=>x;G.I18n={lang:'ko'};G.Mons={abilityName:id=>id,taught:()=>[]};
   vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/data/ability-fx.js'),'utf8'),s);
   vm.runInContext(fs.readFileSync(path.join(__dirname,'../kor/move-ratings.js'),'utf8'),s);

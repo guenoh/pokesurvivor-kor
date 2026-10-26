@@ -22,7 +22,7 @@ G.ArmoredMewtwo = (() => {
     G.EnemyMgr.clear();G.Projectiles.clear();G.Hazards.clear();
     boss=new G.Enemy(definition(),p.x+Math.cos(angle)*distance,p.y+Math.sin(angle)*distance,scale,true);
     G.Rift.reset(); G.Events.reset(); G.EnemyMgr.add(boss); stage='fight';deadline=time+C.fightLimit;
-    G.Sprites.preload([ID,150]);
+    G.Sprites.preload([ID,G.DEX_BY[ID].baseDex]);
     G.Spawner.say('아머드뮤츠가 길을 가로막았다! 공격 예고를 보고 피하세요.',4);
     G.Audio.sfx('boss'); G.Camera.kick(.9); renderHud();
   }
@@ -59,7 +59,7 @@ G.ArmoredMewtwo = (() => {
     e.armoredAI={cd:1/tempo(e),turn:0,cast:null,label:'힘 해방 · 돌진에 대비하세요'};
     clearAttacks(e);
     const dir=e.anim.dir;
-    e.anim=new G.Sprites.Animator(150,e.scale*1.5);e.anim.dir=dir;
+    e.anim=new G.Sprites.Animator(G.DEX_BY[ID].baseDex,e.scale*1.5);e.anim.dir=dir;
     G.FX.burst(e.x,e.y-e.bodyH*.45,'#b2bed2',24,190);
     G.FX.ring(e.x,e.y,20,150,'#d48cff',.6,4);
     if(!e.remote)G.Spawner.say('제어 아머가 부서졌다! 뮤츠의 힘이 해방된다!',3);
@@ -98,7 +98,7 @@ G.ArmoredMewtwo = (() => {
     const shot=G.Projectiles.spawn({x:c.sx+ca*distance,y:c.sy+sa*distance,
       vx:ca*C.rushShotSpeed,vy:sa*C.rushShotSpeed,r:8,life:C.rushShotLife,
       dmg:e.def.shotDmg*e.sc.dmg*C.rushShotRatio,friendly:false,color:'#e08fff',
-      mtype:'psychic',cat:'special',homing:C.rushShotHoming,homingUid:c.targetUid,vis:G.VFX.forType('psychic'),eventOwner:e.id,eventMove:'psycho-rush'});
+      mtype:'psychic',cat:'special',homing:C.rushShotHoming,homingUid:c.targetUid,vis:G.VFX.forType('psychic'),eventOwner:e.id,eventMove:G.DEX_BY[ID].start});
     if(G.Coop.isHost)G.Coop.enemyShot(shot,'psychic');
   }
   function startCast(e,p,ai){

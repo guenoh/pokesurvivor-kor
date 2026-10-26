@@ -607,22 +607,9 @@
     if (m.arc) m.arc = Math.min(3, +(m.arc * 1.25).toFixed(2));
   }
 
-  // Korean event signature: kept out of the shared Psychic and TM pools.
-  RAW.push({ id: 'psycho-rush', name: '사이코러시', type: 'psychic', kind: 'dash', exclusiveDex: 1150,
-    desc: '아머드 뮤츠 전용. 앞으로 돌진하며 경로의 상대를 공격하고, 돌진 도중 상대를 추적하는 염동력 유도탄을 연속 발사합니다. 벽은 통과할 수 없습니다.',
-    cd: 1.8, dmg: 22, radius: 160, width: 36, rushDuration: .32, rushShots: 3, rushShotRatio: .45,
-    speed: 280, life: 2.2, size: 8, homing: 2, pierce: 0,
-    evoMods: { t: '염동력 유도탄 5발 → 7발 · 돌진 타격 폭 +50% · 거리 +15%', m: { rushShots: 7, width: 1.5, radius: 1.15 } },
-    ups: [
-      { t: '돌진과 염동력 탄의 데미지 +35%', m: { dmg: 1.35 } },
-      { t: '염동력 탄 +1발 · 돌진 거리 +20%', m: { rushShots: 4, radius: 1.2 } },
-      { t: '재사용 대기시간 -20%', m: { cd: .8 } },
-      { t: '염동력 탄 +1발 · 데미지 +40%', m: { rushShots: 5, dmg: 1.4 } }
-    ] });
-
   // Pool de movimientos por tipo. El pool `normal` lo tienen todos.
   const POOL = {};
-  for (const m of RAW) if (!m.exclusiveDex) (POOL[m.type] = POOL[m.type] || []).push(m.id);
+  for (const m of RAW) (POOL[m.type] = POOL[m.type] || []).push(m.id);
 
   /*
    * Físico o especial (G.Stats), como en los juegos. Los de estado que aquí sí
@@ -650,7 +637,7 @@
   const BY_ID = {};
   for (const m of RAW) {
     m.cat = m.kind === 'buff' ? null : PHYSICAL.has(m.id) ? 'physical' : 'special';
-    m.ups = m.ups || LADDERS[m.kind];
+    m.ups = LADDERS[m.kind];
     m.maxLvl = m.ups.length + 1;
     BY_ID[m.id] = m;
   }
@@ -663,13 +650,7 @@
     const ids = new Set(POOL.normal);
     for (const t of mon.types) for (const id of (POOL[t] || [])) ids.add(id);
     if (!natural && G.Mons && mon.dex) for (const id of G.Mons.taught(mon.dex)) ids.add(id);
-    for (const m of RAW) if (m.exclusiveDex === mon.dex) ids.add(m.id);
-    return [...ids].filter(id => canUse(mon, id));
-  }
-
-  function canUse(mon, id) {
-    const def = BY_ID[id];
-    return !!def && (!def.exclusiveDex || def.exclusiveDex === mon?.dex);
+    return [...ids];
   }
 
   /**
@@ -743,7 +724,6 @@
     'razor-leaf': 'cd',       'leaf-storm': 'rgn',
     'giga-drain': 'hp',       'thunder-shock': 'atk',
     'discharge': 'def',       'thunderbolt': 'cd',
-    'psycho-rush': 'cd',
     'confusion': 'cd',        'psybeam': 'atk',
     'psychic': 'mag',         'sludge': 'atk',
     'poison-sting': 'spd',    'toxic': 'rgn',
@@ -818,20 +798,20 @@
   function evoInfo(m, statsTaken) {
     const needs = EVO[m.id];
     if (!needs || m.evolved || m.lvl < m.def.maxLvl || !EVO_MODS[m.kind]) return null;
-    return { name: m.id === 'psycho-rush' ? '사이코오버드라이브' : evoName(m.def.name), needs, needName: NEED_NAME[needs], text: (m.def.evoMods || EVO_MODS[m.kind]).t,
+    return { name: evoName(m.def.name), needs, needName: NEED_NAME[needs], text: EVO_MODS[m.kind].t,
              ready: !!(statsTaken && statsTaken[needs]) };
   }
 
   /** Evoluciona una instancia (cambia nombre y potencia; sigue siendo del mismo tipo). */
   function evolve(m) {
     if (!EVO[m.id] || m.evolved) return false;
-    applyMods(m, (m.def.evoMods || EVO_MODS[m.kind]).m);
+    applyMods(m, EVO_MODS[m.kind].m);
     m.baseName = m.name;
-    m.name = m.id === 'psycho-rush' ? '사이코오버드라이브' : evoName(m.baseName);
+    m.name = evoName(m.baseName);
     m.evolved = true;
     return true;
   }
 
-  G.Moves = { ALL: RAW, BY_ID, POOL, poolFor, canUse, instance, levelUp, nextUpText, startFor,
+  G.Moves = { ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
               EVO, NEED_NAME, evoInfo, evolve };
 })();

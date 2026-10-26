@@ -3,11 +3,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 function setup() {
   const sandbox = {}; sandbox.window = sandbox; vm.createContext(sandbox);
-  const load = file => vm.runInContext(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), sandbox);
+  const load = file => vm.runInContext(require('../kor/module-source.cjs').isolatedSource(file), sandbox);
   load('js/core/util.js'); const G = sandbox.G; let commits = 0;
   G.T = text => text; G.I18n = { lang: 'ko', add() {} };
   G.DB = { save: { created: 1, owned: { 150: {} }, bag: { mint: 2, cap: 2, caph: 2 }, pnat: { 150: ['hardy', 1] }, pabil: { 150: [0, 1] } }, commit() { commits++; } };
-  for (const file of ['js/data/pokedex.js', 'js/data/moves.js', 'js/data/tms.js', 'js/data/types.js', 'js/data/abilities.js', 'js/data/natures.js', 'js/systems/mons.js', 'js/data/ability-fx.js', 'js/data/shop.js', 'kor/mon-settings.js']) load(file);
+  for (const file of ['js/data/pokedex.js', 'js/data/sprites-meta.js', 'js/data/moves.js', 'js/data/abilities.js', 'js/data/tms.js', 'js/data/types.js', 'js/data/natures.js', 'js/systems/mons.js', 'js/data/ability-fx.js', 'js/data/shop.js', 'kor/mon-settings.js']) load(file);
   return { G, commits: () => commits };
 }
 test('browsing nature and ability choices leaves inventory and Pokemon unchanged', () => {

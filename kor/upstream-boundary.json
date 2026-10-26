@@ -106,7 +106,7 @@
   ],
   "patches": {
     "dev.html": {
-      "reviewed": "233ba3fd6e3ff4bd1e64e841ac65bd6ed3944a544526e7d439fde4d4d9299c71",
+      "reviewed": "efd9980c70aa7a0be9c1825cfbfffadec1f3a225aea7bf25fcf3c7024078088e",
       "reason": "한국판 문구·화면·확장 로딩 순서",
       "extension": "kor/edition.js"
     },
@@ -145,79 +145,14 @@
       "reason": "기본 언어 한국어",
       "extension": "kor/edition.js"
     },
-    "js/data/achievements.js": {
-      "reviewed": "0d8e1284784101e75fcb9ca0b4e4309d87ec7d252f0ec62f3b828903035a3da9",
-      "reason": "한국어 명칭 충돌 방지",
-      "extension": "js/data/lang-ko-terms.js"
-    },
     "js/data/funding.js": {
       "reviewed": "40ec05e51b164e51e0b8d06075aa5b1119a66c7e1de0b18f68d550bea55c4f99",
       "reason": "한국판 운영 후원 연결",
       "extension": "kor/notices.js"
     },
-    "js/data/moves.js": {
-      "reviewed": "36bef88fd38adb99afe2bb3ddb059f86849418aef9bc58773a0ed0bd46698f29",
-      "reason": "아머드뮤츠 전용 기술·진화 정의",
-      "extension": "kor/armored-data.js"
-    },
-    "js/entities/player.js": {
-      "reviewed": "a138c41d023b2b51531d129a29ae21c41d5ea85de7de913c6c1485a06907845b",
-      "reason": "돌진 무적·공격 후 숨은 특성 처리",
-      "extension": "kor/armored-encounter.js"
-    },
-    "js/entities/projectile.js": {
-      "reviewed": "ac49b7bbb51070597538d75817b48c589e9df85b64c744b3ab1b901cb6e6bd15",
-      "reason": "전용 유도탄·출혈 전파",
-      "extension": "kor/armored-encounter.js"
-    },
-    "js/game.js": {
-      "reviewed": "ab1f3342b880ee4e9b6da85d415bf47fe0ba10472eaf008b55ba6cb58346580d",
-      "reason": "이벤트 생명주기·도움말 입력 처리",
-      "extension": "kor/armored-encounter.js"
-    },
-    "js/net/coop.js": {
-      "reviewed": "92b7d03f714fd67c75d665bb8feca2945766ee29d2025d879711b0a0a2741d74",
-      "reason": "전용 기술·순간이동 협동 동기화",
-      "extension": "kor/net.js"
-    },
-    "js/systems/combat.js": {
-      "reviewed": "217805c5213bdadeca5809463ad990f3e7d6feaffec630a65fd6631a17793284",
-      "reason": "아머드뮤츠 전용 사이코러시 실행",
-      "extension": "kor/armored-encounter.js"
-    },
-    "js/systems/gacha.js": {
-      "reviewed": "a1415654f51f5c50fc4f0b3e1048d21388d646603db2480e1bd612359a8f3898",
-      "reason": "이벤트 포켓몬 뽑기·도감 완성 조건 제외",
-      "extension": "kor/armored-data.js"
-    },
-    "js/systems/hazards.js": {
-      "reviewed": "d1b57f53dcd2ac307a8f8b41de62cf9649389ef1bf6b7fee586eaa0469439390",
-      "reason": "아머드뮤츠 보스 전용 예고·공격",
-      "extension": "kor/armored-encounter.js"
-    },
-    "js/systems/judgment.js": {
-      "reviewed": "4bc664422a03b19a76d69ab61f625d8d0f2c11c45549842d886b5a155e4878da",
-      "reason": "이벤트 전투 뒤 아르세우스 진입",
-      "extension": "kor/armored-encounter.js"
-    },
     "js/systems/mons.js": {
       "reviewed": "c710d5cd595841f8d4979b2c950e3b95a54ac9ecdfa116e5f8aabcc6dd3afe0f",
-      "reason": "전용 기술 시작값",
-      "extension": "kor/armored-data.js"
-    },
-    "js/systems/rift.js": {
-      "reviewed": "508c0a889fe584db82c918be76adb674950db29d9a7f4503ad121042d3704e1b",
-      "reason": "이벤트 대전 중 균열 제한",
-      "extension": "kor/armored-encounter.js"
-    },
-    "js/systems/spawner.js": {
-      "reviewed": "3da4c94c04b0b92799c905a623790bab1b89b48a7e32c5ed2b5b82a273771435",
-      "reason": "이벤트 대전 중 스폰 제어",
-      "extension": "kor/armored-encounter.js"
-    },
-    "js/ui/gacha-ui.js": {
-      "reviewed": "5d7285258390e6ac050b143c7699b51d677c2ef09b8f6cd140dfbe1cae1d3407",
-      "reason": "지방 도감에서 이벤트 포켓몬 제외",
+      "reason": "성격·특성 명칭의 한국어 번역",
       "extension": "kor/armored-data.js"
     },
     "js/ui/icons.js": {
@@ -264,6 +199,75 @@
       "reviewed": "23b7d42db034862199bbee028686d2dafcf68ee07de43e7c73f3c9c5f1e61190",
       "reason": "한국어 텍스트·알림 연동",
       "extension": "kor/mobile-ui.js"
+    }
+  },
+  "pristineEngine": [
+    "js/data/moves.js",
+    "js/entities/player.js",
+    "js/entities/projectile.js",
+    "js/game.js",
+    "js/net/coop.js",
+    "js/systems/combat.js",
+    "js/systems/gacha.js",
+    "js/systems/hazards.js",
+    "js/systems/judgment.js",
+    "js/systems/rift.js",
+    "js/systems/spawner.js",
+    "js/ui/gacha-ui.js",
+    "js/data/achievements.js"
+  ],
+  "extensions": {
+    "js/data/moves.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/content-registry.js"
+    },
+    "js/entities/player.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/entities/projectile.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/game.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/net/coop.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/systems/combat.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/systems/gacha.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/systems/hazards.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/systems/judgment.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/systems/rift.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/systems/spawner.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/ui/gacha-ui.js": {
+      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
+      "extension": "kor/engine-adapter.cjs"
+    },
+    "js/data/achievements.js": {
+      "reason": "이벤트 포켓몬 업적 제외 조건을 한국판 어댑터로 분리",
+      "extension": "kor/engine-adapter.cjs"
     }
   }
 }
