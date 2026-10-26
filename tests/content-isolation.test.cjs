@@ -59,6 +59,9 @@ test('add-on move registration preserves every upstream move and rejects replace
   const move = G.Moves.instance('fixture-rush', 5);
   assert.equal(G.Moves.evoInfo(move, { cd: 1 }).name, '테스트 진화');
   G.Moves.evolve(move); assert.equal(move.rushShots, 9); assert.equal(move.name, '테스트 진화');
+  G.Content.registerMove({ ...pack.moves[0], id: 'fixture-open', exclusiveDex: undefined, type: 'dark' });
+  assert.ok(G.Moves.poolFor({ types: ['dark'] }).includes('fixture-open'));
+  assert.ok(!G.Moves.poolFor({ types: ['fire'] }).includes('fixture-open'), 'a nonexclusive move must still respect type pools without a species id');
 });
 
 test('restored engine protection cannot be bypassed by registering a reviewed core patch', () => {

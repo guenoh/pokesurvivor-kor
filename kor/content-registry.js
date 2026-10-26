@@ -5,7 +5,7 @@
   const extensions = new Map();
   M.canUse = (mon, id) => !!M.BY_ID[id] && (!M.BY_ID[id].exclusiveDex || M.BY_ID[id].exclusiveDex === mon?.dex);
   M.poolFor = (mon, natural) => [...new Set([...original.poolFor(mon, natural),
-    ...[...extensions.values()].filter(m => m.exclusiveDex === mon.dex).map(m => m.id)])].filter(id => M.canUse(mon, id));
+    ...[...extensions.values()].filter(m => m.exclusiveDex && m.exclusiveDex === mon.dex).map(m => m.id)])].filter(id => M.canUse(mon, id));
   M.evoInfo = (move, stats) => {
     const evolution = extensions.get(move.id)?.evolution;
     if (!evolution) return original.evoInfo(move, stats);
