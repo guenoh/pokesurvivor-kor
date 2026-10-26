@@ -82,7 +82,7 @@ G.MonSettings = (() => {
     const confirm = element('button', 'btn gold', kind === 'tm' ? '1개 사용 · 배우기' : `${item.name} 1개 사용해 변경`); confirm.type = 'button'; confirm.disabled = true;
     let query = '', sort = '';
     const render = filter => {
-      const scrollTop = choices.scrollTop;
+      const scrollTop = dialog.scrollTop;
       choices.replaceChildren();
       let visible = list.filter(o => (!filter || o.up === filter) && (!query || o.name.includes(query)));
       if (sort) { const rank = { S: 5, A: 4, B: 3, C: 2, D: 1 }; visible = visible.slice().sort((a, b) => (rank[b[sort]] || 0) - (rank[a[sort]] || 0)); }
@@ -112,7 +112,7 @@ G.MonSettings = (() => {
         };
         choices.append(row);
       }
-      choices.scrollTop = scrollTop;
+      dialog.scrollTop = scrollTop;
     };
     dialog.append(header, summary);
     if (kind === 'nat') {
@@ -121,7 +121,7 @@ G.MonSettings = (() => {
       for (const [value, name] of [['', '전체'], ...Object.entries(STATS), ['neutral', '능력치 변화 없음']]) {
         const option = element('option', '', name); option.value = value; select.append(option);
       }
-      select.onchange = () => { selected = ''; preview.textContent = '변경할 성격을 선택해 주세요.'; confirm.disabled = true; render(select.value); choices.scrollTop = 0; };
+      select.onchange = () => { selected = ''; preview.textContent = '변경할 성격을 선택해 주세요.'; confirm.disabled = true; render(select.value); dialog.scrollTop = 0; };
       label.append(select); dialog.append(label);
     }
     if (kind === 'tm') {
@@ -143,7 +143,7 @@ G.MonSettings = (() => {
       G.Audio.sfx('buy'); G.UI.toast(G.T(result.message), 2600); refresh(); dialog.close();
     };
     footer.append(preview, count, confirm); dialog.append(choices, footer); render('');
-    if (!dialog.open) dialog.showModal(); close.focus();
+    if (!dialog.open) dialog.showModal(); dialog.scrollTop = 0; close.focus({ preventScroll: true });
   }
   return { open, options, apply, isOpen: () => !!dialog?.open };
 })();

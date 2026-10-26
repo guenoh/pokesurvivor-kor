@@ -41,6 +41,7 @@
     dialog.append(header, body, message); document.body.append(dialog);
     dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
     dialog.addEventListener('close', markRead);
+    dialog.addEventListener('keydown', event => event.stopPropagation());
     for (const [parent, after] of [
       [document.querySelector('#scr-menu .menu-right > .box'), null],
       [document.querySelector('#scr-login .box'), document.querySelector('#scr-login .logo')]
