@@ -161,3 +161,24 @@ test('Korean audit checks actual ability effects and generated data beyond Engli
   assert.equal(report.groups.natures.checked, 25);
   assert.ok(report.groups.operationalUi.checked > 0);
 });
+
+
+test('upstream update preserves legacy Korean inventories, event companion and spending across login', async () => {
+  const fixture={v:3,coins:143000,tickets:{t1:4,t10:92},partner:1150,partnerShiny:false,
+    owned:{150:{at:1,from:'gacha'},1150:{at:2,from:'armored-event'}},shiny:{150:{at:3,from:'gacha'}},
+    pupgDone:true,pupg:{1150:{hp:4}},pstart:{1150:'psycho-rush'},pity:{1:69},bag:{mint:3},tms:{confusion:2},
+    evoMoves:{'psycho-rush':1},stats:{bestTime:1823,pulls:84},missions:{day:'2026-10-26',daily:[]},
+    led:{base:{c:[500,0],t1:[4,0],'b:mint':[3,0],'m:confusion':[2,0]},'server:kor-opening-20261023':{c:[150000,0],t10:[100,0]},device:{c:[0,7500],t10:[0,8]}}};
+  let stored=structuredClone(fixture),revision=7;
+  const api=async(url,opt)=>{
+    if(url==='/api/save'){const body=JSON.parse(opt.body);assert.equal(body.revision,revision);stored=body.save;return json({revision:++revision});}
+    return json({user:{id:'legacy-fixture',name:'기존트레이너'},save:structuredClone(stored),revision});
+  };
+  const first=bootAdapter(api);assert.equal(await first.db.ready(),true);
+  for(const k of ['coins','tickets','owned','shiny','pupg','pstart','pity','bag','tms','evoMoves','missions'])assert.equal(JSON.stringify(first.db.save[k]),JSON.stringify(fixture[k]),k);
+  first.db.commit();await first.db.flush();
+  const again=bootAdapter(api);await again.db.ready();
+  assert.equal(again.db.save.coins,143000);assert.equal(again.db.save.tickets.t10,92);
+  assert.equal(again.db.save.stats.bestTime,1823);assert.ok(again.db.save.owned[1150]);
+  assert.equal(again.db.save.pstart[1150],'psycho-rush');assert.equal(again.db.save.led['server:kor-opening-20261023'].t10[0],100);
+});

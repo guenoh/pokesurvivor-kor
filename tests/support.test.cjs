@@ -4,7 +4,7 @@ const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
 const operator='https://buymeacoffee.com/pokesurvivorkor';
 function boot(support){
   const elements=new Map(),storage=new Map();
-  function element(){return {innerHTML:'',textContent:'',classList:{add(){},remove(){},toggle(){}},setAttribute(){},append(){},addEventListener(){},querySelector(){return this.close ||= {};},remove(){this.removed=true;}};}
+  function element(){return {style:{},innerHTML:'',textContent:'',classList:{add(){},remove(){},toggle(){}},setAttribute(){},append(){},addEventListener(){},querySelector(){return this.close ||= element();},remove(){this.removed=true;}};}
   function get(id){if(id==='over-ask'&&!get('over-stats').innerHTML.includes('id="over-ask"'))return null;if(!elements.has(id))elements.set(id,element());return elements.get(id);}
   const sandbox={G:{UI:{$:get,show(){}},DB:{save:{stats:{runs:2}},getNotices:async()=>({support,notices:[]}),guest:true},MenuUI:{open(){}},Flow:{afterLogin(){}},Icons:{html:()=>''},U:{mmss:()=> '3:00'}},document:{readyState:'complete',createElement:element,querySelector:()=>null,body:element()},URL,console,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)}};
   sandbox.window=sandbox;vm.createContext(sandbox);

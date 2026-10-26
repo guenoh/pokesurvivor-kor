@@ -114,6 +114,8 @@ test('slot status reports all ten results, progress and shiny suspense without c
   assert.ok(reports.some(r => r.index === 10 && r.text === '¡¿SHINY?!'));
   assert.equal(reports.at(-1).text, 'SHINY · LEGENDARIA');
   assert.equal(reports.at(-1).total, 10); assert.equal(canvas.onclick, null);
+  const hundred=[];await s.G.Slots.play(canvas, results, 100, status=>hundred.push(status));
+  assert.equal(hundred.at(-1).total,100);assert.equal(hundred.at(-1).index,10);assert.equal(hundred.filter(r=>r.phase==='result').length,10);
   // Upstream callers using two arguments still work.
   await s.G.Slots.play(canvas, [{ rarity: 1 }]);
 });

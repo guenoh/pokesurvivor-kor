@@ -257,3 +257,12 @@ test('teleport cancels when all landing spots or the marked spot become blocked'
     assert.equal(e.x,from.x);assert.equal(e.y,from.y);assert.equal(e.armoredTeleportSeq||0,0);
   }
 });
+
+test('Slumber Orb cannot desynchronize boss rush or teleport warnings but works in recovery',()=>{
+ const {G,player}=setup(),E=G.ArmoredMewtwo;E.updateSpawn(.1,[player],1380);const e=E.boss;
+ for(const cast of [{id:'rush',t:0,wind:.8,duration:.825},{id:'rush',t:1,wind:.8,duration:.825},{id:'teleport',t:0,wind:1}]){
+  e.sleepT=0;e.armoredAI={cast};e.applySleep(1);assert.equal(e.sleepT,0);
+ }
+ e.armoredAI={cast:{id:'rush',t:2,wind:.8,duration:.825}};e.applySleep(1);assert.equal(e.sleepT,1);
+ const normal=new G.Enemy({dex:19,hp:20,spd:0,dmg:1,xp:0,behavior:'chase'},0,0,{hp:1,spd:1,dmg:1});normal.applySleep(4);assert.equal(normal.sleepT,4);
+});

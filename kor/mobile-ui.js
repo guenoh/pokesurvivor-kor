@@ -67,7 +67,8 @@ G.KorMobileUI = (() => {
     resize();
 
     const play = G.Slots.play;
-    G.Slots.play = async function (canvas, results, onStatus) {
+    G.Slots.play = async function (canvas, results, total = results.length, onStatus) {
+      if (typeof total === 'function') { onStatus = total; total = results.length; }
       let frame = canvas.closest('.kor-slot-frame');
       if (!frame) {
         frame = document.createElement('div');
@@ -90,11 +91,11 @@ G.KorMobileUI = (() => {
       root.classList.add('kor-pulling');
       const led = frame.querySelector('.kor-slot-led'), caption = frame.querySelector('.kor-slot-caption');
       try {
-        return await play.call(this, canvas, results, status => {
+        return await play.call(this, canvas, results, total, status => {
           const text = G.T(status.text);
           let short = text, detail = text, color = '#fff2ad';
           if (G.I18n.lang === 'ko') {
-            if (status.phase === 'ready') short = status.total > 1 ? '10회 뽑기' : '행운 가득!';
+            if (status.phase === 'ready') short = status.total > 1 ? `${status.total}회 뽑기` : '행운 가득!';
             if (status.phase === 'suspense') short = '두근두근!';
             if (status.phase === 'result') {
               const result = results[status.index - 1];
@@ -108,7 +109,7 @@ G.KorMobileUI = (() => {
           }
           frame.style.setProperty('--kor-slot-color', color);
           led.textContent = short;
-          caption.textContent = (status.total > 1 ? `${status.index || 1} / ${status.total} · ` : '') + detail;
+          caption.textContent = (status.total > 1 ? `${status.total === 100 ? '100회 뽑기 · 묶음 ' : ''}${status.index || 1} / ${results.length} · ` : '') + detail;
           onStatus?.(status);
         });
       } finally {
