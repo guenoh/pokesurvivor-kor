@@ -31,12 +31,13 @@ test('records wait for the server start token, ignore client team rosters and sh
   if(p.endsWith('/runs/finish'))return {periods:['a']};
   if(p.includes('/records?'))return {rows:[],me:{pos:1,t:3}};
  };
- G.Ranking.runStarted('s');const submitted=G.Ranking.submitSolo({t:3,lv:1,kills:2,members:[{uid:'evil'}]});
+ G.Ranking.runStarted('s');const submitted=G.Ranking.submitSolo({t:1900,lv:1,kills:2,dmg:123,members:[{uid:'evil'}]});
  await new Promise(r=>setImmediate(r));assert.equal(calls.filter(c=>c[0].endsWith('/runs/finish')).length,0);
  resolveStart({id:'server-nonce'});await submitted;
- const finish=calls.find(c=>c[0].endsWith('/runs/finish'))[2];assert.equal(finish.id,'server-nonce');assert.equal(finish.members,undefined);
+ const finish=calls.find(c=>c[0].endsWith('/runs/finish'))[2];assert.equal(finish.id,'server-nonce');assert.equal(finish.members,undefined);assert.equal(finish.dmg,123);
  await Promise.all([G.Ranking.top('s','a',null,true),G.Ranking.myRank('s','a',null,true)]);
- assert.equal(calls.filter(c=>c[0].includes('/records?')).length,1);assert.equal(G.Ranking.periodIds().d,'same-calendar');
+ assert.equal(calls.filter(c=>c[0].includes('/records?')).length,1);
+ await Promise.all([G.Ranking.topDmg('s','a',true),G.Ranking.topDmg('s','a',true)]);assert.equal(calls.filter(c=>c[0].includes('/records?')).length,2);assert.ok(calls.some(c=>c[0].includes('metric=damage')));assert.equal(G.Ranking.periodIds().d,'same-calendar');
 });
 test('late friendship responses cannot restore a logged-out identity',async()=>{
  const {G,handlers}=setup();let complete;G.KorAPI.request=()=>new Promise(r=>complete=r);

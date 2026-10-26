@@ -19,6 +19,7 @@ jobs:
           node-version: '24'
       - run: npm install --global pnpm@11.25.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node kor/upstream-boundary.cjs
       - run: bash .github/scripts/test-sync.sh
       - run: node --test tests/*.test.cjs
       - run: node tools/build.js --sin-seo

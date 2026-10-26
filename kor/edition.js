@@ -1,5 +1,6 @@
 /* Fork-specific UX. Kept out of upstream game modules. */
 (() => {
+  G.LiveUI.init = () => document.getElementById('btn-yt')?.classList.add('hidden'); // Upstream stream polling is not a Korean server service.
   G.LoginUI.updateNotices = () => false; // Original Firebase quota notices do not apply.
   const boot = G.Flow.boot;
   G.Flow.boot = function () {

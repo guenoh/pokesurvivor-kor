@@ -1,8 +1,8 @@
 {
-  "checkedAt": "2026-10-24T04:41:45.971Z",
+  "checkedAt": "2026-10-26T07:18:17.290Z",
   "scope": "English UI keys plus actual Korean species, abilities/effects, natures, moves/upgrades/evolutions, items, achievements, release notes and sampled operational UI. Not exhaustive browser-path coverage.",
-  "reference": 1563,
-  "translated": 1563,
+  "reference": 1633,
+  "translated": 1633,
   "missing": [],
   "groups": {
     "species": {
@@ -41,8 +41,8 @@
       "missing": []
     },
     "evolutions": {
-      "checked": 291,
-      "translated": 291,
+      "checked": 294,
+      "translated": 294,
       "missing": []
     },
     "heldItems": {
@@ -71,8 +71,8 @@
       "missing": []
     },
     "releaseNotes": {
-      "checked": 145,
-      "translated": 145,
+      "checked": 185,
+      "translated": 185,
       "missing": []
     },
     "operationalUi": {

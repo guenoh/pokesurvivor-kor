@@ -113,6 +113,8 @@ G.I18n = (() => {
   }
 
   function t(s, context) {
+    // Movimiento evolucionado: su nombre con « +» (Puño Meteoro +).
+    if (context && typeof s === 'string' && s.endsWith(' +')) return t(s.slice(0, -2), context) + ' +';
     const contextual = contexts.get(context);
     if (contextual && Object.prototype.hasOwnProperty.call(contextual, s)) return contextual[s];
     if (lang === 'es' || !s || typeof s !== 'string') return s;

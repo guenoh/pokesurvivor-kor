@@ -222,6 +222,13 @@ G.ArmoredMewtwo = (() => {
     }
     return stun.call(this,dur);
   };
+  const sleep=G.Enemy.prototype.applySleep;
+  G.Enemy.prototype.applySleep=function(dur){
+    const cast=this.armoredAI?.cast;
+    // New Slumber Orbs follow the same warning protection as stun: hazards must not expire before a delayed dash.
+    if(this.dex===ID&&!this.remote&&((cast?.id==='rush'&&cast.t<cast.wind+cast.duration)||(cast?.id==='teleport'&&cast.t<cast.wind)))return;
+    return sleep.call(this,dur);
+  };
   const slow=G.Enemy.prototype.applySlow;
   G.Enemy.prototype.applySlow=function(factor,dur){return slow.call(this,this.dex===ID?Math.min(.45,factor):factor,dur);};
   function netState(){return [stage,boss?.id||0,releaseAt,deadline,won,!!boss?.armoredFrenzy];}
