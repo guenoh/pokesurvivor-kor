@@ -1,0 +1,269 @@
+{
+  "schema": 1,
+  "upstream": "680c3e12c670a0f131ec846c43248372853389b1",
+  "original": {
+    "css/pages.css": "d375f799d4a19414a3085474bb8cc856f3375806e30fad785460f8ef20b7dc08",
+    "css/style.css": "50ded409d89f6bfd6c9ec16ef2ce5aa546208d2a166468d994b0612d73e6e077",
+    "dev.html": "25b5d37cc49b0e631ea79c3c6a1fe983b17994aef86e1358e6ac32b57b53a521",
+    "js/boot.js": "982354991b355b8ce162e5a7007cce84bf3f5faa16f94f6630c8515d6642993c",
+    "js/core/audio.js": "a424285fa341c238540cdd02d797b08c01324d3e11d871c85e8cd7d8f0a3b421",
+    "js/core/camera.js": "45bff5fcd0c9fc04240f6fccf16c926fe380e6d3a39ccc9fc5e41f1d14af7d95",
+    "js/core/db.js": "d1312979e7bcb7f1d246551929516c953e182e8bc639745aab63ca8e35a12e16",
+    "js/core/firebase-config.js": "3e21ee2db0ec2859d0578e37c5e448dc98ee2a4f9a4a2a05754391bdf9e43fe0",
+    "js/core/gamepad.js": "20ded8f9edcdd457de46a5a67811bb6d0b945622e949583b761db9a03ea24498",
+    "js/core/i18n.js": "3a7b9c15085979768408842847a93bd273a57ebe3faf4d7e1261910cc4ec0fa6",
+    "js/core/input.js": "f1a5d73736fc64f29b1d2b27c13fb8ad4b8649ba256fde1918244bc7f0a2f9a6",
+    "js/core/locales.js": "ec2d88652b78ad6fd3d5d6dc91f29f6aa6bb15cfbb22eddfc42416387f40d075",
+    "js/core/settings.js": "bc3e97d09902946b3530a45712b0a6e775ba1bed8ce4dfbe482d519b624f8b02",
+    "js/core/sprites.js": "5b8ac9189fcd4571ed459fdd6e0d8819425d5cdf8e59127e63e27b7042e61e36",
+    "js/core/touch.js": "be7ae7879e01f96a644b7b1d825a5e06e8924b95743863e751ccb24c4387dedb",
+    "js/core/updater.js": "5b3dfce1960a795d48bde573718db2d4b03c694eee97c75553ad67b5ffed7bf6",
+    "js/core/util.js": "ce755606c3ddf1d59ec6b5a279912009e4159cccaf6c800a606a58a7d7d05b8e",
+    "js/data/abilities.js": "f42826f395ec544e8b87918f9f1356930e2a40225275082548b9005bad05c6ed",
+    "js/data/ability-fx.js": "6ede86b7841cfad6096b380fea3f045e2ce61097d6f30456e7517a4dd3d50112",
+    "js/data/achievements.js": "b40f6c1cbb44c4f2fc732bbd9f4dbeee6303f24112e586050d82a2db6d48d1da",
+    "js/data/changelog.js": "0f7d99bebc564fd4113645926e66ca7292aa6bd74197d6405698559976350179",
+    "js/data/enemies.js": "9e3bdd45fe4d47fa14b0b26d37c2f3417a2323d11466fca2b3212b6190131a63",
+    "js/data/funding.js": "2d8a78a92e7eb360738fb847bfd73dfd52528a4f4886b1f3a0ddd00678e09eb6",
+    "js/data/items.js": "6410fdac6a421849cd4107e47bd9b068556b41caefcacd62e1043a72e394f283",
+    "js/data/lang-en.js": "7a9a5d2238f0e24481cf06b720834d12d9855852894b9bde362822346c48721c",
+    "js/data/lang-fr.js": "6d610482675d145aa681060f53a2073e682c93d1befebd70c34ab684ccf663bf",
+    "js/data/lang-it.js": "d705a3de8fd772a5e229e07eff9713d1341244e1cd23ec5aa748a26b7a4b06fc",
+    "js/data/lang-pt.js": "1dacbea5e2512ea73bfb86cdf626ac4996829a6a70883a800b7e55081805bf31",
+    "js/data/lang-updates.js": "4f5e297fceaf39e4617fee8ff4782a16538968053d3449a096e8602730145102",
+    "js/data/lang-zh-cn-names.js": "62867e5b37152281171bdae5587cf8f65bc62c8c49b6e2f503999e648d697857",
+    "js/data/lang-zh-cn.js": "d63946748d01a0a145feb2c8ed7fea2d104ba63aacf877f8cbfd31780c017074",
+    "js/data/lang-zh-hant-names.js": "c56dd058923e2c04bed531bcb4e67d686023a17c5e0634743c4bbd0c31046a22",
+    "js/data/lang-zh-hant.js": "df062a5134af5c56a3240589e28e275420764b67be5ecac4742ba5900409aa7d",
+    "js/data/missions.js": "5e59334393406027fddc5ee424cd9bddd7f5018290264292d1dd6c3242422c0f",
+    "js/data/moves.js": "9e0f1060ab8c423005ae1a387c54ba0d718813c4cf23bd551d1135dc125b0666",
+    "js/data/music.js": "6121a274d329f8bd99637da604c33c80f2729405efcc0da04a758eb4b1c76821",
+    "js/data/natures.js": "a93452298db292b66837ce34ce430667046a821abfac9c5d844f08a5f59fc691",
+    "js/data/pokedex.js": "43ec37ef3ac48452f9a72c51851a188e2375ec93cde9394b335612ad1e107369",
+    "js/data/shop.js": "742cea16fd046a059e607540fa86804d211a86c0fa90d3e8c840e5a6c47c06ff",
+    "js/data/sprites-meta.js": "da5b1b0f79ab7a1b39a27d344401afb169b651b3f38d531021234643651a9bdc",
+    "js/data/starters.js": "b8183938277f916ae8289fd06e18021283fe29c334ff023ca7526f352e1b82be",
+    "js/data/tms.js": "13e0cf22378490792d94a58627ae0d73f8bbb71161557d95e1a5d73d663897da",
+    "js/data/types.js": "2703e4c4dcccf3591a87d0e3d10316df2373042fa0e5409b3650dc7cb9eb483c",
+    "js/data/upgrades.js": "c6b43cba5e1861903825e53c20352d6931f8a33d0b92c654b19cdc6123c93228",
+    "js/entities/enemy.js": "417b5d7ab89bbf7fda9b6ea4f1cc0746b9c3e617d6630bcac9b57363c15dd646",
+    "js/entities/fx.js": "886f5f9cf3354fc2d7a059dc1e7f77035bf78bf56c14f39474473acb238bd956",
+    "js/entities/pickup.js": "fa650ccd1a613875af367a2a5ab9a1147131e23926ed8cc429964ab13662b835",
+    "js/entities/player.js": "a0929dc56a18402f3bdf63c06f9da8bc6e11b4a5cf441df470a03225afffa85b",
+    "js/entities/projectile.js": "cb07513ec25125663089e43b3534150a09155f7195ea61caf58aaf1e3e02d0a6",
+    "js/entities/vfx.js": "855d2ac6375228880aa71bdadf38d62e018641e8ae8ac765f68dfcb1b3fb1030",
+    "js/game.js": "9aeb89e34b9f3f40871e375baec10f81b3815585d766d657568bc9832a9c4415",
+    "js/main.js": "162f0210f97bd3971e4f83d2d2297919228ccb8d3864f184151569dfc8e33467",
+    "js/net/codec.js": "35f8af727bd86f5adf31e8c9d1b2e8497ed0840c1d524cba4ce8d6b915e22f4a",
+    "js/net/coop.js": "6cc9b197e311332479f07f4d7c2e0ebe40d3aa8790b7c6ad354fc2163659a3ca",
+    "js/net/net.js": "ca53c94d8d276b99f7171b64a0d52c995c3466291447c4177c2788f96bd325e3",
+    "js/net/ranking.js": "de4cae38d025e754aa9718def824e372c4c9cc5fef27d51f78451a2c4da4c3b1",
+    "js/net/social.js": "181a38e0dfcc67b378c7514799bb5b5a4d5d24c124e881f1e941d6f2c0618b8a",
+    "js/noframe.js": "99bb2b55b8f8ebc88db2a0af33b4b07f5cf530ea63aa786a344fe0b3f2adca4d",
+    "js/systems/combat.js": "98e59fb480f3a922d7bc953c42dce36b006b703d3c3eb124e3bf8f49305088a2",
+    "js/systems/events.js": "871b784879aa090fb8d5107f40c12ab66915448c4f9bf2515c52265037809c84",
+    "js/systems/gacha.js": "d9421de07e86b2e3e852f5245fc3be8dfdd50cf49ad2904a73e2c2721ea848c6",
+    "js/systems/hazards.js": "6de77e26e1c741ff07c52404e008ef6a5a1029fc897a8610dbfeaeab0dcc4501",
+    "js/systems/interact.js": "51e7d7849c4981422a3ff011c21d1aa52362be62b574539c1de9c0e9d1bffe2a",
+    "js/systems/judgment.js": "ab68c4d4a594bd7043a3a69627cfcfdc2829a7cc57931dc6c57560df0b33a1dd",
+    "js/systems/levelup.js": "b40e9d02b19c8f695818aea6f46417518d6d9e083aa210c02c2cb0ce9779dd63",
+    "js/systems/mons.js": "a58ae67e184a0742f77b34d8159222279d41e7901206ce0b390d0cc2bdcbd284",
+    "js/systems/orbs.js": "1bcfd762f2caca3b7b6e57f90996046c0743d8bd6cebc9b8487a5ba3d20a1545",
+    "js/systems/pathing.js": "6e3f1a8fa99b6422cfca60a9b3e237cfbb9ac790646bad57a4bf6885112406fa",
+    "js/systems/progress.js": "63747befe765426fa773286e2bce2729e6a8f9d65eb141e3efad2592299e8498",
+    "js/systems/rift.js": "2c27b749de34a0f7be0a53e5499e1591837dd1b5c9b1d54f440493b894c50f76",
+    "js/systems/spawner.js": "c5baee913e35fef7fcffa53e4cee96cef7c1dffd5dbc53770ea48740f759dc99",
+    "js/systems/stats.js": "d9c8248f847a195ecc5da368a7984f0e42f2f0033e93f5b3f6f60c44186bed4b",
+    "js/systems/weather.js": "3eabce86c211030c50ea1977a3f3b2fcac538184e31354379af383c9f37dec10",
+    "js/ui/gacha-ui.js": "e2c530325d7824bcb24d5d052c9369f0ec4fdc1568387546accc6b88d40a7c9d",
+    "js/ui/goals-ui.js": "c000ebe8204b682dc5fdd50a47b5a579531bba6236d83ccaadf82b6a76227199",
+    "js/ui/hud.js": "ebd9f84a809f0b9a3e73d7acb9917eab42f496782220ad12ee7f72cb702e57f1",
+    "js/ui/icons.js": "44dc540b22897e0e518b1f9607725545e2bc7e394de7be88910fad69790eb38e",
+    "js/ui/layout-ui.js": "ca07f53684cde9c1f834f7ca578a73fac1272c396ad933ea1a243db30cde5db8",
+    "js/ui/live-ui.js": "53853dc12118912bc10a7803bb1c85805c707a1dc88704c86179e0a838147a99",
+    "js/ui/login.js": "07a881635e022895f9ef3c6a9faecaf8b52e66a11011ce534c2620900ffad980",
+    "js/ui/menu.js": "196314253c7c7e2987fd6566f32f022ca151d8ef44cb3d0c42c6d5a49913c894",
+    "js/ui/mod-ui.js": "c8cc34f9ab4709aee9f471dbe1a481c990622fe493b322c76025a0f33d40a5b9",
+    "js/ui/news-ui.js": "98a7d8ccdea6d3b20150a5f849bd2f42dd24b8c42da86baaf1b8d37e7469ca08",
+    "js/ui/ranking-ui.js": "a387363a18231a00bc3ad8833f7fec3fdd2b13ef6e0df7fe95a5d909c782a868",
+    "js/ui/run-ui.js": "0104abc794207796c8f2c486140cc5fd865a5b31f0a9077aa3c42480ca9e0ac6",
+    "js/ui/settings-ui.js": "d3d48282cd148fd979256a3458b750f907ee5ba9e4492ac403ba45cdf81de5d9",
+    "js/ui/shop-ui.js": "468c3e5e916c649b54f413a93bb91f99eb2c22417569cd8f02c040667cdd29ee",
+    "js/ui/slots.js": "b105a1f19b23c6c2a5d83da8feb45a551dc2ea06f70c29f7a1f50996290ebcc0",
+    "js/ui/social-ui.js": "e551a8c410e7e4a0de631669fff0c576e8676c5c4c5860439193aefc5339a818",
+    "js/ui/support-ui.js": "08f168d3a3f4a6687f89115b1cf37ea30ceaee1a2d60f3609d1a76fb610ddaea",
+    "js/ui/test.js": "360c274fbda1cc7e808c04ed43dbc5b50a5c82ca57bdd9a977e400c754e97c3b",
+    "js/ui/ui.js": "f860d5cd41938cc221649149e14a2000300aa52c7d3d7dbd2285583e679b806b",
+    "js/world/tiles.js": "d0117658a3da9384c6866d84cd7e7777562d756c7762e2c09d5c63c917d35cb5",
+    "js/world/world.js": "48919fd3ac2e21c2bc8fe49eeea8365c47cdba3d40af852099f39bd199d06ed4"
+  },
+  "koreanOwned": [
+    "js/data/lang-ko-complete.js",
+    "js/data/lang-ko-history.js",
+    "js/data/lang-ko-names.js",
+    "js/data/lang-ko-terms.js",
+    "js/data/lang-ko.js"
+  ],
+  "patches": {
+    "dev.html": {
+      "reviewed": "233ba3fd6e3ff4bd1e64e841ac65bd6ed3944a544526e7d439fde4d4d9299c71",
+      "reason": "한국판 문구·화면·확장 로딩 순서",
+      "extension": "kor/edition.js"
+    },
+    "js/boot.js": {
+      "reviewed": "8aee18000e0f3eacb427bf3a9cff03b29b3d9f6efa22bb9a1457c92a2bcdba2e",
+      "reason": "브라우저 UI 한국어 번역 초기화",
+      "extension": "js/core/i18n.js"
+    },
+    "js/core/db.js": {
+      "reviewed": "072b29049c05e5f87612f9558357b4e0de0f3c61c6e76bcca8afe1acd08a4b82",
+      "reason": "독립 저장 API 초기화 경계",
+      "extension": "kor/selfhost-db.js"
+    },
+    "js/core/firebase-config.js": {
+      "reviewed": "ca688fbfd37c1b1bb452e32ee5243ae8264b993fbbe0358132c77afc76b522bd",
+      "reason": "원작 Firebase 접속 비활성화",
+      "extension": "kor/selfhost-db.js"
+    },
+    "js/core/gamepad.js": {
+      "reviewed": "214b127d53623040613c877a0f7619405a71eb78568d273a227467d193f354c0",
+      "reason": "한국판 메뉴·버튼 탐색",
+      "extension": "kor/mobile-ui.js"
+    },
+    "js/core/i18n.js": {
+      "reviewed": "a335cde402d4fa91a22f9cba45f6d9b9811f57c12914bcdbe93924a5d02c692e",
+      "reason": "한국어 폰트·조사·동적 문구 번역",
+      "extension": "js/data/lang-ko.js"
+    },
+    "js/core/locales.js": {
+      "reviewed": "4824a37c81f7c2eaa23252acec32df4b011d0aff90317537b5c7a309ea2def3d",
+      "reason": "한국어 언어팩 등록",
+      "extension": "js/data/lang-ko.js"
+    },
+    "js/core/settings.js": {
+      "reviewed": "46bcd4004b7b6a626a78910b45952b7070c2cd98688bfa5d1b5e6c8644dfdc13",
+      "reason": "기본 언어 한국어",
+      "extension": "kor/edition.js"
+    },
+    "js/data/achievements.js": {
+      "reviewed": "0d8e1284784101e75fcb9ca0b4e4309d87ec7d252f0ec62f3b828903035a3da9",
+      "reason": "한국어 명칭 충돌 방지",
+      "extension": "js/data/lang-ko-terms.js"
+    },
+    "js/data/funding.js": {
+      "reviewed": "40ec05e51b164e51e0b8d06075aa5b1119a66c7e1de0b18f68d550bea55c4f99",
+      "reason": "한국판 운영 후원 연결",
+      "extension": "kor/notices.js"
+    },
+    "js/data/moves.js": {
+      "reviewed": "36bef88fd38adb99afe2bb3ddb059f86849418aef9bc58773a0ed0bd46698f29",
+      "reason": "아머드뮤츠 전용 기술·진화 정의",
+      "extension": "kor/armored-data.js"
+    },
+    "js/entities/player.js": {
+      "reviewed": "a138c41d023b2b51531d129a29ae21c41d5ea85de7de913c6c1485a06907845b",
+      "reason": "돌진 무적·공격 후 숨은 특성 처리",
+      "extension": "kor/armored-encounter.js"
+    },
+    "js/entities/projectile.js": {
+      "reviewed": "ac49b7bbb51070597538d75817b48c589e9df85b64c744b3ab1b901cb6e6bd15",
+      "reason": "전용 유도탄·출혈 전파",
+      "extension": "kor/armored-encounter.js"
+    },
+    "js/game.js": {
+      "reviewed": "ab1f3342b880ee4e9b6da85d415bf47fe0ba10472eaf008b55ba6cb58346580d",
+      "reason": "이벤트 생명주기·도움말 입력 처리",
+      "extension": "kor/armored-encounter.js"
+    },
+    "js/net/coop.js": {
+      "reviewed": "92b7d03f714fd67c75d665bb8feca2945766ee29d2025d879711b0a0a2741d74",
+      "reason": "전용 기술·순간이동 협동 동기화",
+      "extension": "kor/net.js"
+    },
+    "js/systems/combat.js": {
+      "reviewed": "217805c5213bdadeca5809463ad990f3e7d6feaffec630a65fd6631a17793284",
+      "reason": "아머드뮤츠 전용 사이코러시 실행",
+      "extension": "kor/armored-encounter.js"
+    },
+    "js/systems/gacha.js": {
+      "reviewed": "a1415654f51f5c50fc4f0b3e1048d21388d646603db2480e1bd612359a8f3898",
+      "reason": "이벤트 포켓몬 뽑기·도감 완성 조건 제외",
+      "extension": "kor/armored-data.js"
+    },
+    "js/systems/hazards.js": {
+      "reviewed": "d1b57f53dcd2ac307a8f8b41de62cf9649389ef1bf6b7fee586eaa0469439390",
+      "reason": "아머드뮤츠 보스 전용 예고·공격",
+      "extension": "kor/armored-encounter.js"
+    },
+    "js/systems/judgment.js": {
+      "reviewed": "4bc664422a03b19a76d69ab61f625d8d0f2c11c45549842d886b5a155e4878da",
+      "reason": "이벤트 전투 뒤 아르세우스 진입",
+      "extension": "kor/armored-encounter.js"
+    },
+    "js/systems/mons.js": {
+      "reviewed": "c710d5cd595841f8d4979b2c950e3b95a54ac9ecdfa116e5f8aabcc6dd3afe0f",
+      "reason": "전용 기술 시작값",
+      "extension": "kor/armored-data.js"
+    },
+    "js/systems/rift.js": {
+      "reviewed": "508c0a889fe584db82c918be76adb674950db29d9a7f4503ad121042d3704e1b",
+      "reason": "이벤트 대전 중 균열 제한",
+      "extension": "kor/armored-encounter.js"
+    },
+    "js/systems/spawner.js": {
+      "reviewed": "3da4c94c04b0b92799c905a623790bab1b89b48a7e32c5ed2b5b82a273771435",
+      "reason": "이벤트 대전 중 스폰 제어",
+      "extension": "kor/armored-encounter.js"
+    },
+    "js/ui/gacha-ui.js": {
+      "reviewed": "5d7285258390e6ac050b143c7699b51d677c2ef09b8f6cd140dfbe1cae1d3407",
+      "reason": "지방 도감에서 이벤트 포켓몬 제외",
+      "extension": "kor/armored-data.js"
+    },
+    "js/ui/icons.js": {
+      "reviewed": "00db82cbd842603443f9b43b86621f7f6916a441538f4322f50e8d4a9c32be7d",
+      "reason": "전용 기술 아이콘",
+      "extension": "kor/armored-data.js"
+    },
+    "js/ui/menu.js": {
+      "reviewed": "0058fb46f5b669353708ec748d2912e8f64649ce94d002a62ebbf4406bac7fe7",
+      "reason": "한국판 포켓몬·특성·전용 기술 안내",
+      "extension": "kor/mon-settings.js"
+    },
+    "js/ui/ranking-ui.js": {
+      "reviewed": "e24f5275375b2a7fb77849c388a1e3e93707f43e10b4a1fd512ed9e39bdba0f6",
+      "reason": "독립 랭킹 친구 범위·초기화·신고 정책",
+      "extension": "kor/ranking.js"
+    },
+    "js/ui/run-ui.js": {
+      "reviewed": "21bee3a8038cc04846ba88042bd62793131ced8192239982f92234a3ea6a4309",
+      "reason": "선택 입력·한국판 기술 등급 표시",
+      "extension": "kor/move-ratings.js"
+    },
+    "js/ui/settings-ui.js": {
+      "reviewed": "1291e1bedf9a9949e0404616062a6856aba14377ca4cb979e0bf6598c61a608d",
+      "reason": "한국판 저장·로그아웃·서비스 안내",
+      "extension": "kor/logout.js"
+    },
+    "js/ui/slots.js": {
+      "reviewed": "54300232a48b1bfde25a83227c0992290bbe1c68472ec920587dcc08ffdb373d",
+      "reason": "슬롯 진행 상태를 한국어 캡션에 전달",
+      "extension": "kor/mobile-ui.js"
+    },
+    "js/ui/social-ui.js": {
+      "reviewed": "2fbe935ab8fe5694d1f7bd66229759ad84d7b2aae82526d7d6aa3263d9fd57ee",
+      "reason": "한국판 계정·협동·친구 동작",
+      "extension": "kor/social.js"
+    },
+    "js/ui/support-ui.js": {
+      "reviewed": "1ef53a334fb337cdc4a71c7994eea3361a3f5c3526dd36029ac1379ebb9f178e",
+      "reason": "한국판 운영 후원 문구와 링크",
+      "extension": "kor/notices.js"
+    },
+    "js/ui/ui.js": {
+      "reviewed": "23b7d42db034862199bbee028686d2dafcf68ee07de43e7c73f3c9c5f1e61190",
+      "reason": "한국어 텍스트·알림 연동",
+      "extension": "kor/mobile-ui.js"
+    }
+  }
+}
