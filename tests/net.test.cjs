@@ -164,11 +164,11 @@ test('boss rush bullets retain cleanup ownership through actual host and guest c
     return {G,frames,receive:(f)=>receive('host',f)};
   }
   const host=peer(true),guest=peer(false);
-  const shot={x:10,y:20,vx:340,vy:0,dmg:60,r:8,life:1.6,cat:'special',eventOwner:123,eventMove:'psycho-rush'};
+  const shot={x:10,y:20,vx:340,vy:0,dmg:60,r:8,life:1.6,cat:'special',eventOwner:123,eventMove:'psycho-rush',homing:2,homingUid:'guest'};
   host.G.Coop.enemyShot(shot,'psychic');host.G.Coop.enemyShot({...shot,eventOwner:undefined,eventMove:undefined},'fire');host.G.Coop.tick(1/15);
   const frame=C.decode(C.encode(host.frames[0]));assert.equal(frame.ev[0][10],123);assert.equal(frame.ev[0][11],'psycho-rush');assert.equal(frame.ev[1].length,10);
   guest.receive(frame);const shots=guest.G.Projectiles.all();assert.equal(shots.length,2);
-  assert.equal(shots[0].eventOwner,123);assert.equal(shots[0].eventMove,'psycho-rush');assert.equal(shots[0].cat,'special');
+  assert.equal(shots[0].eventOwner,123);assert.equal(shots[0].eventMove,'psycho-rush');assert.equal(shots[0].cat,'special');assert.equal(shots[0].homing,2);assert.equal(shots[0].homingUid,'guest');
   guest.G.Projectiles.clearEnemyOwner(123);guest.G.Projectiles.update(0,null,[]);
   assert.equal(guest.G.Projectiles.count,1);assert.equal(guest.G.Projectiles.all()[0].mtype,'fire');
 });

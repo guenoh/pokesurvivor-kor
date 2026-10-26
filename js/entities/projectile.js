@@ -83,6 +83,18 @@ G.Projectiles = (() => {
         }
       }
 
+      // Event hostile Confusion tracks the same player on host and guests.
+      // Keep a dead/disconnected target's last heading instead of switching targets locally.
+      if (!p.friendly && p.eventMove === 'psycho-rush' && p.homing > 0) {
+        const targets = p.homingUid ? (G.Game?.everyone?.() || []).filter(q => q?.uid === p.homingUid) : [player];
+        const target = targets.find(q => q && !q.dead && q.hp > 0);
+        if (target) {
+          const [dx, dy] = G.U.norm(target.x - p.x, target.y - p.y), speed = Math.hypot(p.vx, p.vy);
+          p.vx = G.U.damp(p.vx, dx * speed, p.homing, dt);
+          p.vy = G.U.damp(p.vy, dy * speed, p.homing, dt);
+        }
+      }
+
       p.px = p.x; p.py = p.y;          // para la colisión barrida (ver combat.js)
       if (p.vis && p.vis.trail && G.Camera.sees(p.x, p.y, 20)) {
         p.trailT = (p.trailT || 0) - dt;

@@ -186,8 +186,11 @@ G.Coop = (() => {
     for (const e of G.EnemyMgr.all()) {
       if (e.dead || G.U.dist2(e.x, e.y, near.x, near.y) > r2n) continue;
       const a = ANIMS.indexOf(e.anim.cur);
-      out.push([e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
-                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.slow > 0 ? 8 : 0)]);
+      const snapshot = [e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
+                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.slow > 0 ? 8 : 0)];
+      // Persist the warp revision so a dropped first frame or a late join still snaps.
+      if (G.ARMORED_EVENT && e.dex === G.ARMORED_EVENT.id) snapshot.push(e.armoredTeleportSeq || 0);
+      out.push(snapshot);
     }
     return out;
   }
@@ -398,12 +401,19 @@ G.Coop = (() => {
       const e = G.EnemyMgr.get(a[0]);
       if (!e || !e.remote || e.dead) continue;
       const n = e.net;
+      const teleportSeq = G.ARMORED_EVENT && e.dex === G.ARMORED_EVENT.id && Number.isSafeInteger(a[7]) && a[7] >= 0 ? a[7] : null;
+      if (teleportSeq !== null && teleportSeq < (n.armoredTeleportSeq || 0)) continue;
+      const teleported = teleportSeq !== null && teleportSeq > (n.armoredTeleportSeq || 0);
       const dts = (now - (n.last || now)) / 1000;
-      if (dts > 0.02 && dts < 1) {
+      if (teleported) {
+        // A teleport is discontinuous, not velocity: never extrapolate it into a contact hit.
+        e.x = a[1]; e.y = a[2]; n.vx = 0; n.vy = 0;
+      } else if (dts > 0.02 && dts < 1) {
         n.vx = G.U.clamp((a[1] - n.x) / dts, -600, 600);
         n.vy = G.U.clamp((a[2] - n.y) / dts, -600, 600);
       } else { n.vx = 0; n.vy = 0; }
       n.x = a[1]; n.y = a[2]; n.age = 0; n.last = now;
+      if (teleportSeq !== null) n.armoredTeleportSeq = teleportSeq;
       e.hp = Math.min(e.maxHp, a[3]);
       n.anim = a[4]; n.dir = a[5]; n.st = a[6];
     }
@@ -420,7 +430,7 @@ G.Coop = (() => {
       case 'es':
         G.Projectiles.spawn({ x: ev[1], y: ev[2], vx: ev[3], vy: ev[4], dmg: ev[5], r: ev[6], life: ev[7],
                               friendly: false, color: ev[11] === 'psycho-rush' ? '#e08fff' : '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8], cat: ev[9],
-                              eventOwner: Number.isSafeInteger(ev[10]) ? ev[10] : undefined, eventMove: ev[11] });
+                              eventOwner: Number.isSafeInteger(ev[10]) ? ev[10] : undefined, eventMove: ev[11], homing: Number.isFinite(ev[12]) ? Math.max(0, Math.min(4, ev[12])) : 0, homingUid: typeof ev[13] === 'string' ? ev[13] : undefined });
         break;
       case 'c': { const m = mates.get(ev[1]); if (m) G.Combat.ghostCast(m.pl, ev[2], ev[3], ev[4], ev[5]); break; }
       case 'item': api.item(ev[1]); break;
@@ -474,7 +484,7 @@ G.Coop = (() => {
   function enemyGone(e, died) { emit([died ? 'ed' : 'eg', e.id]); }
   function enemyShot(p, type) {
     const event = ['es', r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), r2(p.dmg), p.r, p.life, type, p.cat];
-    if (Number.isSafeInteger(p.eventOwner)) event.push(p.eventOwner, p.eventMove);
+    if (Number.isSafeInteger(p.eventOwner)) event.push(p.eventOwner, p.eventMove, p.homing || 0, p.homingUid || null);
     emit(event);
   }
   function pickupAdded(o) { emit(['pk', o.id, o.kind, r1(o.x), r1(o.y), o.value]); }

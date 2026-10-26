@@ -609,9 +609,10 @@
 
   // Korean event signature: kept out of the shared Psychic and TM pools.
   RAW.push({ id: 'psycho-rush', name: '사이코러시', type: 'psychic', kind: 'dash', exclusiveDex: 1150,
-    desc: '아머드 뮤츠 전용. 앞으로 돌진하며 경로의 상대를 공격하고, 돌진 도중 염동력 탄을 연속 발사합니다. 벽은 통과할 수 없습니다.',
+    desc: '아머드 뮤츠 전용. 앞으로 돌진하며 경로의 상대를 공격하고, 돌진 도중 상대를 추적하는 염동력 유도탄을 연속 발사합니다. 벽은 통과할 수 없습니다.',
     cd: 1.8, dmg: 22, radius: 160, width: 36, rushDuration: .32, rushShots: 3, rushShotRatio: .45,
-    speed: 300, life: 1.6, size: 8, homing: 2, pierce: 0,
+    speed: 280, life: 2.2, size: 8, homing: 2, pierce: 0,
+    evoMods: { t: '염동력 유도탄 5발 → 7발 · 돌진 타격 폭 +50% · 거리 +15%', m: { rushShots: 7, width: 1.5, radius: 1.15 } },
     ups: [
       { t: '돌진과 염동력 탄의 데미지 +35%', m: { dmg: 1.35 } },
       { t: '염동력 탄 +1발 · 돌진 거리 +20%', m: { rushShots: 4, radius: 1.2 } },
@@ -740,6 +741,7 @@
     'razor-leaf': ['Lluevehojas', 'cd'],     'leaf-storm': ['Danza Pétalo', 'rgn'],
     'giga-drain': ['Planta Feroz', 'hp'],    'thunder-shock': ['Trueno', 'atk'],
     'discharge': ['Campo Eléctrico', 'def'], 'thunderbolt': ['Electrocañón', 'cd'],
+    'psycho-rush': ['사이코오버드라이브', 'cd'],
     'confusion': ['Psicocarga', 'cd'],       'psybeam': ['Premonición', 'atk'],
     'psychic': ['Vasta Fuerza', 'mag'],      'sludge': ['Bomba Lodo', 'atk'],
     'poison-sting': ['Puya Nociva', 'spd'],  'toxic': ['Gas Venenoso', 'rgn'],
@@ -813,7 +815,7 @@
     const e = EVO[m.id];
     if (!e || m.evolved || m.lvl < m.def.maxLvl || !EVO_MODS[m.kind]) return null;
     const [name, needs] = e;
-    return { name, needs, needName: NEED_NAME[needs], text: EVO_MODS[m.kind].t,
+    return { name, needs, needName: NEED_NAME[needs], text: (m.def.evoMods || EVO_MODS[m.kind]).t,
              ready: !!(statsTaken && statsTaken[needs]) };
   }
 
@@ -821,7 +823,7 @@
   function evolve(m) {
     const e = EVO[m.id];
     if (!e || m.evolved) return false;
-    applyMods(m, EVO_MODS[m.kind].m);
+    applyMods(m, (m.def.evoMods || EVO_MODS[m.kind]).m);
     m.baseName = m.name;
     m.name = e[0];
     m.evolved = true;
