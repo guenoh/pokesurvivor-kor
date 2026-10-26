@@ -143,7 +143,7 @@ G.MoveRatings = (() => {
     const body=document.createElement('div');body.className='kor-rating-body';
     const paragraph=text=>{const p=document.createElement('p');p.textContent=text;body.append(p);};
     function select(result) {
-      body.replaceChildren();body.scrollTop=0;
+      body.replaceChildren();dialog.scrollTop=0;
       [...tabs.children].forEach((b,i)=>b.setAttribute('aria-pressed',String(results[i]===result)));
       const name=document.createElement('h3');name.textContent=result.name;body.append(name);
       if(result.description)paragraph(result.description);
@@ -163,7 +163,7 @@ G.MoveRatings = (() => {
       tab.onclick=()=>select(result);tabs.append(tab);
     }
     select(results[0]);
-    dialog.append(body);dialog.showModal();close.focus();
+    dialog.append(body);dialog.showModal();dialog.scrollTop=0;close.focus({preventScroll:true});
   }
 
   function mountCategory(host,move) {

@@ -50,7 +50,7 @@ html[lang="ko"] .stat > span:last-child { white-space: nowrap; text-align: right
 .kor-server-actions .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; text-decoration: none; }
 .kor-server-actions .kor-support-shortcut { margin-left: auto; border-color: #fff0ac; box-shadow: 0 0 0 1px #e6c96755; }
 .kor-support-shortcut[hidden] { display: none; }
-dialog.kor-notices { width: min(600px, calc(100vw - 28px)); max-height: calc(100dvh - 36px); color: #eef4ff; margin: auto; padding: 20px; }
+dialog.kor-notices { position: fixed; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; width: min(600px, calc(100vw - 28px)); max-height: calc(100dvh - 36px); color: #eef4ff; margin: auto; padding: 20px; }
 dialog.kor-notices:not([open]) { display: none; }
 dialog.kor-notices::backdrop { background: #081022d9; }
 .kor-notices-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; position: sticky; top: -20px; background: #263c77; z-index: 1; padding: 8px 0; }
@@ -309,13 +309,13 @@ html[lang="ko"] .kor-choice-box .card > .kor-move-ratings { flex-basis: 100%; gr
 .ban-moves > .kor-rated-option { width: 100%; min-width: min(320px, 100%); }
 .kor-rated-option > .chip { min-height: calc(40px / var(--kor-ui-scale)); white-space: normal; }
 
-dialog.kor-rating-dialog { margin: auto; width: min(620px, calc(var(--kor-vw) - 28px)); max-height: calc(var(--kor-vh) - 24px); padding: 16px; color: #fff; overflow: hidden; }
-dialog.kor-rating-dialog[open] { display: flex; flex-direction: column; }
+dialog.kor-rating-dialog { position: fixed; margin: auto; width: min(620px, calc(var(--kor-vw) - 28px)); max-height: calc(var(--kor-vh) - 24px); padding: 16px; color: #fff; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
+dialog.kor-rating-dialog[open] { display: block; }
 dialog.kor-rating-dialog::backdrop { background: #081022e8; }
-.kor-rating-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-shrink: 0; padding-bottom: 10px; }
+.kor-rating-head { position: sticky; top: -16px; z-index: 3; background: #263c77; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-shrink: 0; padding-bottom: 10px; }
 .kor-rating-head h2 { font-size: 20px; margin: 0; }
 .kor-rating-head .btn { flex-shrink: 0; min-height: 40px; }
-.kor-rating-body { min-height: 0; overflow: auto; overscroll-behavior: contain; color: #e5edff; font-size: 14px; line-height: 1.7; }
+.kor-rating-body { min-height: 0; overflow: visible; color: #e5edff; font-size: 14px; line-height: 1.7; }
 .kor-rating-body p { margin: 0 0 12px; }
 /* All reward choices form full-width rows, regardless of orientation.
    Clamp the minimum to the available space rather than overflowing a phone. */
@@ -393,7 +393,7 @@ html[lang="ko"] #lobby-invite { max-height: 160px; }
 .kor-move-help[hidden] { display: none; }
 .kor-move-help:is(:hover, :focus-visible) { border-color: #ffe17d; background: #345991; color: #fff; }
 .kor-move-help:focus-visible { outline: 3px solid #ffe17d; outline-offset: 3px; }
-.kor-rating-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 10px; max-height: 28vh; overflow: auto; flex-shrink: 0; }
+.kor-rating-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 10px; overflow: visible; flex-shrink: 0; }
 .kor-rating-tabs .chip { min-height: 38px; }
 .kor-rating-tabs .chip[aria-pressed="true"] { background: #3b5484; border-color: #ffe17d; color: #ffe17d; }
 .kor-rating-tabs .chip:focus-visible { outline: 2px solid #ffe17d; outline-offset: 1px; }
@@ -422,10 +422,10 @@ html[lang="ko"] #lobby-invite { max-height: 160px; }
 .kor-tier-components { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 6px; margin-top: 10px; }
 .kor-tier-components > div { display: flex; align-items: center; flex-direction: column; gap: 4px; background: #0d1e38; border-radius: 5px; padding: 7px 2px; }
 .kor-tier-components span, .kor-tier-components small { font-size: 12px; color: #e2edff; }
-dialog.kor-tier-dialog { width: min(820px,calc(var(--kor-vw) - 24px)); max-height: calc(var(--kor-vh) - 20px); margin: auto; padding: 16px; color: #f4f8ff; overflow: hidden; }
-dialog.kor-tier-dialog[open] { display: flex; flex-direction: column; }
+dialog.kor-tier-dialog { position: fixed; width: min(820px,calc(var(--kor-vw) - 24px)); max-height: calc(var(--kor-vh) - 20px); margin: auto; padding: 16px; color: #f4f8ff; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
+dialog.kor-tier-dialog[open] { display: block; }
 dialog.kor-tier-dialog::backdrop { background: #081022ed; }
-.kor-tier-body { min-height: 0; overflow: auto; overscroll-behavior: contain; text-align: left; font-size: 14px; line-height: 1.7; }
+.kor-tier-body { min-height: 0; overflow: visible; text-align: left; font-size: 14px; line-height: 1.7; }
 .kor-tier-body h3 { margin: 18px 0 8px; font-size: 18px; color: #ffe17d; }
 .kor-tier-body p { margin: 8px 0; }
 .kor-tier-tabs, .kor-tier-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
@@ -472,17 +472,18 @@ html[lang="ko"] #mx-picker .kor-move-help { position: static; }
 html[lang="ko"] #mx-picker .kor-rated-option > .chip::after { content: '선택 ›'; margin-left: auto; color: #ffe17d; font-size: 12px; white-space: nowrap; }
 html[lang="ko"] #mx-picker .kor-rated-option > .chip:focus-visible { outline: 2px solid #ffe17d; outline-offset: 2px; }
 
-dialog.kor-mon-settings { width: min(700px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); margin: auto; padding: 16px; color: #f4f8ff; overflow: hidden; }
-dialog.kor-mon-settings[open] { display: flex; flex-direction: column; gap: 10px; }
+dialog.kor-mon-settings { --kor-dialog-padding: 16px; position: fixed; width: min(700px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); margin: auto; padding: 16px; color: #f4f8ff; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scroll-padding-block: 70px 100px; }
+dialog.kor-mon-settings[open] { display: block; }
+dialog.kor-mon-settings > * + * { margin-top: 10px; }
 dialog.kor-mon-settings::backdrop { background: #050b1cce; }
-.kor-mon-settings-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-shrink: 0; }
+.kor-mon-settings-header { position: sticky; top: calc(-1 * var(--kor-dialog-padding)); z-index: 3; background: #263c77; padding: 6px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-shrink: 0; }
 .kor-mon-settings-header h2 { margin: 0; font-size: 22px; }
 .kor-mon-settings-header .btn { flex-shrink: 0; }
 .kor-mon-settings-current { flex-shrink: 0; background: #101e435c; padding: 8px 12px; border-radius: 8px; }
 .kor-mon-settings-current p { margin: 3px 0 0; color: #d7e6ff; font-size: 14px; }
 .kor-mon-settings-filter { flex-shrink: 0; display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .kor-mon-settings-filter select { width: auto; min-width: 160px; padding: 5px 8px; }
-.kor-mon-settings-list { min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 8px; padding: 3px; }
+.kor-mon-settings-list { min-height: 0; overflow: visible; display: flex; flex-direction: column; gap: 8px; padding: 3px; }
 .kor-mon-settings-option { flex-shrink: 0; width: 100%; min-height: 58px; padding: 10px 12px; text-align: left; border: 2px solid #8da6d47a; border-radius: 9px; background: #152852; cursor: pointer; line-height: 1.5; }
 .kor-mon-settings-option.on { border-color: #ffe17d; background: #314b7b; }
 .kor-mon-settings-option:disabled { cursor: default; background: #15213b; }
@@ -492,7 +493,7 @@ dialog.kor-mon-settings::backdrop { background: #050b1cce; }
 .kor-mon-settings-badge, .kor-mon-settings-hidden { font-size: 12px; font-weight: 400; padding: 1px 7px; border-radius: 5px; background: #415784; color: #fff; }
 .kor-mon-settings-option.on .kor-mon-settings-badge { background: #ffe17d; color: #342500; }
 .kor-mon-settings-hidden { color: #ffe17d; background: #403457; }
-.kor-mon-settings-footer { flex-shrink: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center; padding-top: 8px; border-top: 1px solid #8ba9dc66; }
+.kor-mon-settings-footer { position: sticky; bottom: calc(-1 * var(--kor-dialog-padding)); z-index: 2; background: #1a2f63; flex-shrink: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center; padding-top: 8px; border-top: 1px solid #8ba9dc66; }
 .kor-mon-settings-preview { margin: 0; color: #ffe17d; grid-column: 1; grid-row: 1; font-size: 14px; }
 .kor-mon-settings-footer small { grid-column: 1; grid-row: 2; font-size: 13px; color: #d7e6ff; }
 .kor-mon-settings-footer .btn { grid-column: 2; grid-row: 1 / span 2; min-height: 44px; font-size: 15px; padding: 8px 12px; }
@@ -502,7 +503,8 @@ dialog.kor-mon-settings::backdrop { background: #050b1cce; }
   .kor-mon-settings-footer .btn { grid-column: 1; grid-row: 3; }
 }
 @media (max-height: 430px) {
-  dialog.kor-mon-settings { padding: 10px 14px; gap: 6px; }
+  dialog.kor-mon-settings { --kor-dialog-padding: 10px; padding: 10px 14px; }
+  dialog.kor-mon-settings > * + * { margin-top: 6px; }
   .kor-mon-settings-header h2 { font-size: 19px; }
   .kor-mon-settings-current { padding: 5px 10px; display: flex; flex-wrap: wrap; gap: 3px 12px; align-items: center; }
   .kor-mon-settings-current p { margin: 0; }
