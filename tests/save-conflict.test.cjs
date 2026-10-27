@@ -170,3 +170,15 @@ test('server reward ledger is not repeated when an offline browser copy is recov
   assert.equal(server.save.coins, 150900); assert.equal(server.save.tickets.t10, 109);
   assert.deepEqual(server.save.led['server:opening'], { c: [150000, 0], t10: [100, 0] });
 });
+
+test('a bulk single-ticket member gift merges with active play without replacing local gains or ten-draw tickets', async () => {
+  const server = cloud(); await seed(server);
+  const first = browser(server); await first.db.ready();
+  first.db.save.coins += 9; first.db.save.tickets.t1 += 2; first.db.commit();
+  server.save.led['server:kia'] = { c: [50000, 0], t1: [333, 0] };
+  server.save.coins += 50000; server.save.tickets.t1 += 333; server.revision++;
+  await first.db.flush();
+  assert.equal(server.save.coins, 51009); assert.equal(server.save.tickets.t1, 335); assert.equal(server.save.tickets.t10, 10);
+  const reloaded = browser(server, first.storage).db; await reloaded.ready(); reloaded.commit(); await reloaded.flush();
+  assert.equal(server.save.coins, 51009); assert.equal(server.save.tickets.t1, 335);
+});

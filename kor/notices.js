@@ -13,6 +13,7 @@
   function unread(notice) { try { return !localStorage.getItem(seenKey(notice)); } catch { return true; } }
   function rewardLabel(reward) {
     const parts = [];
+    if (reward.ticket1) parts.push(`1회 뽑기권 ${reward.ticket1.toLocaleString('ko-KR')}장`);
     if (reward.ticket10) parts.push(`10회 뽑기권 ${reward.ticket10.toLocaleString('ko-KR')}장 · 총 ${(reward.ticket10 * 10).toLocaleString('ko-KR')}회`);
     if (reward.coins) parts.push(`${reward.coins.toLocaleString('ko-KR')}코인`);
     return parts.join(' + ');
@@ -89,7 +90,11 @@
         const reward = notice.reward;
         const gift = make('div', 'kor-notice-gift');
         gift.append(make('strong', '', rewardLabel(reward)));
-        gift.append(make('p', 'kor-auth-help', reward.window === 'signup24h' ? '가입 후 24시간 안에 계정당 한 번 받을 수 있습니다.' : '오픈 이벤트 시작부터 24시간 동안 계정당 한 번 받을 수 있습니다.'));
+        gift.append(make('p', 'kor-auth-help', reward.automatic ? '기존·신규 가입 회원 모두 계정당 한 번 자동 지급됩니다. 수령 기한은 없습니다.' : reward.window === 'signup24h' ? '가입 후 24시간 안에 계정당 한 번 받을 수 있습니다.' : '오픈 이벤트 시작부터 24시간 동안 계정당 한 번 받을 수 있습니다.'));
+        if (reward.automatic) {
+          gift.append(make('p', 'kor-auth-help', reward.claimed ? locallyCredited(notice) ? '지급 완료! 선물이 보유 재화에 반영되었습니다.' : '서버 지급 완료! 저장을 눌러 보유 재화를 동기화해 주세요.' : reward.needsLogin ? '계정을 만들거나 로그인하면 자동으로 지급됩니다.' : '자동 지급을 확인하고 있습니다. 잠시 후 공지를 다시 열어 주세요.'));
+          article.append(gift); body.append(article); continue;
+        }
         if (reward.partiallyClaimed) gift.append(make('p', 'kor-auth-help', `이미 받은 선물은 유지됩니다. 추가로 받을 선물: ${rewardLabel(reward.remaining)}`));
         if (reward.expiresAt && !reward.claimed) {
           const date = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: false }).format(new Date(reward.expiresAt));
@@ -124,13 +129,24 @@
       body.append(support);
     }
   }
+  function locallyCredited(notice) {
+    const entry = G.DB.save?.led?.[`server:${notice.id}`];
+    return (Number(entry?.t1?.[0]) || 0) >= (notice.reward.ticket1 || 0)
+      && (Number(entry?.c?.[0]) || 0) >= (notice.reward.coins || 0);
+  }
+  async function syncMemberGifts(result) {
+    if (!G.DB.selfhostUser || G.DB.guest || !result.notices.some(n => n.reward?.automatic && n.reward.claimed && !locallyCredited(n))) return;
+    // A server credit advances revision. The independent bridge merges the latest
+    // ledger with unsubmitted local play; never replace the current save outright.
+    try { G.DB.commit(); await G.DB.flush(); G.UI.refreshCoins(); } catch { /* The notice explains how to retry. */ }
+  }
   async function open() {
     init();
     if (loading || busy) return;
     loading = true; message.textContent = '공지를 불러오는 중입니다…';
     if (!dialog.open) dialog.showModal();
     dialog.scrollTop = 0;
-    try { data = await G.DB.getNotices(); render(); message.textContent = ''; }
+    try { data = await G.DB.getNotices(); await syncMemberGifts(data); render(); message.textContent = ''; }
     catch { message.textContent = '공지를 불러오지 못했습니다. 잠시 후 다시 열어 주세요.'; }
     finally { loading = false; }
   }
@@ -141,6 +157,7 @@
     checked.set(user, Date.now()); loading = true;
     try {
       const result = await G.DB.getNotices();
+      await syncMemberGifts(result);
       updateSupport(result.support);
       if (!G.DB.guest && user === G.DB.accountKey && G.Game.state === 'ui' && result.notices.some(notice => notice.autoOpen !== false && unread(notice))) {
         init(); data = result; render(); message.textContent = ''; if (!dialog.open) dialog.showModal(); dialog.scrollTop = 0;
