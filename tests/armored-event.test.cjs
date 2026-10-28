@@ -1,17 +1,17 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
+const read=f=>require('../kor/module-source.cjs').isolatedSource(f);
 function setup(){
   const noop=()=>{},calls={grants:0,commits:0,heal:0,clears:0,events:[],shots:[]};
   class Anim{constructor(dex,scale){this.dex=dex;this.scale=scale;this.dir=0;}play(){}busy(){return false;}loop(){}update(){}}
   const s={console,performance:{now:()=>10000},document:{addEventListener:noop,getElementById:()=>null}};s.window=s;vm.createContext(s);
   const load=f=>vm.runInContext(read(f),s,{filename:f});
-  for(const f of ['js/core/util.js','js/data/pokedex.js','js/data/sprites-meta.js','js/data/abilities.js','js/data/tms.js','kor/armored-data.js','js/data/enemies.js'])load(f);
+  for(const f of ['js/core/util.js','js/data/pokedex.js','js/data/sprites-meta.js','js/data/moves.js','js/data/abilities.js','js/data/tms.js','kor/armored-data.js','js/data/enemies.js'])load(f);
   const G=s.G;
   Object.assign(G,{Sprites:{PX:2,Animator:Anim,animMeta:()=>({ay:35}),bodyRadius:()=>18,bodyHeight:()=>72,hovers:()=>false,preload:noop},
     Stats:{sideOf:()=> 'special'},Coop:{active:false,isHost:false,scaleHp:n=>1+(n-1)*.8,enemyGone:noop},
     FX:new Proxy({},{get:()=>noop}),VFX:{forType:type=>({proj:'ring',pal:type})},Audio:{sfx:noop},Camera:{outerRadius:()=>400,kick:noop,sees:()=>true},
-    Judgment:{active:false,noteDmg:noop},Rift:{inArena:false,reset:noop},Events:{reset:noop},
+    Halloween:{inRun:false},Judgment:{active:false,noteDmg:noop},Rift:{inArena:false,reset:noop},Events:{reset:noop},
     Hazards:{all:[],add(h){this.all.push(h);},clearOwner(id){this.all=this.all.filter(h=>h.owner!==id);},clear(){this.all=[];}},
     Projectiles:{clear(){calls.clears++;calls.shots=[];},spawn(p){calls.shots.push(p);return p;},clearEnemyOwner(id){calls.shots=calls.shots.filter(p=>p.friendly!==false||p.eventOwner!==id);}},Spawner:{say:noop},UI:{toast:noop},Types:{},
     World:{isFree:()=>true},Items:{roll:()=> 'leftovers'},Pickups:{drop:noop,dropXp:noop},DB:{save:{owned:{}},owns:id=>!!G.DB.save.owned[id],grant(id,from){calls.grants++;G.DB.save.owned[id]={from};},commit(){calls.commits++;}}});

@@ -23,6 +23,7 @@ G.Player = class Player {
     this.spdMul = perks.spdMul || 1;
     this.cdMul = perks.cdMul || 1;
     this.dmgReduce = perks.dmgReduce || 0;
+    this.itemReduce = 0;          // el del objeto (Chaleco Asalto): no cuenta para el tope de las cartas Coraza
     this.regenFlat = perks.regen || 0;
     this.magnet = 78 * (perks.magnetMul || 1);
     this.xpMul = perks.xpMul || 1;
@@ -121,12 +122,12 @@ G.Player = class Player {
     const slow = this.inLiquid && !ab.steady ? G.World.liquidEffect(this.mon.types).slow || 1 : 1;
     return G.Judgment && G.Judgment.active ? G.Judgment.capSpd(s * slow * w) : s * slow * w;
   }
-  get reduction() { return Math.min(0.8, this.dmgReduce + this.buffs.def.n * this.buffs.def.amount); }
+  get reduction() { return Math.min(0.8, this.dmgReduce + this.itemReduce + this.buffs.def.n * this.buffs.def.amount); }
   get regen() { return this.regenFlat + this.buffs.regen.n * this.buffs.regen.amount; }
 
   // ---------------- movimientos ----------------
   addMove(id) {
-    if (this.slots.length >= this.maxMoves || this.hasMove(id) || !G.Moves.canUse(this.mon, id)) return false;
+    if (this.slots.length >= this.maxMoves || this.hasMove(id)) return false;
     const m = G.Moves.instance(id, 1);
     m.since = G.Game.st.time;          // desde cuándo lo tienes (daño por segundo en el resumen)
     this.moves.push(m);
@@ -365,8 +366,12 @@ G.Player = class Player {
   addBuff(stat, amount, dur, maxStacks) {
     const b = this.buffs[stat];
     if (!b) return;
+    const n = Math.min(maxStacks, b.n + 1);
+    // Si lo que ya tienes vale más, no se pierde: con 3 cargas de Agilidad, un golpe
+    // con Armadura Frágil las dejaba en 1 (27-10-2026, #352). Sólo dura lo que dure más.
+    if (b.n && b.n * b.amount > n * amount) { b.t = Math.max(b.t, dur); return; }
     b.amount = amount;
-    b.n = Math.min(maxStacks, b.n + 1);
+    b.n = n;
     b.t = dur;
   }
 
@@ -400,11 +405,11 @@ G.Player = class Player {
 
     // --- movimiento con colisiones ---
     // (En cooperativo la pausa no para el juego: sólo te quedas quieto.)
-    const [ax, ay] = this.frozen || this.rushActive ? [0, 0] : G.Input.axis();
+    const [ax, ay] = this.frozen ? [0, 0] : G.Input.axis();
     this.walking = ax !== 0 || ay !== 0;
     const s = this.spd;
     // Hielo: resbalas (la velocidad cambia despacio).
-    const slide = !this.rushActive && this.inLiquid && G.World.liquidEffect(this.mon.types).slide;
+    const slide = this.inLiquid && G.World.liquidEffect(this.mon.types).slide;
     this.svx = slide ? G.U.damp(this.svx || 0, ax * s * 1.15, 1.6, dt) : ax * s;
     this.svy = slide ? G.U.damp(this.svy || 0, ay * s * 1.15, 1.6, dt) : ay * s;
     this.x += this.svx * dt;

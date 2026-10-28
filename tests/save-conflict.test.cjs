@@ -182,3 +182,24 @@ test('a bulk single-ticket member gift merges with active play without replacing
   const reloaded = browser(server, first.storage).db; await reloaded.ready(); reloaded.commit(); await reloaded.flush();
   assert.equal(server.save.coins, 51009); assert.equal(server.save.tickets.t1, 335);
 });
+
+
+test('Halloween purchases and candy survive device conflicts alongside Korean gifts and event ownership', async () => {
+  const server = cloud(); await seed(server);
+  server.save.bag.candy = 600; server.save.owned[1150] = { at: 2, from: 'armored-event' };
+  server.save.led['server:kia-victory-20261027'] = { t1: [333, 0], c: [50000, 0], 'b:candy': [600, 0] };
+  server.save.coins += 50000; server.save.tickets.t1 += 333; server.revision++;
+  const a = browser(server).db, b = browser(server).db; await a.ready(); await b.ready();
+  const coins = a.save.coins, tickets = a.save.tickets.t1;
+  a.save.bag.candy -= 300; a.save.skins['bruja-gengar'] = 100;
+  a.save.pskin[94] = ['bruja-gengar', 100]; a.commit(); await a.flush();
+  b.save.bag.candy += 5; b.save.skins['bruja-pikachu'] = 200;
+  b.save.pskin[25] = ['bruja-pikachu', 200]; b.commit(); await b.flush();
+  assert.equal(server.save.bag.candy, 305);
+  assert.equal(server.save.coins, coins); assert.equal(server.save.tickets.t1, tickets);
+  assert.ok(server.save.owned[1150]);
+  assert.deepEqual(server.save.skins, { 'bruja-gengar': 100, 'bruja-pikachu': 200 });
+  assert.deepEqual(server.save.pskin, { 94: ['bruja-gengar', 100], 25: ['bruja-pikachu', 200] });
+  const reopened = browser(server).db; await reopened.ready();
+  assert.equal(reopened.save.bag.candy, 305); assert.deepEqual(clone(reopened.save.skins), server.save.skins);
+});

@@ -25,6 +25,7 @@ function audit(dir, manifest) {
     const file = path.join(dir, name), patch = manifest.patches[name];
     if (!fs.existsSync(file)) { errors.push('Missing upstream source: ' + name); continue; }
     const actual = hash(fs.readFileSync(file));
+    if ((manifest.pristineEngine || []).includes(name) && actual !== original) errors.push('Pristine upstream engine must not be edited: ' + name);
     if (actual === original) {
       if (patch) errors.push('Remove obsolete patch entry: ' + name);
       continue;
@@ -48,10 +49,11 @@ function refreshBaseline(dir, manifest, ref) {
 
 function overlapReport(dir, manifest, ref) {
   const names = git(dir, ['diff', '--name-only', manifest.upstream, ref, '--']).trim().split('\n');
-  const overlap = names.filter(name => manifest.patches[name]);
+  const boundaries = { ...manifest.extensions, ...manifest.patches };
+  const overlap = names.filter(name => boundaries[name]);
   return '\n### Korean extension compatibility\n\n' + (overlap.length
-    ? 'Upstream changed these directly patched files. Review the Korean extension and its regression tests before approving. A clean Git merge alone is not compatibility proof.\n\n' + overlap.map(name => '- `' + name + '` — ' + manifest.patches[name].reason + ' → `' + manifest.patches[name].extension + '`').join('\n')
-    : 'No upstream changes overlap the registered Korean core patches.') + '\n';
+    ? 'Upstream changed these extension boundaries or directly patched files. Review the Korean extension and its regression tests before approving. A clean Git merge alone is not compatibility proof.\n\n' + overlap.map(name => '- `' + name + '` — ' + boundaries[name].reason + ' → `' + boundaries[name].extension + '`').join('\n')
+    : 'No upstream changes overlap the registered Korean extension boundaries.') + '\n';
 }
 
 if (require.main === module) {

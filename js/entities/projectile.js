@@ -13,10 +13,6 @@ G.Projectiles = (() => {
   let nextId = 1;
 
   function clear() { list = []; }
-  // Expire without replacing/mutating the list during a combat collision loop.
-  function clearEnemyOwner(owner) {
-    for (const p of list) if (!p.friendly && p.eventOwner === owner) p.life = 0;
-  }
   function all() { return list; }
 
   /** Proyectil del jugador. */
@@ -83,18 +79,6 @@ G.Projectiles = (() => {
         }
       }
 
-      // Event hostile Confusion tracks the same player on host and guests.
-      // Keep a dead/disconnected target's last heading instead of switching targets locally.
-      if (!p.friendly && p.eventMove === 'psycho-rush' && p.homing > 0) {
-        const targets = p.homingUid ? (G.Game?.everyone?.() || []).filter(q => q?.uid === p.homingUid) : [player];
-        const target = targets.find(q => q && !q.dead && q.hp > 0);
-        if (target) {
-          const [dx, dy] = G.U.norm(target.x - p.x, target.y - p.y), speed = Math.hypot(p.vx, p.vy);
-          p.vx = G.U.damp(p.vx, dx * speed, p.homing, dt);
-          p.vy = G.U.damp(p.vy, dy * speed, p.homing, dt);
-        }
-      }
-
       p.px = p.x; p.py = p.y;          // para la colisión barrida (ver combat.js)
       if (p.vis && p.vis.trail && G.Camera.sees(p.x, p.y, 20)) {
         p.trailT = (p.trailT || 0) - dt;
@@ -129,18 +113,15 @@ G.Projectiles = (() => {
     // Sombras primero, todas juntas.
     ctx.fillStyle = 'rgba(0,0,0,.25)';
     for (const p of list) {
-      if (p.t >= p.life) continue;
       ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 0.9, p.r * 0.38, 0, 0, 6.2832); ctx.fill();
     }
     // Los disparos enemigos llevan un aro rojo en el suelo: "esto te hace daño".
     ctx.fillStyle = 'rgba(255,60,80,.35)';
     for (const p of list) {
-      if (p.t >= p.life) continue;
       if (p.friendly) continue;
       ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 1.5, p.r * 0.6, 0, 0, 6.2832); ctx.fill();
     }
     for (const p of list) {
-      if (p.t >= p.life) continue;
       const v = p.vis || G.VFX.forType('normal');
       const shape = v.proj;
       const a = p.orb ? 1 : Math.min(1, (p.life - p.t) * 4);
@@ -154,6 +135,6 @@ G.Projectiles = (() => {
     }
   }
 
-  return { clear, clearEnemyOwner, all, spawn, spawnOrb, clearOrbs, update, remove, draw, nearest,
+  return { clear, all, spawn, spawnOrb, clearOrbs, update, remove, draw, nearest,
            get count() { return list.length; } };
 })();

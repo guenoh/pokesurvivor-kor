@@ -14,8 +14,8 @@
  * porque la conexión parpadea, el siguiente envío lo arregla y nadie se queda
  * esperando a otro para siempre (pasaba en 2026-10).
  *
- * Mensajes (por net.js, unas 15 veces por segundo; 5 si va por el relé):
- *   invitado -> anfitrión  { k:'f', p:[estado], ev:[eventos] }
+ * Mensajes (por net.js, unas 15 veces por segundo; 3 si va por el relé):
+ *   invitado -> anfitrión  { k:'f', p:[estado], ev:[eventos], h, w }   (h, w: ver flushClient)
  *   anfitrión -> invitado  { k:'f', t, lv, xp, xn, ki, bo, co, p:{uid:[estado]},
  *                            e:[[id,x,y,vida,anim,dir,estados]], ev:[eventos],
  *                            ja:[x,y,anim,dir,daño] (Arceus, sólo en la Sentencia) }
@@ -29,6 +29,7 @@ G.Coop = (() => {
   const RATE_FAST = 1 / 15, RATE_SLOW = 1 / 3;
   const rateFor = u => (G.Net.slow(u) ? RATE_SLOW : RATE_FAST);
   const NEAR = 950;                     // radio de enemigos que se mandan a cada uno
+  const EV_MAX = 500;                   // eventos por envío como mucho (el resto, en el siguiente)
 
   let active = false, host = false, me = null, hostUid = null;
   let local = null;                     // tu Player
@@ -59,7 +60,7 @@ G.Coop = (() => {
   /**
    * @param cfg   { seed, host, members }
    * @param pl    tu Player (ya creado)
-   * @param cb    { levelStart(lv), resume(), waiting(names), over(data), lost(msg), team(t), shiny(dex) }
+   * @param cb    lo que hace falta del juego (coopApi en game.js: levelStart, resume, over, hold...)
    */
   function begin(cfg, pl, cb) {
     active = true;
@@ -101,19 +102,17 @@ G.Coop = (() => {
       flushAll();
     } else {
       outEv.push(['bye']);
-      flushClient(true);
+      flushClient('bye');
     }
     end();
   }
 
   // ---------------- lista de jugadores ----------------
 
-  function players() {
-    const out = [local];
-    for (const m of mates.values()) if (m.connected) out.push(m.pl);
-    return out;
-  }
+  /** Los Pokémon de los compañeros conectados. */
   function puppets() { const out = []; for (const m of mates.values()) if (m.connected) out.push(m.pl); return out; }
+  /** Todos: tú primero. */
+  function players() { return [local, ...puppets()]; }
 
   /**
    * Multiplicador de la experiencia del equipo: la media de los bonus de
@@ -161,9 +160,12 @@ G.Coop = (() => {
     const mv = (Array.isArray(s.mv) ? s.mv : []).slice(0, 8)
       .filter(m => Array.isArray(m) && typeof m[0] === 'string' && G.Moves.BY_ID[m[0]])
       .map(m => [m[0], Math.floor(num(m[1], 1, 1, 99)), Math.round(num(m[2], 0, 0, 1e13)), Math.round(num(m[3], 0, 0, 86400)), m[4] ? 1 : 0]);
+    const sk = typeof s.sk === 'string' && G.Skins && G.Skins.get(s.sk, dex) ? s.sk : '';
     return { dex, sh: s.sh === true, lv: Math.floor(num(s.lv, 1, 1, 9999)), t: Math.round(num(s.t, 0, 0, 86400)),
-             it: typeof s.it === 'string' && G.Items.BY[s.it] ? s.it : null, mv };
+             it: typeof s.it === 'string' && G.Items.BY[s.it] ? s.it : null, sk, mv };
   }
+  /** La skin (Halloween) de un compañero, que va en su resumen: se le pone a su Pokémon. */
+  function dressMate(u, c) { const m = mates.get(u); if (m && m.pl.anim && m.pl.dex === c.dex) m.pl.anim.skin = c.sk || null; }
   /** Los resúmenes de todos (el tuyo, recién hecho). Siguen ahí al acabar la partida. */
   function teamSums() { const out = Object.assign({}, sums), m = mySum(); if (m && me) out[me] = m; return out; }
   function takeSums(all) {
@@ -171,7 +173,7 @@ G.Coop = (() => {
     for (const u of Object.keys(all)) {
       if (u === me || !members.some(x => x.uid === u)) continue;
       const c = cleanSum(all[u]);
-      if (c) sums[u] = c;
+      if (c) { sums[u] = c; dressMate(u, c); }
     }
   }
 
@@ -220,11 +222,8 @@ G.Coop = (() => {
     for (const e of G.EnemyMgr.all()) {
       if (e.dead || G.U.dist2(e.x, e.y, near.x, near.y) > r2n) continue;
       const a = ANIMS.indexOf(e.anim.cur);
-      const snapshot = [e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
-                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.slow > 0 ? 8 : 0) | (e.sleepT > 0 ? 16 : 0)];
-      // Persist the warp revision so a dropped first frame or a late join still snaps.
-      if (G.ARMORED_EVENT && e.dex === G.ARMORED_EVENT.id) snapshot.push(e.armoredTeleportSeq || 0);
-      out.push(snapshot);
+      out.push([e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
+                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.slow > 0 ? 8 : 0) | (e.sleepT > 0 ? 16 : 0)]);
     }
     return out;
   }
@@ -235,19 +234,20 @@ G.Coop = (() => {
     for (const o of mates.values()) {
       if (o.connected && o.uid !== m.uid && o.state) p[o.uid] = o.state;
     }
-    const ev = m.q; m.q = [];
-    const f = { k: 'f', t: r2(st.time), lv: st.level, xp: r2(st.xp), xn: st.xpNext, ki: st.kills, bo: st.bosses, co: st.coins, tk: [st.t1, st.t10],
+    // Tras una espera (ver tick) puede haber muchos: un mensaje enorme no saldría.
+    const ev = m.q.length > EV_MAX ? m.q.splice(0, EV_MAX) : m.q;
+    if (ev === m.q) m.q = [];
+    const f = { k: 'f', t: r2(st.time), lv: st.level, xp: r2(st.xp), xn: st.xpNext, ki: st.kills, bo: st.bosses, co: st.coins, tk: [st.t1, st.t10, st.cn || 0],
                 p, e: enemyList(viewOf(m)), ev };
     const ja = G.Judgment.netState();       // Arceus en la Sentencia
     if (ja) f.ja = ja;
-    if (G.ArmoredMewtwo) f.am = G.ArmoredMewtwo.netState();
     // Siempre: quién está eligiendo y, si hay cartas de nivel, cuáles (ver arriba).
     f.ho = holdNames();
     if (waiting.size) f.lu = [levelSeq, levelNow];
     return f;
   }
 
-  function flushAll() { for (const m of mates.values()) if (m.connected) G.Net.send(m.uid, hostFrame(m)); }
+  function flushAll() { for (const m of mates.values()) if (m.connected && !G.Net.busy(m.uid)) G.Net.send(m.uid, hostFrame(m)); }
 
   /*
    * Cada mensaje del invitado lleva también si está eligiendo fusión u objeto (h)
@@ -259,6 +259,8 @@ G.Coop = (() => {
   let myHold = false;
   function flushClient(force) {
     if (!force && !outEv.length && flushT > 0) return;
+    // Con la conexión atascada se espera (los eventos siguen en outEv); el 'bye' sale igual.
+    if (force !== 'bye' && G.Net.busy(hostUid)) return;
     G.Net.toHost({ k: 'f', p: myState(), ev: outEv, h: myHold ? 1 : 0, w: doneSeq });
     outEv = [];
   }
@@ -269,7 +271,11 @@ G.Coop = (() => {
     if ((sumT -= dt) <= 0) {
       sumT = SUM_EVERY;
       if (host) emit(['sms', teamSums()]);
-      else { const m = mySum(); if (m) outEv.push(['sm', m]); }
+      else {
+        const m = mySum(); if (m) outEv.push(['sm', m]);
+        // El sello del ranking (ranking.js): el anfitrión lo necesita para subir la marca.
+        const sl = G.Ranking.mySeal(); if (sl) outEv.push(['seal', sl.s, sl.g]);
+      }
     }
     if (host) {
       for (const m of mates.values()) {
@@ -280,6 +286,10 @@ G.Coop = (() => {
         m.pl.silent = performance.now() - m.lastAt > SILENT_MS;
         m.flushT -= dt;
         if (m.flushT > 0) continue;
+        // Si aún no ha salido lo de antes, mandar más sólo alarga la cola: se espera
+        // (los eventos se guardan en m.q). Si dura, el invitado se pone en pausa
+        // («esperando al anfitrión») en vez de ver la partida minutos tarde.
+        if (G.Net.busy(m.uid)) continue;
         m.flushT = rateFor(m.uid);
         G.Net.send(m.uid, hostFrame(m));
       }
@@ -288,8 +298,7 @@ G.Coop = (() => {
       flushT -= dt;
       if (flushT <= 0) {
         flushT = rateFor(hostUid);
-        G.Net.toHost({ k: 'f', p: myState(), ev: outEv });
-        outEv = [];
+        flushClient(true);
       }
     }
   }
@@ -318,7 +327,7 @@ G.Coop = (() => {
 
   G.Net.onPeer((u, mode) => {
     if (!active) return;
-    if (mode === 'direct' || mode === 'relay') {
+    if (mode === 'direct') {
       if (!graceT.has(u)) return;
       stopGrace(u);
       const m = mates.get(u);
@@ -332,7 +341,7 @@ G.Coop = (() => {
       if (host) G.Spawner.say(nameOf(u) + ': reconectando…', 3);
       graceT.set(u, setTimeout(() => {
         graceT.delete(u);
-        if (!active || ['direct', 'relay'].includes(G.Net.mode(u)) || (host && !keeps(u))) return;   // volvió, o se fue ('bye')
+        if (!active || G.Net.mode(u) === 'direct' || (host && !keeps(u))) return;   // volvió, o se fue ('bye')
         if (host) G.Social.dropMember(u);         // no volvió: fuera de la sala
         gone(u);
       }, GRACE_MS));
@@ -358,7 +367,6 @@ G.Coop = (() => {
     G.Spawner.say(m.name + ' ha dejado la partida', 2.6);
     if (waiting.has(u)) picked(u);
     if (holds.has(u)) holdOff(u);
-    if (api.mateLeft) api.mateLeft(m);
   }
 
   // --- en el anfitrión ---
@@ -410,7 +418,8 @@ G.Coop = (() => {
         case 'he': holdOff(from); break;
         case 're': G.Rift.enterRequest(); break;
         case 'bye': mateGone(from); break;
-        case 'sm': { const c = cleanSum(ev[1]); if (c) sums[from] = c; break; }
+        case 'sm': { const c = cleanSum(ev[1]); if (c) { sums[from] = c; dressMate(from, c); } break; }
+        case 'seal': if (Number.isSafeInteger(ev[1]) && typeof ev[2] === 'string' && /^[0-9a-f]{64}$/.test(ev[2])) m.seal = { s: ev[1], g: ev[2] }; break;
         // Un invitado con Sequía, Llovizna...: su clima, si no hay otro (como mucho uno por minuto).
         case 'wxq':
           if (typeof ev[1] === 'string' && G.Weather.KINDS[ev[1]] && !G.Weather.current && performance.now() - (m.wxAt || -1e9) > 60000) {
@@ -460,9 +469,8 @@ G.Coop = (() => {
       if (msg.lu && msg.lu[0] > doneSeq && (msg.lu[0] > seenSeq || !showing)) { seenSeq = msg.lu[0]; api.levelStart(msg.lu[1]); }
       else if (!msg.lu && showing) api.resume();
     }
-    if (msg.am) G.ArmoredMewtwo?.netApply(msg.am);
     api.syncTeam({ time: msg.t, level: msg.lv, xp: msg.xp, xpNext: msg.xn, kills: msg.ki, bosses: msg.bo, coins: msg.co,
-                   t1: (msg.tk || [])[0], t10: (msg.tk || [])[1] });
+                   t1: (msg.tk || [])[0], t10: (msg.tk || [])[1], cn: num((msg.tk || [])[2], 0, 0, 1e6) });
     for (const u in msg.p || {}) {
       const m = mates.get(u);
       if (m) m.pl.net = readState(msg.p[u]);
@@ -472,19 +480,12 @@ G.Coop = (() => {
       const e = G.EnemyMgr.get(a[0]);
       if (!e || !e.remote || e.dead) continue;
       const n = e.net;
-      const teleportSeq = G.ARMORED_EVENT && e.dex === G.ARMORED_EVENT.id && Number.isSafeInteger(a[7]) && a[7] >= 0 ? a[7] : null;
-      if (teleportSeq !== null && teleportSeq < (n.armoredTeleportSeq || 0)) continue;
-      const teleported = teleportSeq !== null && teleportSeq > (n.armoredTeleportSeq || 0);
       const dts = (now - (n.last || now)) / 1000;
-      if (teleported) {
-        // A teleport is discontinuous, not velocity: never extrapolate it into a contact hit.
-        e.x = a[1]; e.y = a[2]; n.vx = 0; n.vy = 0;
-      } else if (dts > 0.02 && dts < 1) {
+      if (dts > 0.02 && dts < 1) {
         n.vx = G.U.clamp((a[1] - n.x) / dts, -600, 600);
         n.vy = G.U.clamp((a[2] - n.y) / dts, -600, 600);
       } else { n.vx = 0; n.vy = 0; }
       n.x = a[1]; n.y = a[2]; n.age = 0; n.last = now;
-      if (teleportSeq !== null) n.armoredTeleportSeq = teleportSeq;
       e.hp = Math.min(e.maxHp, a[3]);
       n.anim = a[4]; n.dir = a[5]; n.st = a[6];
     }
@@ -500,8 +501,7 @@ G.Coop = (() => {
       case 'hn': { const e = G.EnemyMgr.get(ev[1]); if (e && !e.dead) e.showHurt(ev[2], ev[3]); break; }
       case 'es':
         G.Projectiles.spawn({ x: ev[1], y: ev[2], vx: ev[3], vy: ev[4], dmg: ev[5], r: ev[6], life: ev[7],
-                              friendly: false, color: ev[11] === 'psycho-rush' ? '#e08fff' : '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8], cat: ev[9],
-                              eventOwner: Number.isSafeInteger(ev[10]) ? ev[10] : undefined, eventMove: ev[11], homing: Number.isFinite(ev[12]) ? Math.max(0, Math.min(4, ev[12])) : 0, homingUid: typeof ev[13] === 'string' ? ev[13] : undefined });
+                              friendly: false, color: '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8], cat: ev[9] });
         break;
       case 'c': { const m = mates.get(ev[1]); if (m) G.Combat.ghostCast(m.pl, ev[2], ev[3], ev[4], ev[5]); break; }
       case 'item': api.item(ev[1]); break;
@@ -556,11 +556,7 @@ G.Coop = (() => {
     emit(['ne', e.id, e.dex, r1(e.x), r1(e.y), e.boss ? 1 : 0, e.shiny ? 1 : 0, Math.ceil(e.maxHp), r2(e.dmg), e.behavior]);
   }
   function enemyGone(e, died) { emit([died ? 'ed' : 'eg', e.id]); }
-  function enemyShot(p, type) {
-    const event = ['es', r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), r2(p.dmg), p.r, p.life, type, p.cat];
-    if (Number.isSafeInteger(p.eventOwner)) event.push(p.eventOwner, p.eventMove, p.homing || 0, p.homingUid || null);
-    emit(event);
-  }
+  function enemyShot(p, type) { emit(['es', r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), r2(p.dmg), p.r, p.life, type, p.cat]); }
   function pickupAdded(o) { emit(['pk', o.id, o.kind, r1(o.x), r1(o.y), o.value]); }
   function pickupGone(id) { emit(['pc', id]); }
   function say(text, secs) { emit(['say', text, secs]); }
@@ -664,6 +660,8 @@ G.Coop = (() => {
     broadcast(ev) { emit(ev); },
     toHost(ev) { if (active && !host) { outEv.push(ev); flushClient(true); } },
     mate(u) { return mates.get(u); },
+    /** Anfitrión: el sello del ranking que mandó el invitado u (o null). */
+    sealOf(u) { const m = mates.get(u); return m && m.seal ? { s: m.seal.s, g: m.seal.g } : null; },
     get mates() { return [...mates.values()]; },
     get members() { return members; },
     /** uid -> resumen de cada jugador (ver cleanSum), también al acabar. */

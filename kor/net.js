@@ -34,7 +34,7 @@ G.Net = (() => {
     open(id, mine, hostUid) { roomId = id; isHost = mine; host = hostUid; }, close, syncMembers, send,
     toHost: message => send(host, message), broadcast: (message, except) => { for (const uid of modes.keys()) if (uid !== except) send(uid, message); },
     on: fn => handlers.add(fn), off: fn => handlers.delete(fn), onPeer: fn => peerHandlers.add(fn),
-    mode: uid => modes.get(uid) || 'connecting', viaTurn: () => false, slow: () => false, peers: () => [...modes.keys()],
+    mode: uid => modes.get(uid) || 'connecting', viaTurn: () => false, slow: () => false, busy: () => G.KorLive.busy, peers: () => [...modes.keys()],
     get open_() { return !!roomId; }, get isHost() { return isHost; }, get uid() { return G.Social.uid; }, get hostUid() { return host; },
     stats: () => ({ bytes, relay: true })
   };

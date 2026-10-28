@@ -70,7 +70,7 @@
     </div>
     <form id="login-form" autocomplete="off">
       <label for="f-user">Nombre</label>
-      <input id="f-user" class="field" maxlength="16" spellcheck="false">
+      <input id="f-user" class="field" maxlength="16" spellcheck="false" autocomplete="username" autocapitalize="none" autocorrect="off">
       <label for="f-pass">Contraseña</label>
       <input id="f-pass" class="field" type="password" maxlength="64">
       <p id="login-err" class="err"></p>
@@ -140,6 +140,7 @@
     <div class="logo">
       <div class="t1">PokéSurvivor<span class="splash">Folagor, Sekiam, PokeAlex: ¿un hueco?</span></div>
       <div class="t2">한국어 독립판</div>
+      <div id="menu-hw" class="hw-count hidden"></div>
     </div>
     <div class="partner-card">
       <canvas id="menu-partner" class="stage" width="260" height="200"></canvas>
@@ -510,9 +511,9 @@
 <section id="scr-levelup" class="scr dim hidden kor-choice-screen">
   <div class="box center kor-choice-box">
     <h2>¡Nivel <span id="lvl-num">2</span>!</h2>
-    <p class="sub">Elige una recompensa · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></p>
+    <p class="sub">Elige una recompensa<span class="kbd-hint"> · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></span></p>
     <div id="cards" class="cards"></div>
-    <button id="lvl-reroll" class="btn small ghost hidden" data-sfx="none" style="margin-top:10px">Cambiar opciones (<span id="lvl-rr-n">1</span>) · <kbd>R</kbd></button>
+    <button id="lvl-reroll" class="btn small ghost hidden" data-sfx="none" style="margin-top:10px">Cambiar opciones (<span id="lvl-rr-n">1</span>)<span class="kbd-hint"> · <kbd>R</kbd></span></button>
     <p id="lvl-wait" class="note hidden"></p>
   </div>
 </section>
@@ -530,7 +531,7 @@
 <section id="scr-item" class="scr dim hidden kor-choice-screen">
   <div class="box center kor-choice-box">
     <h2>¡Un objeto!</h2>
-    <p class="sub">Sólo puedes llevar uno · <kbd>1</kbd> <kbd>2</kbd></p>
+    <p class="sub">Sólo puedes llevar uno<span class="kbd-hint"> · <kbd>1</kbd> <kbd>2</kbd></span></p>
     <div id="item-cards" class="cards"></div>
   </div>
 </section>
@@ -561,110 +562,114 @@
 
 <!-- datos generados -->
 <!-- scripts:begin -->
-<script defer src="js/core/util.js"></script>
-<script defer src="js/core/i18n.js"></script>
-<script defer src="js/data/lang-en.js"></script>
-<script defer src="js/core/settings.js"></script>
-<script defer src="js/data/music.js"></script>
-<script defer src="js/data/pokedex.js"></script>
-<script defer src="js/data/sprites-meta.js"></script>
+<script type="application/x-kor-module" data-src="js/core/util.js"></script>
+<script type="application/x-kor-module" data-src="js/core/i18n.js"></script>
+<script type="application/x-kor-module" data-src="js/data/lang-en.js"></script>
+<script type="application/x-kor-module" data-src="js/core/settings.js"></script>
+<script type="application/x-kor-module" data-src="js/data/music.js"></script>
+<script type="application/x-kor-module" data-src="js/data/pokedex.js"></script>
+<script type="application/x-kor-module" data-src="js/data/sprites-meta.js"></script>
 <!-- núcleo -->
-<script defer src="js/core/firebase-config.js"></script>
-<script defer src="js/core/db.js"></script>
-<script defer src="kor/selfhost-db.js"></script>
-<script defer src="js/core/audio.js"></script>
-<script defer src="js/core/input.js"></script>
-<script defer src="js/core/touch.js"></script>
-<script defer src="js/core/gamepad.js"></script>
-<script defer src="js/core/sprites.js"></script>
-<script defer src="js/core/camera.js"></script>
+<script type="application/x-kor-module" data-src="js/core/firebase-config.js"></script>
+<script type="application/x-kor-module" data-src="js/core/db.js"></script>
+<script type="application/x-kor-module" data-src="kor/selfhost-db.js"></script>
+<script type="application/x-kor-module" data-src="js/core/audio.js"></script>
+<script type="application/x-kor-module" data-src="js/core/input.js"></script>
+<script type="application/x-kor-module" data-src="js/core/touch.js"></script>
+<script type="application/x-kor-module" data-src="js/core/gamepad.js"></script>
+<script type="application/x-kor-module" data-src="js/core/sprites.js"></script>
+<script type="application/x-kor-module" data-src="js/core/skins.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/halloween.js"></script>
+<script type="application/x-kor-module" data-src="js/core/camera.js"></script>
 <!-- datos de juego -->
-<script defer src="js/data/moves.js"></script>
-<script defer src="js/data/natures.js"></script>
-<script defer src="js/data/abilities.js"></script>
-<script defer src="js/data/tms.js"></script>
-<script defer src="kor/armored-data.js"></script>
-<script defer src="kor/armored-sprites.js"></script>
-<script defer src="js/data/types.js"></script>
-<script defer src="js/data/starters.js"></script>
-<script defer src="js/data/enemies.js"></script>
-<script defer src="js/data/upgrades.js"></script>
-<script defer src="js/data/items.js"></script>
-<script defer src="js/data/shop.js"></script>
-<script defer src="js/data/missions.js"></script>
-<script defer src="js/data/achievements.js"></script>
-<script defer src="js/data/funding.js"></script>
-<script defer src="js/data/changelog.js"></script>
+<script type="application/x-kor-module" data-src="js/data/moves.js"></script>
+<script type="application/x-kor-module" data-src="js/data/natures.js"></script>
+<script type="application/x-kor-module" data-src="js/data/abilities.js"></script>
+<script type="application/x-kor-module" data-src="js/data/tms.js"></script>
+<script type="application/x-kor-module" data-src="kor/armored-data.js"></script>
+<script type="application/x-kor-module" data-src="kor/armored-sprites.js"></script>
+<script type="application/x-kor-module" data-src="js/data/types.js"></script>
+<script type="application/x-kor-module" data-src="js/data/starters.js"></script>
+<script type="application/x-kor-module" data-src="js/data/enemies.js"></script>
+<script type="application/x-kor-module" data-src="js/data/upgrades.js"></script>
+<script type="application/x-kor-module" data-src="js/data/items.js"></script>
+<script type="application/x-kor-module" data-src="js/data/shop.js"></script>
+<script type="application/x-kor-module" data-src="js/data/missions.js"></script>
+<script type="application/x-kor-module" data-src="js/data/achievements.js"></script>
+<script type="application/x-kor-module" data-src="js/data/funding.js"></script>
+<script type="application/x-kor-module" data-src="js/data/changelog.js"></script>
 <!-- mundo -->
-<script defer src="js/world/tiles.js"></script>
-<script defer src="js/world/world.js"></script>
+<script type="application/x-kor-module" data-src="js/world/tiles.js"></script>
+<script type="application/x-kor-module" data-src="js/world/world.js"></script>
 <!-- entidades -->
-<script defer src="js/entities/vfx.js"></script>
-<script defer src="js/entities/fx.js"></script>
-<script defer src="js/entities/projectile.js"></script>
-<script defer src="js/entities/enemy.js"></script>
-<script defer src="js/entities/pickup.js"></script>
-<script defer src="js/entities/player.js"></script>
+<script type="application/x-kor-module" data-src="js/entities/vfx.js"></script>
+<script type="application/x-kor-module" data-src="js/entities/fx.js"></script>
+<script type="application/x-kor-module" data-src="js/entities/projectile.js"></script>
+<script type="application/x-kor-module" data-src="js/entities/enemy.js"></script>
+<script type="application/x-kor-module" data-src="js/entities/pickup.js"></script>
+<script type="application/x-kor-module" data-src="js/entities/player.js"></script>
 <!-- sistemas -->
-<script defer src="js/systems/stats.js"></script>
-<script defer src="js/systems/mons.js"></script>
-<script defer src="js/data/ability-fx.js"></script>
-<script defer src="js/systems/combat.js"></script>
-<script defer src="js/systems/spawner.js"></script>
-<script defer src="js/systems/levelup.js"></script>
-<script defer src="js/systems/gacha.js"></script>
-<script defer src="js/systems/interact.js"></script>
-<script defer src="js/systems/rift.js"></script>
-<script defer src="js/systems/judgment.js"></script>
-<script defer src="js/systems/events.js"></script>
-<script defer src="js/systems/weather.js"></script>
-<script defer src="js/systems/pathing.js"></script>
-<script defer src="js/systems/progress.js"></script>
-<script defer src="js/systems/hazards.js"></script>
-<script defer src="kor/armored-encounter.js"></script>
-<script defer src="js/systems/orbs.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/stats.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/mons.js"></script>
+<script type="application/x-kor-module" data-src="js/data/ability-fx.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/combat.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/spawner.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/levelup.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/gacha.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/interact.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/rift.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/judgment.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/events.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/weather.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/pathing.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/progress.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/hazards.js"></script>
+<script type="application/x-kor-module" data-src="kor/armored-encounter.js"></script>
+<script type="application/x-kor-module" data-src="js/systems/orbs.js"></script>
 <!-- red: amigos, salas, cooperativo y ranking -->
-<script defer src="js/net/social.js"></script>
-<script defer src="kor/social.js"></script>
-<script defer src="js/net/codec.js"></script>
-<script defer src="js/net/net.js"></script>
-<script defer src="kor/net.js"></script>
-<script defer src="js/net/coop.js"></script>
-<script defer src="js/net/ranking.js"></script>
-<script defer src="kor/ranking.js"></script>
+<script type="application/x-kor-module" data-src="js/net/social.js"></script>
+<script type="application/x-kor-module" data-src="kor/social.js"></script>
+<script type="application/x-kor-module" data-src="js/net/codec.js"></script>
+<script type="application/x-kor-module" data-src="js/net/net.js"></script>
+<script type="application/x-kor-module" data-src="kor/net.js"></script>
+<script type="application/x-kor-module" data-src="js/net/coop.js"></script>
+<script type="application/x-kor-module" data-src="js/net/ranking.js"></script>
+<script type="application/x-kor-module" data-src="kor/ranking.js"></script>
 <!-- interfaz -->
-<script defer src="js/ui/icons.js"></script>
-<script defer src="js/ui/ui.js"></script>
-<script defer src="kor/logout.js"></script>
-<script defer src="js/ui/hud.js"></script>
-<script defer src="js/ui/login.js"></script>
-<script defer src="js/ui/test.js"></script>
-<script defer src="kor/move-ratings.js"></script>
-<script defer src="kor/tier-baseline.js"></script>
-<script defer src="kor/pokemon-tiers.js"></script>
-<script defer src="kor/mon-settings.js"></script>
-<script defer src="js/ui/menu.js"></script>
-<script defer src="js/ui/slots.js"></script>
-<script defer src="js/ui/gacha-ui.js"></script>
-<script defer src="js/ui/shop-ui.js"></script>
-<script defer src="js/ui/run-ui.js"></script>
-<script defer src="js/ui/social-ui.js"></script>
-<script defer src="js/ui/ranking-ui.js"></script>
-<script defer src="js/ui/mod-ui.js"></script>
-<script defer src="js/ui/goals-ui.js"></script>
-<script defer src="js/ui/settings-ui.js"></script>
-<script defer src="js/ui/layout-ui.js"></script>
-<script defer src="js/ui/support-ui.js"></script>
-<script defer src="js/ui/news-ui.js"></script>
-<script defer src="js/ui/live-ui.js"></script>
-<script defer src="js/core/updater.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/icons.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/ui.js"></script>
+<script type="application/x-kor-module" data-src="kor/logout.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/hud.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/login.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/test.js"></script>
+<script type="application/x-kor-module" data-src="kor/move-ratings.js"></script>
+<script type="application/x-kor-module" data-src="kor/tier-baseline.js"></script>
+<script type="application/x-kor-module" data-src="kor/pokemon-tiers.js"></script>
+<script type="application/x-kor-module" data-src="kor/mon-settings.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/menu.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/slots.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/gacha-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/shop-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/run-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/social-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/ranking-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/mod-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/goals-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/settings-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/layout-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/support-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/news-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/ui/live-ui.js"></script>
+<script type="application/x-kor-module" data-src="js/core/updater.js"></script>
 <!-- juego -->
-<script defer src="js/game.js"></script>
-<script defer src="kor/signup.js"></script>
-<script defer src="kor/notices.js"></script>
-<script defer src="kor/mobile-ui.js"></script>
-<script defer src="kor/edition.js"></script>
-<script defer src="js/main.js"></script>
+<script type="application/x-kor-module" data-src="js/game.js"></script>
+<script type="application/x-kor-module" data-src="kor/signup.js"></script>
+<script type="application/x-kor-module" data-src="kor/notices.js"></script>
+<script type="application/x-kor-module" data-src="kor/mobile-ui.js"></script>
+<script type="application/x-kor-module" data-src="kor/edition.js"></script>
+<script type="application/x-kor-module" data-src="js/main.js"></script>
+<!-- Run the adapter-aware development bundle generated by tools/build.js. -->
+<script defer src="tools/cache/dev-app.js"></script>
 <!-- scripts:end -->
 </body>
 </html>

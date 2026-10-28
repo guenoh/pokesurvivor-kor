@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
-const source=file=>fs.readFileSync(path.join(__dirname,'..',file),'utf8');
+const source=file=>require('../kor/module-source.cjs').isolatedSource(file);
 
 function peer(host){
   const G={},noop=()=>{},frames=[];let receive,now=1000;
@@ -14,7 +14,8 @@ function peer(host){
   });
   const boss=enemy(123,1150),ordinary=enemy(124,25),enemies=[boss,ordinary];
   G.EnemyMgr={all:()=>enemies,get:id=>enemies.find(e=>e.id===id)};
-  G.Net={uid:host?'host':'guest',on:fn=>receive=fn,onPeer:noop,slow:()=>false,send:(uid,f)=>frames.push(f),toHost:noop};
+  G.Net={uid:host?'host':'guest',on:fn=>receive=fn,onPeer:noop,slow:()=>false,busy:()=>false,send:(uid,f)=>frames.push(f),toHost:noop};
+  G.Ranking={mySeal:()=>null};
   G.Player=class{constructor(){this.maxHp=300}};G.DEX_BY={25:{dex:25}};G.baseStartOf=()=> 'tackle';
   G.Sprites={preload:noop};G.Judgment={netState:()=>null,netApply:noop};G.ARMORED_EVENT={id:1150};
   new Function('G','document','performance',source('js/net/coop.js'))(G,{addEventListener:noop},{now:()=>now});

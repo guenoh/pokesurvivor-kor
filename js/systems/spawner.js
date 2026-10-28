@@ -141,7 +141,6 @@ G.Spawner = (() => {
     // En la arena de la grieta no sale nada más (y el reloj de jefes espera).
     // En la Sentencia de Arceus, sólo sus legendarios (systems/judgment.js).
     if (G.Rift.inArena || G.Judgment.active) return;
-    if (G.ArmoredMewtwo.updateSpawn(dt, players, t)) return;
 
     // Precarga lo que va a salir en el próximo minuto.
     preloadT -= dt;
@@ -209,6 +208,6 @@ G.Spawner = (() => {
   /** Invitado en cooperativo: sólo corre el reloj del aviso. */
   function tickBanner(dt) { if (announceT > 0) announceT -= dt; }
 
-  return { reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP,
+  return { reset, update, ahead, burst, outR, tickBanner, banner, say, rate, SHINY_RATE, CAP,
            debugForceShiny(n = 1) { forceShiny = n; } };
 })();

@@ -75,7 +75,7 @@ G.AchDefs = (() => {
   ];
 
   // Un logro por legendario: "Vence a Mewtwo"...
-  for (const p of G.DEX.filter(p => p.leg && !p.eventOnly && G.SPRITE_META[p.dex])) {
+  for (const p of G.DEX.filter(p => p.leg && G.SPRITE_META[p.dex])) {
     LIST.push({ id: 'leg_' + p.dex, cat: 'legendarios', tier: 2, dex: p.dex, name: 'Vence a ' + p.name,
                 desc: 'Derrota a ' + p.name + ' en una grieta.', value: s => (s.legends && s.legends[p.dex] ? 1 : 0), goal: 1, reward: { t1: 1 } });
   }

@@ -100,6 +100,7 @@
   }
   function quiet(promise) { promise.then(r => { if (!r.ok) G.UI?.toast(r.error, 4000); }); }
   G.KorLive = { on(fn) { liveListeners.add(fn); return () => liveListeners.delete(fn); }, send,
+    get busy() { return !!socket && socket.bufferedAmount > 64 * 1024; },
     get connected() { return socket?.readyState === WebSocket.OPEN; } };
   G.Social = {
     start, stop, claimNick: async () => ({ ok: false, error: '친구 기능은 기존 계정 이름을 사용합니다.' }),

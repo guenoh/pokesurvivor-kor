@@ -28,7 +28,7 @@ G.Combat = (() => {
     if (m.kind === 'orbit') { orbit(pl, m, dt, now); return; }
 
     m.t -= dt;
-    if (m.t > 0 || pl.rushActive) return;
+    if (m.t > 0) return;
     // Los ataques que necesitan blanco esperan a tenerlo (no gastes animación al aire).
     if (needsTarget(m, pl) && !(pl.target && G.U.dist(pl.x, pl.y, pl.target.x, pl.target.y) <= reach(m))) {
       m.t = 0.05;
@@ -46,7 +46,6 @@ G.Combat = (() => {
   }
 
   function run(pl, m) {
-    if (!G.Moves.canUse(pl.mon, m.id)) return;
     switch (m.kind) {
       case 'projectile': fireProjectiles(pl, m); break;
       case 'melee':      melee(pl, m); break;
@@ -101,6 +100,17 @@ G.Combat = (() => {
   /** Tabla de tipos × clima para un ataque de tipo `type` contra `e`. */
   function typeK(type, e) { return G.Types.mult(type, e.types) * G.Weather.mult(type); }
 
+  /** Un proyectil del movimiento m, de pl hacia el ángulo a. */
+  function shot(pl, m, a, col, vis) {
+    G.Projectiles.spawn(Object.assign({
+      x: pl.x + Math.cos(a) * 3, y: pl.y + Math.sin(a) * 3,
+      vx: Math.cos(a) * m.speed, vy: Math.sin(a) * m.speed,
+      dmg: m.dmg * pl.atkFor(m), r: m.size, life: m.life,
+      pierce: m.pierce | 0, color: col, homing: m.homing || 0,
+      hits: new Set(), vis, ghost, owner: pl
+    }, payload(m)));
+  }
+
   function fireProjectiles(pl, m) {
     const col = G.U.TYPE_COLOR[m.type];
     const vis = G.VFX.forMove(m);
@@ -109,13 +119,7 @@ G.Combat = (() => {
     for (let i = 0; i < n; i++) {
       const off = n === 1 ? 0 : (i / (n - 1) - 0.5) * spread * n;
       const a = pl.aim + off + G.U.rand(-0.03, 0.03);
-      G.Projectiles.spawn(Object.assign({
-        x: pl.x + Math.cos(a) * 3, y: pl.y + Math.sin(a) * 3,
-        vx: Math.cos(a) * m.speed, vy: Math.sin(a) * m.speed,
-        dmg: m.dmg * pl.atkFor(m), r: m.size, life: m.life,
-        pierce: m.pierce | 0, color: col, homing: m.homing || 0,
-        hits: new Set(), vis, ghost, owner: pl
-      }, payload(m)));
+      shot(pl, m, a, col, vis);
     }
     G.FX.spark(pl.x + Math.cos(pl.aim) * pl.r, pl.y - G.LIFT + Math.sin(pl.aim) * pl.r,
                col, Math.cos(pl.aim), Math.sin(pl.aim), 3);
@@ -127,13 +131,7 @@ G.Combat = (() => {
     const n = Math.max(3, m.count | 0);
     for (let i = 0; i < n; i++) {
       const a = (i / n) * 6.2832 + G.U.rand(-0.06, 0.06);
-      G.Projectiles.spawn(Object.assign({
-        x: pl.x + Math.cos(a) * 3, y: pl.y + Math.sin(a) * 3,
-        vx: Math.cos(a) * m.speed, vy: Math.sin(a) * m.speed,
-        dmg: m.dmg * pl.atkFor(m), r: m.size, life: m.life,
-        pierce: m.pierce | 0, color: col, homing: m.homing || 0,
-        hits: new Set(), vis, ghost, owner: pl
-      }, payload(m)));
+      shot(pl, m, a, col, vis);
     }
     G.FX.ring(pl.x, pl.y, pl.r, pl.r * 4, col, 0.3, 3);
   }
@@ -311,62 +309,8 @@ G.Combat = (() => {
     G.FX.ring(pl.x, pl.y, 4, 30, col, 0.3, 2);
   }
 
-  // A timed dash rather than a teleport: the owner moves locally; co-op ghosts
-  // only render the trail and projectiles, never move or damage remote players.
-  function startPsychoRush(pl, m) {
-    if (fields.some(f => f.kind === 'psycho-rush' && f.owner === pl)) return;
-    fields.push({ kind: 'psycho-rush', owner: pl, ghost, m, t: 0,
-      sx: pl.x, sy: pl.y, x: pl.x, y: pl.y, angle: pl.aim,
-      ca: Math.cos(pl.aim), sa: Math.sin(pl.aim), travelled: 0, shot: 0,
-      hits: new Set(), props: new Set(), col: G.U.TYPE_COLOR[m.type], vis: G.VFX.forMove(m) });
-    if (!ghost) {
-      pl.rushActive = true;
-      pl.invuln = Math.max(pl.invuln || 0, m.rushDuration + .04);
-    }
-  }
-
-  function tickPsychoRush(f) {
-    const pl = f.owner, m = f.m;
-    if (pl.dead) { if (!f.ghost) pl.rushActive = false; return true; }
-    const target = Math.min(1, f.t / m.rushDuration) * m.radius;
-    while (!f.blocked && f.travelled < target - .0001) {
-      const step = Math.min(8, target - f.travelled), sx = f.x, sy = f.y;
-      const x = sx + f.ca * step, y = sy + f.sa * step;
-      if (!G.World.isFree(x, y, pl.r, true)) { f.blocked = true; break; }
-      f.x = x; f.y = y; f.travelled += step;
-      G.FX.sp(f.vis.proj, f.vis.pal, x, y - G.LIFT * .6, { life: .18, angle: f.angle });
-      if (!f.ghost) {
-        pl.x = x; pl.y = y; G.World.collide(pl);
-        const width = m.width / 2;
-        for (const e of G.EnemyMgr.queryCircle((sx+x)/2, (sy+y)/2, width + step)) {
-          if (e.dead || f.hits.has(e) || segDist2(sx,sy,x,y,e.x,e.y) > (width+e.r)**2) continue;
-          f.hits.add(e); hit(pl,e,m.dmg*pl.atkFor(m),f.col,f.ca,f.sa,0,m);
-        }
-        for (const p of G.World.propsInCircle((sx+x)/2, (sy+y)/2, width + step)) {
-          if (f.props.has(p) || segDist2(sx,sy,x,y,p.x,p.y) > (width+p.r)**2) continue;
-          f.props.add(p); G.World.damageProp(p,m.dmg*pl.atkFor(m),f.col);
-        }
-      }
-    }
-    const count = m.rushShots;
-    while (f.shot < count && f.t >= (f.shot + .5) / count * m.rushDuration) {
-      const distance = Math.min(f.travelled, (f.shot + .5) / count * m.radius);
-      const x = f.sx + f.ca * distance, y = f.sy + f.sa * distance;
-      const enemy = !pl.manualAim && G.Projectiles.nearest(G.EnemyMgr.all(), x, y, 360);
-      const angle = enemy ? Math.atan2(enemy.y-y,enemy.x-x) : f.angle;
-      G.Projectiles.spawn(Object.assign({ x,y,vx:Math.cos(angle)*m.speed,vy:Math.sin(angle)*m.speed,
-        dmg:m.dmg*m.rushShotRatio*pl.atkFor(m),r:m.size,life:m.life,pierce:m.pierce|0,
-        homing:m.homing,color:f.col,hits:new Set(),vis:f.vis,ghost:f.ghost,owner:pl },payload(m)));
-      f.shot++;
-    }
-    if (f.t < m.rushDuration) return false;
-    if (!f.ghost) pl.rushActive = false;
-    return true;
-  }
-
   /** Embestida: cruzas como un rayo hacia el enemigo y golpeas a todo lo del camino. */
   function dash(pl, m) {
-    if (m.rushShots) { startPsychoRush(pl, m); return; }
     const col = G.U.TYPE_COLOR[m.type], vis = G.VFX.forMove(m);
     const ca = Math.cos(pl.aim), sa = Math.sin(pl.aim);
     const sx = pl.x, sy = pl.y;
@@ -510,7 +454,6 @@ G.Combat = (() => {
   /** Cada fotograma de los campos nuevos (los llama updateFields). → true si hay que quitarlo. */
   function tickNewField(f, dt) {
     const pl = f.owner, m = f.m;
-    if (f.kind === 'psycho-rush') return tickPsychoRush(f);
     if (f.kind === 'charge') {
       f.x = pl.x; f.y = pl.y;
       // La energía se junta en ti mientras carga.
@@ -600,7 +543,7 @@ G.Combat = (() => {
     for (const p of G.World.propsInCircle(f.x, f.y, r)) G.World.damageProp(p, f.dmg * k, f.col);
   }
 
-  const NEW_FIELDS = new Set(['charge', 'spin', 'quake', 'vortex', 'stunzone', 'psycho-rush']);
+  const NEW_FIELDS = new Set(['charge', 'spin', 'quake', 'vortex', 'stunzone']);
   function updateFields(dt) {
     for (let i = fields.length - 1; i >= 0; i--) {
       const f = fields[i];
@@ -726,10 +669,7 @@ G.Combat = (() => {
     }
   }
 
-  function clearFields(owner) {
-    for (const f of fields) if (f.kind === 'psycho-rush' && !f.ghost && (!owner || f.owner === owner)) f.owner.rushActive = false;
-    fields = owner ? fields.filter(f => f.owner !== owner) : [];
-  }
+  function clearFields(owner) { fields = owner ? fields.filter(f => f.owner !== owner) : []; }
 
   function orbit(pl, m, dt, now, isGhost = false) {
     const col = G.U.TYPE_COLOR[m.type];
@@ -838,7 +778,6 @@ G.Combat = (() => {
 
     for (let i = projectiles.length - 1; i >= 0; i--) {
       const p = projectiles[i];
-      if (p.t >= p.life) { projectiles.splice(i, 1); continue; }
 
       // --- disparos enemigos: paredes y objetos sólidos dan cobertura ---
       if (!p.friendly) {
