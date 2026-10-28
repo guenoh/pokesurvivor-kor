@@ -10,6 +10,7 @@ function bootAdapter(fetch) {
     localStorage: { getItem: k => storage.get(k) || null, setItem: (k, v) => storage.set(k, v), removeItem: k => storage.delete(k) } };
   sandbox.window = sandbox; vm.createContext(sandbox);
   vm.runInContext(read('js/core/db.js'), sandbox);
+  vm.runInContext(read('kor/retired-content.js'), sandbox);
   vm.runInContext(read('kor/selfhost-db.js'), sandbox);
   return { db: sandbox.G.DB, storage };
 }
@@ -52,7 +53,7 @@ test('independent login uses upstream migration and ledger, never enables Fireba
     return json({ user, save: {}, revision: 0 });
   });
   assert.equal(await db.ready(), true); assert.equal(db.save.coins, 500);
-  assert.equal(db.fb, null); assert.equal(db.online, false); assert.equal(db.guest, false);
+  assert.equal(db.fb, null); assert.equal(db.online, true); assert.equal(db.guest, false);
   db.save.coins -= 50; db.commit();
   await db.flush();
   const sent = JSON.parse(requests.find(([u]) => u === '/api/save')[1].body);
@@ -163,7 +164,7 @@ test('Korean audit checks actual ability effects and generated data beyond Engli
 });
 
 
-test('upstream update preserves legacy Korean inventories, event companion and spending across login', async () => {
+test('retirement preserves legacy inventories and spending without transferring retired upgrades', async () => {
   const fixture={v:3,coins:143000,tickets:{t1:4,t10:92},partner:1150,partnerShiny:false,
     owned:{150:{at:1,from:'gacha'},1150:{at:2,from:'armored-event'}},shiny:{150:{at:3,from:'gacha'}},
     pupgDone:true,pupg:{1150:{hp:4}},pstart:{1150:'psycho-rush'},pity:{1:69},bag:{mint:3},tms:{confusion:2},
@@ -175,10 +176,10 @@ test('upstream update preserves legacy Korean inventories, event companion and s
     return json({user:{id:'legacy-fixture',name:'기존트레이너'},save:structuredClone(stored),revision});
   };
   const first=bootAdapter(api);assert.equal(await first.db.ready(),true);
-  for(const k of ['coins','tickets','owned','shiny','pupg','pstart','pity','bag','tms','evoMoves','missions'])assert.equal(JSON.stringify(first.db.save[k]),JSON.stringify(fixture[k]),k);
+  for(const k of ['coins','tickets','shiny','pity','bag','tms','missions'])assert.equal(JSON.stringify(first.db.save[k]),JSON.stringify(fixture[k]),k);
   first.db.commit();await first.db.flush();
   const again=bootAdapter(api);await again.db.ready();
   assert.equal(again.db.save.coins,143000);assert.equal(again.db.save.tickets.t10,92);
-  assert.equal(again.db.save.stats.bestTime,1823);assert.ok(again.db.save.owned[1150]);
-  assert.equal(again.db.save.pstart[1150],'psycho-rush');assert.equal(again.db.save.led['server:kor-opening-20261023'].t10[0],100);
+  assert.equal(again.db.save.stats.bestTime,1823);assert.ok(again.db.save.owned[150]);assert.equal(again.db.save.owned[1150],undefined);assert.equal(again.db.save.partner,150);assert.equal(again.db.save.pupg[1150],undefined);assert.equal(again.db.save.pupg[150],undefined);assert.equal(again.db.save.retiredKor.armoredMewtwo.pupg.hp,4);
+  assert.equal(again.db.save.pstart[1150],undefined);assert.equal(again.db.save.led['server:kor-opening-20261023'].t10[0],100);
 });

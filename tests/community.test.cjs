@@ -65,3 +65,25 @@ test('relay exposes upstream backpressure without dropping the next frame when t
   assert.equal(G.Net.send('b', { k: 'f', ev: [['reward', 1]] }), true);
   assert.equal(ws.sent.at(-1).message.ev[0][0], 'reward'); G.Social.stop();
 });
+
+test('original lobby delegates starting a game to the authenticated server and never starts locally', async () => {
+ const {adapt}=require('../kor/service-adapter.cjs');
+ const elements=new Map(),calls=[];
+ const $=id=>{if(!elements.has(id))elements.set(id,{dataset:{}});return elements.get(id)};
+ const G={UI:{$,toast:m=>calls.push(['toast',m])},U:{esc:x=>x},Social:{room:{isHost:true,members:[{uid:'a'},{uid:'b'}]},on(){},startRoom:async()=>calls.push(['server-start']),setOpen:()=>calls.push(['local-open'])},Net:{onPeer(){},broadcast:()=>calls.push(['local-broadcast'])},Flow:{startCoop:()=>calls.push(['local-game'])},Halloween:{on:false}};
+ new Function('G',adapt('js/ui/social-ui.js',code('js/ui/social-ui.js')))(G);
+ G.LobbyUI.init();$('lobby-start').onclick();await new Promise(r=>setImmediate(r));
+ assert.deepEqual(calls,[['server-start']]);
+ G.Social.room.isHost=false;$('lobby-start').onclick();assert.equal(calls.length,1);
+ G.Social.room.isHost=true;G.Social.startRoom=async()=>{throw Error('server offline')};$('lobby-start').onclick();await new Promise(r=>setImmediate(r));assert.deepEqual(calls.at(-1),['toast','server offline']);
+});
+
+test('original cooperative game accepts a recovered independent relay without expiring the reconnect grace period', () => {
+ const {adapt}=require('../kor/service-adapter.cjs');
+ const timers=new Map(),lost=[];let peer,mode='relay',next=0;
+ const G={Net:{uid:'guest',on(){},onPeer:f=>peer=f,slow:()=>false,mode:()=>mode,connectedMode:m=>m==='direct'||m==='relay'},Player:class{constructor(){this.maxHp=100}},DEX_BY:{25:{dex:25}},baseStartOf:()=> 'thundershock',Sprites:{preload(){}},U:{dist2:()=>0},Social:{me:{name:'guest'}},Spawner:{say(){}},Projectiles:{clearOrbs(){}}};
+ new Function('G','document','setTimeout','clearTimeout',adapt('js/net/coop.js',code('js/net/coop.js')))(G,{addEventListener(){}},f=>{timers.set(++next,f);return next},id=>timers.delete(id));
+ G.Coop.begin({host:'host',members:[{uid:'host',name:'host',dex:25},{uid:'guest',name:'guest',dex:25}]},{x:0,y:0},{lost:m=>lost.push(m)});
+ mode='failed';peer('host',mode);assert.equal(timers.size,1);
+ mode='relay';peer('host',mode);assert.equal(timers.size,0);assert.equal(lost.length,0);assert.equal(G.Coop.active,true);G.Coop.end();
+});

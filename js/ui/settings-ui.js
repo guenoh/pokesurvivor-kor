@@ -7,7 +7,7 @@ G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = G.U.esc;
   const VERSION = '1.2 · 2026-10-09';
-  const REPO = 'https://github.com/guenoh/pokesurvivor-kor';
+  const REPO = 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
   function init() {
@@ -76,12 +76,9 @@ G.SettingsUI = (() => {
       G.UI.soundControls($('set-sound'));
     } else if (tab === 'gfx') {
       const auto = ['baja', 'media', 'alta'][G.Settings.autoLevel];
-      box.innerHTML = (G.I18n.lang === 'ko' ? '<div translate="no">'
-          + section('메뉴 크기', '자동은 작은 화면에서 메뉴와 창을 줄입니다. 게임 화면과 조작 범위는 그대로이며, 선택은 이 기기에 저장됩니다.')
-          + choice('uiScale', [['auto', '자동'], [0.8, '80%'], [0.9, '90%'], [1, '100%'], [1.1, '110%']]) + '</div>' : '')
-        + section('Idioma', 'El juego se recarga al cambiarlo.')
+      box.innerHTML = section('Idioma', 'El juego se recarga al cambiarlo.')
         + `<div class="chips set-chips" translate="no">${G.I18n.choices.map(([v, l]) =>
-             `<button class="chip ${G.I18n.lang === v ? 'on' : ''}" data-lang="${v}">${G.I18n.lang === 'ko' ? esc(G.T(l, 'language')) : l}</button>`).join('')}</div>`
+             `<button class="chip ${G.I18n.lang === v ? 'on' : ''}" data-lang="${v}">${l}</button>`).join('')}</div>`
         + section('Calidad', 'Cuántos efectos y partículas se dibujan. <b>Auto</b> la baja sola si el juego va a tirones (ahora: ' + auto + ').')
         + choice('quality', [['auto', 'Auto'], ['high', 'Alta'], ['mid', 'Media'], ['low', 'Baja']])
         + section('Pantalla')
@@ -136,13 +133,13 @@ G.SettingsUI = (() => {
              <li><b>Sprites:</b> PMD SpriteCollab y sus artistas (CC BY-NC 4.0).</li>
              <li><b>Datos de los Pokémon:</b> PokéAPI.</li>
              <li><b>Música y sonidos:</b> originales, generados por el propio juego.</li>
-             <li><b>Fuente:</b> Pixelify Sans / Galmuri11 (OFL).</li>
+             <li><b>Fuente:</b> Pixelify Sans (OFL).</li>
            </ul>`
         + `<div class="row wrap" style="justify-content:center;gap:8px">
              ${window.PS_PAGES ? `<a class="btn small" href="${G.I18n.lang === 'en' ? 'en/guide/' : 'guia/'}" target="_blank">Guía y preguntas</a>
              <a class="btn small" href="${G.I18n.lang === 'en' ? 'en/pokedex/' : 'pokedex/'}" target="_blank">Pokédex</a>` : ''}
              <button class="btn small" data-legal>Aviso legal y privacidad</button>
-             <a class="btn small" href="https://github.com/guenoh/pokesurvivor-kor/issues" target="_blank" rel="noopener">Contacto</a>
+             <a class="btn small" href="contacto/" target="_blank" rel="noopener">Contacto</a>
              <a class="btn small" href="${REPO}" target="_blank" rel="noopener">Código (GitHub)</a>
            </div>`;
     }
@@ -199,7 +196,7 @@ G.SettingsUI = (() => {
     if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
     if (G.Game.state !== 'ui') G.Game.quit && G.Game.quit();
     G.Audio.music(null);
-    G.DB.logout().then(() => G.Flow.toLogin()).catch(() => {});
+    G.DB.logout().then(() => G.Flow.toLogin());
   }
 
   return { init, open, close, get isOpen() { return isOpen(); } };

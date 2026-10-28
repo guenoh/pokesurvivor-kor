@@ -34,10 +34,9 @@ G.Slots = (() => {
     });
   }
 
-  /** Anima las tiradas. → Promise que se resuelve al terminar. */
-  async function play(canvas, results, total = results.length, onStatus = () => {}) {
-    if (typeof total === 'function') { onStatus = total; total = results.length; }
-    const report = (index = 0, phase = 'progress') => onStatus({ text: st.led, index, total, phase });
+  /** Anima las tiradas. → Promise que se resuelve al terminar.
+   *  @param total  cuántas tiradas son de verdad (100: results trae lo mejor de cada ×10) */
+  async function play(canvas, results, total = results.length) {
     cv = canvas; ctx = cv.getContext('2d');
     fast = false; skipped = false;
     cv.onclick = () => { fast = true; };
@@ -47,7 +46,6 @@ G.Slots = (() => {
       ten: results.length === 10, tray: [], led: hundred ? 'TIRADA ×100' : results.length === 10 ? 'TIRADA ×10' : '¡SUERTE!',
       ledCol: C.bulbOn, win: null, frenzy: 0, sparks: []
     };
-    report(0, 'ready');
     last = performance.now();
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(frame);
@@ -55,8 +53,7 @@ G.Slots = (() => {
     const ten = results.length === 10;
     for (let i = 0; i < results.length && !skipped; i++) {
       const r = results[i];
-      if (ten) { st.led = (hundred ? '×100 · ' : 'TIRADA ') + (i + 1) + '/10'; st.ledCol = C.bulbOn; }
-      report(i + 1);
+      if (ten) st.led = (hundred ? '×100 · ' : 'TIRADA ') + (i + 1) + '/10';
       // Palanca.
       G.Audio.sfx('ball');
       await tween(v => { st.lever = v; }, 0, 1, ten ? 0.12 : 0.22);
@@ -71,7 +68,6 @@ G.Slots = (() => {
           st.frenzy = 1;
           st.led = r.shiny ? '¡¿SHINY?!' : r.rarity === 5 ? '¡¿LEGENDARIO?!' : '¡¿ÉPICO?!';
           st.ledCol = colOf(r);
-          report(i + 1, 'suspense');
           await tween(v => { st.reels[2].speed = v; }, 520, 120, ten ? 0.5 : 1.1);
         }
         stopReel(st.reels[k], symOf(r));
@@ -83,7 +79,6 @@ G.Slots = (() => {
       st.win = { col: colOf(r), t: 0 };
       st.led = (r.shiny ? 'SHINY · ' : '') + G.Gacha.RARITY_NAME[r.rarity].toUpperCase();
       st.ledCol = colOf(r);
-      report(i + 1, 'result');
       G.Audio.sfx('reveal', { rarity: r.rarity });
       if (r.rarity === 5) G.Audio.sfx('legend');
       if (r.shiny) G.Audio.sfx('shiny');

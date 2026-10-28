@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { frame, client } = require('./net-fixtures.cjs');
-const source = file => require('../kor/module-source.cjs').isolatedSource(file);
+const source = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
 function codec() { const G = {}; new Function('G', source('js/net/codec.js'))(G); return G.NetCodec; }
 const C = codec();
 // Mensajes por la base de datos: rooms/{sala}/q/{para}/{remitente}_00..99 (database.rules.json).
@@ -156,28 +156,6 @@ test('real Coop.tick frames pass through the codec without changing gameplay fie
     if (host) { assert.deepEqual(sent[0].e, [[123, 50, -10, 126, 1, 3, 1]]); assert.ok('ho' in sent[0]); }
     else { assert.equal(sent[0].p.length, 17); assert.equal(sent[0].p[15], ''); assert.equal(sent[0].p[16], 1); }   // 16.º: a quién mira estando caído; 17.º: zoom (Luminosfera)
   }
-});
-test('boss rush bullets retain cleanup ownership through actual host and guest co-op packets',()=>{
-  function peer(host){
-    let receive;const frames=[],noop=()=>{},G={};
-    G.Net={uid:host?'host':'guest',on:fn=>receive=fn,onPeer:noop,slow:()=>false,busy:()=>false,send:(uid,f)=>frames.push(f),toHost:f=>frames.push(f)};
-    G.Player=class{constructor(){this.maxHp=300}};G.DEX_BY={25:{dex:25}};G.baseStartOf=()=> 'tackle';
-    G.Sprites={preload:noop};G.U={dist2:()=>0};G.Camera={sees:()=>true};G.VFX={forType:t=>({pal:t})};
-    G.EnemyMgr={all:()=>[]};G.Judgment={netState:()=>[],netApply:noop};
-    new Function('G',source('js/entities/projectile.js'))(G);
-    new Function('G','document',source('js/net/coop.js'))(G,{addEventListener:noop});
-    const local={x:0,y:0,hp:300,maxHp:300,magnet:78,aim:0,xpMul:1,activeGroup:()=>[{id:'tackle',lvl:1}]};
-    G.Coop.begin({host:'host',members:[{uid:'host',dex:25},{uid:'guest',dex:25}]},local,{team:()=>({time:1400}),choosing:()=>false,syncTeam:noop});
-    return {G,frames,receive:(f)=>receive('host',f)};
-  }
-  const host=peer(true),guest=peer(false);
-  const shot={x:10,y:20,vx:340,vy:0,dmg:60,r:8,life:1.6,cat:'special',eventOwner:123,eventMove:'psycho-rush',homing:2,homingUid:'guest'};
-  host.G.Coop.enemyShot(shot,'psychic');host.G.Coop.enemyShot({...shot,eventOwner:undefined,eventMove:undefined},'fire');host.G.Coop.tick(1/15);
-  const frame=C.decode(C.encode(host.frames[0]));assert.equal(frame.ev[0][10],123);assert.equal(frame.ev[0][11],'psycho-rush');assert.equal(frame.ev[1].length,10);
-  guest.receive(frame);const shots=guest.G.Projectiles.all();assert.equal(shots.length,2);
-  assert.equal(shots[0].eventOwner,123);assert.equal(shots[0].eventMove,'psycho-rush');assert.equal(shots[0].cat,'special');assert.equal(shots[0].homing,2);assert.equal(shots[0].homingUid,'guest');
-  guest.G.Projectiles.clearEnemyOwner(123);guest.G.Projectiles.update(0,null,[]);
-  assert.equal(guest.G.Projectiles.count,1);assert.equal(guest.G.Projectiles.all()[0].mtype,'fire');
 });
 
 function turnNetwork(respond, { user = { uid: 'host', getIdToken: async () => 'token' }, host = true } = {}) {

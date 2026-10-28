@@ -3,12 +3,21 @@ G.RunUI = (() => {
   const $ = G.UI.$;
   let offers = null, offerCb = null, coopMode = false;
 
-  /* Keep battle shortcuts / an already-started gesture from picking a new
-   * card accidentally. A fresh pointer press on a visible card is deliberate
-   * and must work immediately, including inside the old 600 ms guard window. */
+  /*
+   * Al aparecer unas cartas (nivel, vínculo, objeto) no se pueden elegir
+   * durante GUARD s y se ven apagadas: en plena pelea se pulsa 1-4 (o se toca
+   * la pantalla) para cambiar de ataque y se elegía una carta sin querer.
+   * Cambiar las cartas o el 2.º paso del vínculo no lo vuelven a poner: ahí ya
+   * estás eligiendo a propósito.
+   */
   const GUARD = 0.6;
-  let guardUntil = 0;
-  function guard() { guardUntil = performance.now() + GUARD * 1000; }
+  let guardUntil = 0, guardT = 0;
+  function guard(box) {
+    guardUntil = performance.now() + GUARD * 1000;
+    box.classList.add('guard');
+    clearTimeout(guardT);
+    guardT = setTimeout(() => document.querySelectorAll('.cards.guard').forEach(b => b.classList.remove('guard')), GUARD * 1000);
+  }
   const guarded = () => performance.now() < guardUntil;
 
   /*
@@ -26,23 +35,17 @@ G.RunUI = (() => {
    */
   let fired = -1e9;           // último toque que eligió algo
   function onTap(el, fn) {
-    let id = null, at = 0, freshMouse = false;
-    el.addEventListener('pointerdown', e => {
-      freshMouse = e.pointerType === 'mouse' && e.button === 0;
-      if (e.pointerType !== 'mouse') { id = e.pointerId; at = performance.now(); }
-    });
-    el.addEventListener('pointercancel', e => { if (e.pointerId === id) id = null; freshMouse = false; });
+    let id = null, at = 0;
+    el.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { id = e.pointerId; at = performance.now(); } });
+    el.addEventListener('pointercancel', e => { if (e.pointerId === id) id = null; });
     el.addEventListener('pointerup', e => {
       if (e.pointerId !== id) return;
       id = null;
       if (performance.now() - at > 1500) return;          // (dejar el dedo encima un rato no cuenta)
       fired = performance.now();
-      fn(true);
+      fn();
     });
-    el.onclick = () => {
-      const deliberate = freshMouse; freshMouse = false;
-      if (performance.now() - fired > 700) fn(deliberate);
-    };
+    el.onclick = () => { if (performance.now() - fired > 700) fn(); };
   }
 
   /** @param coop  en grupo: tras elegir, se queda esperando a los demás */
@@ -55,7 +58,7 @@ G.RunUI = (() => {
     renderCards(list);
     if (!$('lvl-reroll').dataset.tap) { $('lvl-reroll').dataset.tap = 1; onTap($('lvl-reroll'), reroll); }
     G.UI.show('scr-levelup');
-    guard();
+    guard($('cards'));
   }
 
   /**
@@ -69,7 +72,6 @@ G.RunUI = (() => {
   }
 
   function reroll() {
-    if (G.MoveRatings && G.MoveRatings.isOpen()) return;
     if (!offers || rerollsLeft() <= 0) return;
     const p = G.Game.player;
     p.rerolls = (p.rerolls || 0) + 1;
@@ -98,16 +100,13 @@ G.RunUI = (() => {
          <div class="txt"><div class="nm">${c.title} ${tag}</div><div class="ds">${c.desc}</div></div>
          <div class="key">${i + 1}</div>`;
       el.dataset.sfx = 'none';             // el juego pone su propio sonido al elegir
-      onTap(el, deliberate => pick(i, deliberate));
-      if (G.MoveRatings) G.MoveRatings.mountChoice(el, c, G.Game.player);
+      onTap(el, () => pick(i));
       box.appendChild(el);
     });
-    if (G.MoveRatings) G.MoveRatings.mountHelp(box, $('lvl-reroll'));
   }
 
-  function pick(i, deliberate = false) {
-    if (G.MoveRatings && G.MoveRatings.isOpen()) return;
-    if (!offers || !offers[i] || (!deliberate && guarded())) return;
+  function pick(i) {
+    if (!offers || !offers[i] || guarded()) return;
     const c = offers[i], cb = offerCb;
     offers = null; offerCb = null;
     $('lvl-reroll').classList.add('hidden');
@@ -138,7 +137,7 @@ G.RunUI = (() => {
   }
 
   /**
-   * Mensaje de apoyo al servidor coreano al acabar: tras un récord o cada 10 partidas,
+   * Mensaje de apoyo (Ko-fi) al acabar: tras un récord o cada 10 partidas,
    * nunca en la primera y como mucho una vez al día. Se cierra con la X.
    */
   function askSupport(r) {
@@ -174,8 +173,8 @@ G.RunUI = (() => {
       ${r.record ? '<div style="grid-column:1/-1;text-align:center" class="gold">¡Nuevo récord de tiempo!</div>' : ''}
       ${askSupport(r) ? `<div class="support-ask" id="over-ask" style="grid-column:1/-1">
         <button class="x" type="button" aria-label="Cerrar">×</button>
-        <p>한국어 서버의 지속적인 운영과 유지보수를 위해 자율 후원을 부탁드립니다. 후원 여부에 따른 게임 혜택은 없습니다.</p>
-        <a class="btn small gold" href="${G.Funding.url}" target="_blank" rel="noopener noreferrer">${G.Icons.html('heart', 14)} 한국어 서버 후원하기</a>
+        <p>¿Te está gustando PokéSurvivor? Lo hago yo solo y los servidores cuestan dinero. Si quieres, puedes ayudarme a mantenerlo en línea.</p>
+        <a class="btn small gold" href="${G.Funding.url}" target="_blank" rel="noopener">${G.Icons.html('heart', 14)} Apoyar en Ko-fi</a>
       </div>` : ''}`;
     const ask = $('over-ask');
     if (ask) ask.querySelector('.x').onclick = () => ask.remove();
@@ -222,11 +221,11 @@ G.RunUI = (() => {
       el.innerHTML = `<div class="ico">${G.Icons.html(id, 36)}</div>
         <div class="txt"><div class="nm">${verb} ${it.name}</div><div class="ds">${it.desc}</div></div>
         <div class="key">${i + 1}</div>`;
-      onTap(el, deliberate => { if ((!deliberate && guarded()) || !G.UI.isOpen('scr-item')) return; G.UI.hide('scr-item'); cb(id); });
+      onTap(el, () => { if (guarded() || !G.UI.isOpen('scr-item')) return; G.UI.hide('scr-item'); cb(id); });
       box.appendChild(el);
     });
     G.UI.show('scr-item');
-    guard();
+    guard(box);
   }
 
   // ---------------- vínculo: qué movimientos se fusionan ----------------
@@ -242,7 +241,7 @@ G.RunUI = (() => {
     if (!$('bond-back').dataset.tap) { $('bond-back').dataset.tap = 1; onTap($('bond-back'), bondBack); }
     renderBond();
     G.UI.show('scr-bond');
-    guard();
+    guard($('bond-cards'));
   }
 
   function renderBond() {
@@ -267,16 +266,13 @@ G.RunUI = (() => {
          <div class="txt"><div class="nm">${G.T(m.name, 'move')} <span class="tag-chip" style="background:${col}">Nv.${m.lvl}</span></div><div class="ds">${desc}</div></div>
          <div class="key">${i + 1}</div>`;
       el.dataset.sfx = 'none';
-      onTap(el, deliberate => pickBond(i, deliberate));
-      if (G.MoveRatings) G.MoveRatings.mount(el, m, G.Game.player);
+      onTap(el, () => pickBond(i));
       box.appendChild(el);
     });
-    if (G.MoveRatings) G.MoveRatings.mountHelp(box, $('bond-back'));
   }
 
-  function pickBond(i, deliberate = false) {
-    if (G.MoveRatings && G.MoveRatings.isOpen()) return;
-    if (!bond || !bond.list[i] || (!deliberate && guarded())) return;
+  function pickBond(i) {
+    if (!bond || !bond.list[i] || guarded()) return;
     const m = bond.list[i];
     if (bond.opt.mode === 'pair' && !bond.first) {
       bond.first = m;

@@ -8,13 +8,6 @@
 
 ## Sprites
 
-### 한국어판 이벤트 도트 시안
-
-- 아머드뮤츠 시안: 기존 뮤츠 도트와 2019년 공식 갑옷 디자인을 참고해 imagegen으로 생성한 8방향 그림입니다. 현재 동작은 시험용 변형 애니메이션이며, 원본 스프라이트를 대체하지 않습니다.
-- 기반 뮤츠 도트: PMD SpriteCollab, CC BY-NC 4.0. 기존 도감 번호 150의 제작 표기(CHUNSOFT, El_Pangoro_Parse, JFain)를 보존합니다. 종별 표기이며 개별 프레임의 제작자라고 단정하지 않습니다.
-- 갑옷 디자인 참고: https://www.pokemon.co.jp/goods/toy/to190726_01.html?page=goods
-- 생성 지시문과 출처는 `assets/events/armored-mewtwo/`에 함께 보관합니다. Pokémon 및 관련 디자인의 권리는 각 권리자에게 있습니다.
-
 Los sprites estilo *Pokémon Mundo Misterioso* vienen de
 [SpriteCollab](https://github.com/PMDCollab/SpriteCollab), bajo licencia
 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/):

@@ -30,7 +30,11 @@ G.MenuUI = (() => {
     });
     document.querySelectorAll('[data-back]').forEach(b => { b.onclick = open; });
     G.Social.on(() => { if (G.UI.isOpen('scr-menu')) socialLine(); });
-    $('btn-logout').onclick = () => G.KorLogout.run();
+    $('btn-logout').onclick = () => {
+      if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
+      G.Audio.music(null);
+      G.DB.logout().then(() => G.Flow.toLogin());
+    };
   }
 
   // ---------------- menú principal ----------------
@@ -51,8 +55,7 @@ G.MenuUI = (() => {
     // Normal / shiny a mano, aquí mismo (en el móvil no se encontraba en la ficha).
     const seg = $('menu-shiny');
     seg.classList.toggle('hidden', !G.DB.ownsShiny(mon.dex));
-    seg.querySelector('[data-v="0"]').textContent = G.T('Normal', 'appearance');
-    seg.lastChild.innerHTML = G.Icons.html('shiny', 12) + ' ' + G.T('Shiny', 'appearance');
+    seg.lastChild.innerHTML = G.Icons.html('shiny', 12) + ' Shiny';
     seg.querySelectorAll('button').forEach(b => {
       b.classList.toggle('on', (b.dataset.v === '1') === shiny);
       b.onclick = () => {
@@ -81,13 +84,12 @@ G.MenuUI = (() => {
     $('menu-goals-sub').textContent = pend ? pend + (pend === 1 ? ' premio por recoger' : ' premios por recoger') : 'Misiones, logros y perfil';
     $('menu-goals-sub').classList.toggle('gold', pend > 0);
     // Con cuenta en la nube: amigos en línea, invitaciones y (una vez) el apodo.
-    if ((G.DB.online || G.DB.selfhostUser) && !G.Social.started) {
+    if (G.DB.online && !G.Social.started) {
       G.Social.start().then(r => {
         if (r === 'need-nick' && !G.NickUI.skipped && G.UI.isOpen('scr-menu')) G.NickUI.open();
         socialLine();
       });
     }
-    if (G.Social.independent) { G.Social.setPlaying(false); G.Social.refreshPresence(); }
     G.InvitePop.refresh();
   }
 
@@ -183,8 +185,6 @@ G.MenuUI = (() => {
       sb.appendChild(c);
     }
 
-    if (G.PokemonTiers) G.PokemonTiers.addEntry(sb);
-
     // Tipo y búsqueda (la búsqueda mira en todas las generaciones).
     const ts = $('dex-type');
     ts.innerHTML = `<option value="">Todos los tipos</option>` +
@@ -214,15 +214,15 @@ G.MenuUI = (() => {
     const list = G.DEX.filter(p => {
       const own = !!s.owned[p.dex];
       if (q) {
-        // Event names are disclosed even before ownership; ordinary hidden names stay hidden.
-        if (num != null ? p.dex !== num : !((own || p.eventOnly) && [p.name, G.T(p.name)].some(name => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q)))) return false;
+        // Por número, o por nombre (sin tildes); de los que no tienes no se busca el nombre.
+        if (num != null ? p.dex !== num : !(own && [p.name, G.T(p.name)].some(name => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q)))) return false;
       } else if (dexGen && p.gen !== dexGen) return false;
       if (f.status === 'own' && !own) return false;
       if (f.status === 'miss' && own) return false;
       if (f.shiny && !(s.shiny && s.shiny[p.dex])) return false;
       if (f.fav && !G.DB.isFav(p.dex)) return false;
       if (f.rar.size && !f.rar.has(p.rarity)) return false;
-      if (f.type && !((own || p.eventOnly) && p.types.includes(f.type))) return false;
+      if (f.type && !(own && p.types.includes(f.type))) return false;
       return true;
     });
     const at = p => (s.owned[p.dex] && s.owned[p.dex].at) || 0, used = p => +(s.pused || {})[p.dex] || 0;
@@ -282,12 +282,12 @@ G.MenuUI = (() => {
     const cell = document.createElement('div');
     cell.className = 'cell' + (own ? '' : ' locked') + (p.dex === dexSel ? ' on' : '');
     cell.dataset.pad = '1';
-    cell.insertAdjacentHTML('beforeend', `<span class="no">${p.eventOnly ? '이벤트' : String(p.dex).padStart(3, '0')}${G.DB.isFav(p.dex) ? ' ' + G.Icons.html('star', 10) : ''}</span>`);
+    cell.insertAdjacentHTML('beforeend', `<span class="no">${String(p.dex).padStart(3, '0')}${G.DB.isFav(p.dex) ? ' ' + G.Icons.html('star', 10) : ''}</span>`);
     if (p.dex === s.partner) cell.insertAdjacentHTML('beforeend', `<span class="badge-r" title="Compañero">${G.Icons.html('crown', 14)}</span>`);
     else if (sh) cell.insertAdjacentHTML('beforeend', `<span class="badge-r" title="Tienes su shiny">${G.Icons.html('shiny', 12)}</span>`);
     const useShiny = sh && p.dex === s.partner && s.partnerShiny;
     cell.appendChild(G.UI.spriteCanvas(p.dex, 92, 80, { scale: 2, silhouette: !own, shadow: own, shiny: useShiny }));
-    cell.insertAdjacentHTML('beforeend', `<b>${own || p.eventOnly ? p.name : '???'}</b>${G.UI.stars(p.rarity, 9)}`);
+    cell.insertAdjacentHTML('beforeend', `<b>${own ? p.name : '???'}</b>${G.UI.stars(p.rarity, 9)}`);
     cell.onclick = () => {
       dexSel = p.dex;
       $('dex-grid').querySelectorAll('.cell').forEach(c => c.classList.remove('on'));
@@ -327,16 +327,15 @@ G.MenuUI = (() => {
     box.innerHTML = `
       <canvas id="dex-big" class="stage" width="220" height="190"></canvas>
       ${hasSh ? `<div class="seg">
-          <button class="${viewShiny ? '' : 'on'}" data-v="0">${G.T('Normal', 'appearance')}</button>
-          <button class="${viewShiny ? 'on' : ''}" data-v="1">${G.Icons.html('shiny', 12)} ${G.T('Shiny', 'appearance')}</button></div>` : ''}
+          <button class="${viewShiny ? '' : 'on'}" data-v="0">Normal</button>
+          <button class="${viewShiny ? 'on' : ''}" data-v="1">${G.Icons.html('shiny', 12)} Shiny</button></div>` : ''}
       <div class="center">
-        <div style="color:var(--muted);font-size:13px">${p.eventOnly ? '이벤트 포켓몬 · Nº ' + p.nationalDex : 'Nº ' + String(p.dex).padStart(3, '0')} · ${GEN_NAMES[p.gen - 1]}</div>
-        <h3>${own || p.eventOnly ? p.name : '???'}</h3>
+        <div style="color:var(--muted);font-size:13px">Nº ${String(p.dex).padStart(3, '0')} · ${GEN_NAMES[p.gen - 1]}</div>
+        <h3>${own ? p.name : '???'}</h3>
         ${own ? `<button id="dex-fav" class="chip${G.DB.isFav(dex) ? ' on' : ''}" type="button">${G.Icons.html(G.DB.isFav(dex) ? 'star' : 'starDim', 12)} ${G.DB.isFav(dex) ? 'Favorito' : 'Marcar como favorito'}</button>` : ''}
         <div style="color:${G.Gacha.RARITY_COLOR[p.rarity]}">${G.UI.stars(p.rarity, 24)} ${G.Gacha.RARITY_NAME[p.rarity]}</div>
-        <div style="margin:6px 0">${own || p.eventOnly ? G.UI.typeChips(p.types) : ''}</div>
+        <div style="margin:6px 0">${own ? G.UI.typeChips(p.types) : ''}</div>
       </div>
-      ${p.eventOnly ? '<p class="sub center" data-event-description translate="no"></p>' : ''}
       ${own ? `
         ${bar('Vida', q.hp, max.hp, q.hp)}
         ${bar('Ataque', q.pa, max.atk, '×' + q.pa.toFixed(2), 'pa')}
@@ -353,11 +352,9 @@ G.MenuUI = (() => {
         ${usingThis
           ? '<button class="btn grow" disabled style="width:100%">Es tu compañero</button>'
           : `<button id="dex-pick" class="btn gold" data-sfx="confirm" style="width:100%">Elegir de compañero${viewShiny ? ' (shiny)' : ''}</button>`}
-      ` : p.eventOnly ? '<p class="center" style="color:var(--muted)" translate="no">아직 동료가 되지 않은 포켓몬입니다.</p>' : `<p class="center" style="color:var(--muted)">Aún no lo tienes.<br>Consíguelo en el banner de <b class="gold">${GEN_NAMES[p.gen - 1]}</b>
+      ` : `<p class="center" style="color:var(--muted)">Aún no lo tienes.<br>Consíguelo en el banner de <b class="gold">${GEN_NAMES[p.gen - 1]}</b>
             o derrotándolo cuando salga shiny.</p>`}
     `;
-    const eventDescription = box.querySelector('[data-event-description]');
-    if (eventDescription) eventDescription.textContent = p.eventDescription || '이벤트를 통해 동료가 되는 포켓몬입니다.';
     for (const [el, t] of scrolls) el.scrollTop = t;
     moveTips($('dex-moves'));
     $('dex-big').style.setProperty('--stage-c', !own ? '#5b83d6' : viewShiny ? '#9ae6ff' : G.U.TYPE_COLOR[p.types[0]]);
@@ -377,7 +374,6 @@ G.MenuUI = (() => {
       G.UI.toast(p.name + (s.partnerShiny ? ' shiny' : '') + ' es ahora tu compañero');
       renderGrid(true); showDetail(dex);
     };
-    if (G.PokemonTiers && own) G.PokemonTiers.mountDetail(dex, box);
     if (own) wireExtras(dex, box);
   }
 
@@ -481,13 +477,7 @@ G.MenuUI = (() => {
       };
     });
     box.querySelectorAll('[data-extra]').forEach(b => {
-      b.onclick = () => {
-        if (G.I18n.lang === 'ko' && G.MonSettings) {
-          extraOpen = ''; G.Audio.sfx('select');
-          G.MonSettings.open(dex, b.dataset.extra, () => showDetail(dex), b); return;
-        }
-        extraOpen = extraOpen === b.dataset.extra ? '' : b.dataset.extra; G.Audio.sfx('select'); showDetail(dex);
-      };
+      b.onclick = () => { extraOpen = extraOpen === b.dataset.extra ? '' : b.dataset.extra; G.Audio.sfx('select'); showDetail(dex); };
     });
     const host = box.querySelector('#mx-picker');
     if (!host || !extraOpen) return;
@@ -517,7 +507,6 @@ G.MenuUI = (() => {
         if (!G.Mons.teach(dex, id)) return;
         done(G.I18n.f('¡{x} ha aprendido {x}!', mon.name, G.T(G.Moves.BY_ID[id].name, 'move')));
       });
-      if (G.MoveRatings) G.MoveRatings.decoratePicker(host, dex, 'data-v');
     }
   }
 
@@ -562,14 +551,14 @@ G.MenuUI = (() => {
       el.className = 'panel upg-item';
       el.innerHTML = `
         <div class="ic">${G.Icons.html(u.icon, 32)}</div>
-        <div class="upg-copy">
-          <b>${u.name}</b> <span class="upg-description" style="color:var(--muted);font-size:13px">${u.unit}</span>
+        <div>
+          <b>${u.name}</b> <span style="color:var(--muted);font-size:13px">${u.unit}</span>
           <div class="pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('')}</div>
         </div>
         <div class="upg-btns">
           ${u.id === 'ban' && lvl > 0 ? `<button class="btn small" data-ban>Elegir (${banList().length}/${lvl})</button>` : ''}
-          ${u.id === 'start' && lvl > 0 ? `<button class="btn small" data-start>Elegir: ${G.T(G.Moves.BY_ID[G.startMoveOf(upgDex)].name, 'move')}</button>` : ''}
-          ${u.id === 'start2' && lvl > 0 ? `<button class="btn small" data-start2>Elegir: ${pick2 ? G.T(G.Moves.BY_ID[pick2].name, 'move') : G.T('Al azar')}</button>` : ''}
+          ${u.id === 'start' && lvl > 0 ? `<button class="btn small" data-start>Elegir: ${G.Moves.BY_ID[G.startMoveOf(upgDex)].name}</button>` : ''}
+          ${u.id === 'start2' && lvl > 0 ? `<button class="btn small" data-start2>Elegir: ${pick2 ? G.Moves.BY_ID[pick2].name : G.T('Al azar')}</button>` : ''}
           <button class="btn small ${maxed ? '' : 'gold'}" data-buy data-sfx="none" ${maxed || locked || s.coins < cost ? 'disabled' : ''}
             ${locked ? `title="${G.T('Primero compra Repertorio')}"` : ''}>
           ${maxed ? 'Máx.' : locked ? G.T('Necesita Repertorio') : `<span class="coin"></span> ${cost}`}</button></div>`;
@@ -640,7 +629,7 @@ G.MenuUI = (() => {
     el.className = 'panel ban-picker';
     el.innerHTML = `<p class="sub" style="margin:0 0 8px">Elige con qué ataque empieza. Lo puedes cambiar cuando quieras, gratis.</p>
       <div class="ban-moves">${ids.map(id => { const d = G.Moves.BY_ID[id];
-        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${G.T(d.name, 'move')}${id === base ? ' <small>(de serie)</small>' : ''}</button>`; }).join('')}</div>`;
+        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${d.name}${id === base ? ' <small>(de serie)</small>' : ''}</button>`; }).join('')}</div>`;
     el.querySelectorAll('[data-id]').forEach(b => {
       b.onclick = () => {
         const id = b.dataset.id;
@@ -653,11 +642,10 @@ G.MenuUI = (() => {
         if (i >= 0) l.splice(i, 1);
         G.DB.commit();
         G.Audio.sfx('select');
-        G.UI.toast(G.DEX_BY[upgDex].name + ' empezará con ' + G.T(G.Moves.BY_ID[id].name, 'move'));
+        G.UI.toast(G.DEX_BY[upgDex].name + ' empezará con ' + G.Moves.BY_ID[id].name);
         renderUpgrades();
       };
     });
-    if (G.MoveRatings) G.MoveRatings.decoratePicker(el, upgDex);
     return el;
   }
 
@@ -672,7 +660,7 @@ G.MenuUI = (() => {
     el.className = 'panel ban-picker';
     el.innerHTML = `<p class="sub" style="margin:0 0 8px">Elige el segundo ataque con el que empieza. Lo puedes cambiar cuando quieras, gratis.</p>
       <div class="ban-moves"><button class="chip ${!cur ? 'on' : ''}" data-id="">${G.T('Al azar')}</button>${ids.map(id => { const d = G.Moves.BY_ID[id];
-        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${G.T(d.name, 'move')}</button>`; }).join('')}</div>`;
+        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${d.name}</button>`; }).join('')}</div>`;
     el.querySelectorAll('[data-id]').forEach(b => {
       b.onclick = () => {
         const id = b.dataset.id;
@@ -683,12 +671,11 @@ G.MenuUI = (() => {
         if (i >= 0) l.splice(i, 1);
         G.DB.commit();
         G.Audio.sfx('select');
-        G.UI.toast(id ? G.I18n.f('{x} empezará también con {x}', G.DEX_BY[upgDex].name, G.T(G.Moves.BY_ID[id].name, 'move'))
+        G.UI.toast(id ? G.I18n.f('{x} empezará también con {x}', G.DEX_BY[upgDex].name, G.Moves.BY_ID[id].name)
                       : G.T('El segundo ataque saldrá al azar'));
         renderUpgrades();
       };
     });
-    if (G.MoveRatings) G.MoveRatings.decoratePicker(el, upgDex);
     return el;
   }
 

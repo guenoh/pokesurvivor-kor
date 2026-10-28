@@ -5,7 +5,7 @@
 
   /** ¿Se puede usar lo online? Si no, explica por qué. */
   function needOnline() {
-    if (G.DB.online || G.DB.selfhostUser) return true;
+    if (G.DB.online) return true;
     G.UI.toast(G.DB.guest ? 'Crea una cuenta para jugar con amigos y salir en el ranking.'
       : 'Esto necesita la versión online del juego (con la nube).', 3200);
     return false;
@@ -48,7 +48,7 @@
   function withNick(fn) {
     if (!needOnline()) return;
     if (G.Social.me) { fn(); return; }
-    G.Social.start().then(r => { if (r === 'ok') fn(); else if (!G.Social.independent) G.NickUI.open(fn); });
+    G.Social.start().then(r => { if (r === 'ok') fn(); else G.NickUI.open(fn); });
   }
 
   // ======================= AMIGOS =======================
@@ -84,13 +84,12 @@
     function stateText(f) {
       if (f.status === 'in') return 'Quiere ser tu amigo';
       if (f.status === 'out') return 'Solicitud enviada';
-      return G.Social.independent ? (f.online ? (f.play ? '전투 중' : '접속 중') : '접속 안 함') : '';
+      return '';
     }
 
     function render() {
       const room = G.Social.room;
       $('fr-me').innerHTML = 'Tu apodo: <b class="gold" translate="no">' + esc(G.Social.me ? G.Social.me.name : '') + '</b> · dáselo a tus amigos para que te añadan.';
-      if (G.Social.independent) $('fr-me').innerHTML = '내 계정 이름: <b class="gold" translate="no">' + esc(G.Social.me?.name || '') + '</b> · 이 이름을 친구에게 알려 주세요.';
       $('fr-room').classList.toggle('hidden', !room);
       const list = G.Social.friends.sort((a, b) => {
         const rank = f => f.status === 'in' ? 0 : f.status === 'ok' ? 1 : 2;
@@ -99,15 +98,15 @@
       const box = $('fr-list');
       box.innerHTML = '';
       if (!list.length) {
-        box.innerHTML = G.Social.independent ? '<p class="sub">아직 등록한 친구가 없습니다. 위에 친구의 계정 이름을 입력해 주세요.</p>' : '<p class="sub">Aún no tienes amigos añadidos. Escribe arriba el apodo de un amigo.</p>';
+        box.innerHTML = '<p class="sub">Aún no tienes amigos añadidos. Escribe arriba el apodo de un amigo.</p>';
         return;
       }
       for (const f of list) {
         const el = document.createElement('div');
         el.className = 'fr-row';
-        const dot = f.status !== 'ok' ? 'pend' : G.Social.independent && !f.online ? 'off' : 'on';
+        const dot = f.status !== 'ok' ? 'pend' : 'on';
         const inRoom = room && room.members.some(m => m.uid === f.uid);
-        el.innerHTML = `<i class="dot ${dot}"></i><b translate="no"><a href="#" class="plink" title="프로필 보기">${esc(f.name)}</a></b><span class="st">${inRoom ? 'En tu sala' : stateText(f)}</span><span class="grow"></span>`;
+        el.innerHTML = `<i class="dot ${dot}"></i><b translate="no"><a href="#" class="plink" title="Ver su perfil">${esc(f.name)}</a></b><span class="st">${inRoom ? 'En tu sala' : stateText(f)}</span><span class="grow"></span>`;
         if (f.status === 'ok') el.querySelector('.plink').onclick = e => { e.preventDefault(); G.ProfileUI.show(f.uid); };
         else el.querySelector('.plink').onclick = e => e.preventDefault();
         const btn = (txt, cls, fn) => {
@@ -115,7 +114,7 @@
           b.className = 'btn small ' + cls; b.textContent = txt; b.onclick = fn; el.appendChild(b); return b;
         };
         if (f.status === 'in') {
-          btn(G.Social.independent ? '수락' : 'Aceptar', 'gold', async () => { const r = await G.Social.accept(f.uid); msg(r.ok ? r.msg : r.error, !r.ok); });
+          btn('Aceptar', 'gold', async () => { const r = await G.Social.accept(f.uid); msg(r.ok ? r.msg : r.error, !r.ok); });
           btn('Rechazar', 'ghost', () => G.Social.remove(f.uid));
         } else if (f.status === 'out') {
           btn('Cancelar', 'ghost', () => G.Social.remove(f.uid));
@@ -182,7 +181,6 @@
     function connText(m, room) {
       if (m.uid === room.host) return 'Anfitrión';
       if (!room.isHost) return m.uid === G.Social.uid ? 'Tú' : 'En la sala';
-      if (G.Social.independent && m.ready === false) return '전투 종료를 기다리는 중';
       const mode = G.Net.mode(m.uid);
       return mode === 'direct' ? (G.Net.viaTurn(m.uid) ? 'Conectado (por servidor)' : 'Conectado') : mode === 'relay' ? 'Conectado (por servidor)' : mode === 'failed' ? 'No se pudo conectar (reintentando…)' : 'Conectando…';
     }
@@ -194,8 +192,6 @@
       $('lobby-sub').textContent = room.isHost
         ? 'Eres el anfitrión. Invita a tus amigos (hasta ' + G.Social.MAX_PLAYERS + ') y empezad cuando estéis.'
         : 'Estás en la sala de ' + ((ms.find(m => m.uid === room.host) || {}).name || '…') + '. El anfitrión empezará la partida.';
-
-      if (G.Social.independent && room.isHost) $('lobby-sub').textContent = '나를 포함해 최대 4명이 함께할 수 있습니다. 친구를 초대하고 준비되면 시작해 주세요.';
 
       // Las tarjetas sólo se rehacen si cambian los miembros (los sprites no parpadean).
       const key = ms.map(m => m.uid + ':' + m.dex + ':' + (m.shiny ? 1 : 0)).join('|');
@@ -231,7 +227,7 @@
       if (canInvite) {
         inv.innerHTML = '';
         const free = G.Social.friends.filter(f => f.status === 'ok' && !ms.some(m => m.uid === f.uid));
-        if (!free.length) inv.innerHTML = G.Social.independent ? '<p class="sub" style="margin:0">친구들이 모두 대기실에 있습니다.</p>' : '<p class="sub" style="margin:0">Aún no tienes amigos añadidos.</p>';
+        if (!free.length) inv.innerHTML = '<p class="sub" style="margin:0">Aún no tienes amigos añadidos.</p>';
         for (const f of free) {
           const el = document.createElement('div');
           el.className = 'fr-row';
@@ -248,7 +244,7 @@
       btn.classList.toggle('hidden', !room.isHost);
       const connecting = ms.some(m => m.uid !== room.host && G.Net.mode(m.uid) === 'connecting');
       const failed = ms.some(m => m.uid !== room.host && G.Net.mode(m.uid) === 'failed');
-      btn.disabled = !room.isHost || ms.length < 2 || connecting || failed || (G.Social.independent && ms.some(m => !m.ready));
+      btn.disabled = !room.isHost || ms.length < 2 || connecting || failed;
       btn.textContent = 'Empezar partida (' + ms.length + '/' + G.Social.MAX_PLAYERS + ')';
       $('lobby-note').textContent = !room.isHost ? 'Cuando el anfitrión empiece, entraréis todos a la vez.'
         : ms.length < 2 ? 'Necesitas al menos un amigo en la sala.'
@@ -259,7 +255,6 @@
     function start() {
       const room = G.Social.room;
       if (!room || !room.isHost || room.members.length < 2) return;
-      if (G.Social.independent) { G.Social.startRoom().catch(e => G.UI.toast(e.message)); return; }
       const cfg = {
         k: 'start', seed: Math.floor(Math.random() * 1e6), host: room.host, hw: G.Halloween.on,   // hw: ¿partida de Halloween?
         members: room.members.map(m => ({ uid: m.uid, name: m.name, dex: m.dex, shiny: !!m.shiny }))
