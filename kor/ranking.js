@@ -26,7 +26,9 @@
     PERIODS: [['d', '오늘'], ['w', '이번 주'], ['m', '이번 달'], ['a', '전체 기간']], periodIds,
     board: (mode, period, dex) => [mode, period, dex || ''].join('_'),
     useGroupRun(id) { groupId = id; },
-    runStarted(mode) {
+    // Independent server run IDs replace upstream Firebase ranking seals.
+    newSeal() {}, mySeal: () => null,
+    runStarted(mode = G.Coop?.active ? 'g' : 's') {
       cache.clear();
       G.Social.setPlaying(true);
       run = mode === 'g' ? Promise.resolve(groupId) : !G.DB.selfhostUser ? Promise.resolve(null)

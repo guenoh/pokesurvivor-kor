@@ -44,3 +44,24 @@ test('late friendship responses cannot restore a logged-out identity',async()=>{
  const loading=G.Social.start();G.Social.stop();G.DB.selfhostUser=null;complete({me:{uid:'a',name:'가'},friends:[{uid:'x'}],room:null});await loading;
  assert.equal(G.Social.started,false);assert.equal(G.Social.me,null);assert.equal(G.Social.friends.length,0);assert.equal(handlers.length,0);
 });
+
+
+test('upstream ranking lifecycle uses independent run IDs for solo and co-op, including seal calls', async () => {
+  const { G, calls } = setup(); G.Coop = { active: true };
+  G.Ranking.useGroupRun('group-server-id');
+  G.KorAPI.request = async (p, method, body) => { calls.push([p, method, body]); return { periods: ['a'] }; };
+  G.Ranking.newSeal(); assert.equal(G.Ranking.mySeal(), null);
+  G.Ranking.runStarted(); await G.Ranking.submitGroup({ t: 1801, lv: 10, kills: 20 });
+  assert.ok(!calls.some(c => c[0].endsWith('/runs/start')));
+  assert.equal(calls.find(c => c[0].endsWith('/runs/finish'))[2].id, 'group-server-id');
+});
+
+test('relay exposes upstream backpressure without dropping the next frame when the queue drains', async () => {
+  const { G, handlers } = setup(); await G.Social.start(); const ws = handlers[0]; ws.open();
+  ws.message({ type: 'room', room: { id: 'r', host: 'a', members: [{uid:'a', online:true}, {uid:'b', online:true}] } });
+  G.Net.open('r', true, 'a'); G.Net.syncMembers(['a','b']);
+  ws.bufferedAmount = 65537; assert.equal(G.Net.busy('b'), true);
+  ws.bufferedAmount = 0; assert.equal(G.Net.busy('b'), false);
+  assert.equal(G.Net.send('b', { k: 'f', ev: [['reward', 1]] }), true);
+  assert.equal(ws.sent.at(-1).message.ev[0][0], 'reward'); G.Social.stop();
+});

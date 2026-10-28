@@ -29,17 +29,18 @@ const hooks = {
     ['if (G.Rift.inArena || G.Judgment.active) return;', 'if (G.Rift.inArena || G.Judgment.active) return;\n    if (G.ContentRuntime.blockSpawn(dt, players, t)) return;']
   ],
   'js/systems/judgment.js': [
-    ['p.leg && p.dex !== ARCEUS', 'p.leg && G.ContentRuntime.eligible(p) && p.dex !== ARCEUS'],
+    ['p.leg && p.dex !== ARCEUS_B.dex', 'p.leg && G.ContentRuntime.eligible(p) && p.dex !== ARCEUS_B.dex'],
     ['time >= AT && !G.Rift.inArena)', 'time >= AT && !G.Rift.inArena && G.ContentRuntime.canJudge(time))']
   ],
   'js/systems/rift.js': [['p.leg && G.SPRITE_META[p.dex]', 'p.leg && G.ContentRuntime.eligible(p) && G.SPRITE_META[p.dex]']],
   'js/systems/gacha.js': [
-    ['return p.gen === gen &&', 'return G.ContentRuntime.eligible(p) && p.gen === gen &&'],
+    ['if (!G.SPRITE_META[p.dex]) return false;', 'if (!G.ContentRuntime.eligible(p) || !G.SPRITE_META[p.dex]) return false;'],
+    ["G.DEX.filter(p => p.types.includes('ghost'))", "G.DEX.filter(p => G.ContentRuntime.eligible(p) && p.types.includes('ghost'))"],
     ['G.DEX.filter(p => p.gen === gen);', 'G.DEX.filter(p => G.ContentRuntime.eligible(p) && p.gen === gen);'],
     ['return d.have >= d.total;', 'return G.ContentRuntime.hasDexEntries(d.total) && d.have >= d.total;']
   ],
   'js/data/achievements.js': [['p.leg && G.SPRITE_META[p.dex]', 'p.leg && G.ContentRuntime.eligible(p) && G.SPRITE_META[p.dex]']],
-  'js/ui/gacha-ui.js': [['G.DEX.filter(p => p.gen === gen);', 'G.DEX.filter(p => G.ContentRuntime.eligible(p) && p.gen === gen);']],
+  "js/ui/gacha-ui.js": [["G.DEX.filter(p => (spooky ? p.types.includes('ghost') : p.gen === gen));", "G.DEX.filter(p => G.ContentRuntime.eligible(p) && (spooky ? p.types.includes('ghost') : p.gen === gen));"]],
   'js/systems/hazards.js': [
     ["G.Coop.broadcast(['hz', {", "G.Coop.broadcast(['hz', G.ContentRuntime.packHazard({"],
     ['boom: o.boom ? 1 : 0 }]);', 'boom: o.boom ? 1 : 0 }, o)]);'],

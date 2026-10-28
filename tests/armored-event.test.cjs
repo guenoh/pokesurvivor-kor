@@ -11,7 +11,7 @@ function setup(){
   Object.assign(G,{Sprites:{PX:2,Animator:Anim,animMeta:()=>({ay:35}),bodyRadius:()=>18,bodyHeight:()=>72,hovers:()=>false,preload:noop},
     Stats:{sideOf:()=> 'special'},Coop:{active:false,isHost:false,scaleHp:n=>1+(n-1)*.8,enemyGone:noop},
     FX:new Proxy({},{get:()=>noop}),VFX:{forType:type=>({proj:'ring',pal:type})},Audio:{sfx:noop},Camera:{outerRadius:()=>400,kick:noop,sees:()=>true},
-    Judgment:{active:false,noteDmg:noop},Rift:{inArena:false,reset:noop},Events:{reset:noop},
+    Halloween:{inRun:false},Judgment:{active:false,noteDmg:noop},Rift:{inArena:false,reset:noop},Events:{reset:noop},
     Hazards:{all:[],add(h){this.all.push(h);},clearOwner(id){this.all=this.all.filter(h=>h.owner!==id);},clear(){this.all=[];}},
     Projectiles:{clear(){calls.clears++;calls.shots=[];},spawn(p){calls.shots.push(p);return p;},clearEnemyOwner(id){calls.shots=calls.shots.filter(p=>p.friendly!==false||p.eventOwner!==id);}},Spawner:{say:noop},UI:{toast:noop},Types:{},
     World:{isFree:()=>true},Items:{roll:()=> 'leftovers'},Pickups:{drop:noop,dropXp:noop},DB:{save:{owned:{}},owns:id=>!!G.DB.save.owned[id],grant(id,from){calls.grants++;G.DB.save.owned[id]={from};},commit(){calls.commits++;}}});

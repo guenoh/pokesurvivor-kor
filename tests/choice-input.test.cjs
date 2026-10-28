@@ -7,23 +7,26 @@ const vm = require('node:vm');
 function setup() {
   let now = 1000;
   function element() {
-    const classes = new Set();
+    const classes = new Set(), listeners = {};
     return { children: [], dataset: {}, className: '',
+      addEventListener(type, fn) { (listeners[type] ||= []).push(fn); },
+      dispatch(type, event) { for (const fn of listeners[type] || []) fn(event); },
       classList: { add: k => classes.add(k), remove: k => classes.delete(k), toggle(k, value) { if (value) classes.add(k); else classes.delete(k); } },
       set innerHTML(value) { this.children = []; },
       appendChild(child) { this.children.push(child); },
       querySelectorAll() { return this.children; } };
   }
   const nodes = new Map(), hidden = [];
+  const open = new Set();
   const node = id => { if (!nodes.has(id)) nodes.set(id, element()); return nodes.get(id); };
-  const G = { UI: { $: node, show() {}, hide: id => hidden.push(id) }, Game: { player: {} },
+  const G = { UI: { $: node, show: id => open.add(id), hide: id => { open.delete(id); hidden.push(id); }, isOpen: id => open.has(id) }, Game: { player: {} },
     Icons: { html: () => '' }, Audio: { sfx() {} }, U: { TYPE_COLOR: { psychic: '#f0f' } },
     T: s => s, Items: { BY: { first: { name: 'First', desc: '' }, next: { name: 'Next', desc: '' } } },
     MoveRatings: { isOpen: () => false, mountChoice() {}, mountHelp() {}, mount() {} } };
   const sandbox = { G, performance: { now: () => now }, document: { createElement: element } };
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(__dirname, '../js/ui/run-ui.js'), 'utf8'), sandbox);
-  const tap = card => { card.onpointerdown({ button: 0, isPrimary: true }); card.onclick(); };
+  const tap = card => { card.dispatch('pointerdown', { pointerType: 'mouse', button: 0, isPrimary: true }); card.onclick(); };
   return { G, node, hidden, tap, advance: ms => { now += ms; } };
 }
 
@@ -44,7 +47,7 @@ test('cancelled touch scrolling cannot bypass the opening guard; keyboard select
   const { G, node, advance } = setup(); let picks = 0;
   G.RunUI.showLevelUp(2, [{ type: 'stat' }], () => picks++);
   const card = node('cards').children[0];
-  card.onpointerdown({ button: 0, isPrimary: true }); card.onpointercancel(); card.onclick();
+  card.dispatch('pointerdown', { pointerType: 'mouse', button: 0, isPrimary: true }); card.dispatch('pointercancel', {}); card.onclick();
   assert.equal(picks, 0);
   advance(601); G.RunUI.pick(0); assert.equal(picks, 1);
 });
