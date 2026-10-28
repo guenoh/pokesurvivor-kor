@@ -108,7 +108,7 @@
   ],
   "patches": {
     "dev.html": {
-      "reviewed": "daed2bb89554b20c62e1455ab1c15f0e659ab5e2d1e610e406bc6c0d3b52d9fc",
+      "reviewed": "1f668cffa4486455b1c60cd2ded141fcc9bba32a46c20fa7bc4bb516ccaf1465",
       "reason": "한국판 문구·화면·확장 로딩 순서",
       "extension": "kor/edition.js"
     },

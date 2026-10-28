@@ -40,3 +40,11 @@ test('permanent Halloween skins only equip for their matching owned purchase', (
   skins.wear(s, 25, 'bruja-pikachu'); assert.equal(skins.worn(s, 25), '');
   skins.wear(s, 94, ''); assert.equal(skins.worn(s, 94), ''); assert.ok(s.skins['bruja-gengar']);
 });
+
+
+test('game HTML has unique element IDs and the Halloween countdown belongs to the menu', () => {
+  const html = source('dev.html');
+  const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+  assert.equal(ids.length, new Set(ids).size);
+  assert.match(html, /<section id="scr-menu"[\s\S]*?id="menu-hw"[\s\S]*?<\/section>/);
+});
