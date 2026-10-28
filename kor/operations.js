@@ -19,6 +19,16 @@
     },
     close() { $('scr-support').classList.add('hidden'); }
   };
+  const showOver = G.RunUI.showOver;
+  G.RunUI.showOver = function () {
+    const result = showOver.apply(this, arguments), ask = $('over-ask');
+    if (ask) {
+      ask.setAttribute('translate', 'no');
+      ask.querySelector('p').textContent = '한국어 서버 운영을 위한 자율 후원입니다. 후원에 따른 게임 혜택은 없습니다.';
+      ask.querySelector('a').innerHTML = G.Icons.html('heart', 14) + ' 한국어 서버 후원';
+    }
+    return result;
+  };
   // Upstream billing notices and broadcaster polling belong to the original service.
   G.LiveUI.init = () => $('btn-yt')?.classList.add('hidden');
   G.LoginUI.updateNotices = () => false;

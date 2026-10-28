@@ -42,3 +42,15 @@ test('upstream gameplay, battle UI and stylesheet are unmodified and receive no 
   for (const name of ['kor/armored-encounter.js','kor/timed-rush.js','kor/pokemon-tiers.js','kor/move-ratings.js','kor/mon-settings.js','kor/mobile-ui.js','assets/events/armored-mewtwo']) assert.equal(fs.existsSync(path.join(root,name)),false,name);
   assert.doesNotMatch(fs.readFileSync(path.join(root,'kor/style.css'),'utf8'),/kor-ui-scale|kor-choice|kor-rated|kor-menu/);
 });
+
+test('upstream result support prompt keeps the operator link and uses independent server copy', () => {
+  const vm=require('node:vm'),nodes={p:{},a:{}},attrs={};
+  let ask={setAttribute:(k,v)=>attrs[k]=v,querySelector:k=>nodes[k]},shown=0;
+  const G={RunUI:{showOver(){shown++;return 'original-result'}},Icons:{html:()=>'<i>heart</i>'},LiveUI:{},LoginUI:{},MenuUI:{init(){},open(){}},RankingUI:{open(){}},Flow:{boot(){}}};
+  const context={G,document:{getElementById:id=>id==='over-ask'?ask:null,addEventListener(){}},console};vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(root,'kor/operations.js'),'utf8'),context);
+  G.Funding.url='https://buymeacoffee.com/pokesurvivorkor';
+  assert.equal(G.RunUI.showOver({record:true}),'original-result');assert.equal(shown,1);assert.equal(attrs.translate,'no');
+  assert.match(nodes.p.textContent,/한국어 서버 운영/);assert.match(nodes.a.innerHTML,/한국어 서버 후원/);assert.doesNotMatch(nodes.a.innerHTML,/Ko-fi|원작 후원/);
+  assert.equal(G.Funding.url,'https://buymeacoffee.com/pokesurvivorkor');ask=null;assert.equal(G.RunUI.showOver({}),'original-result');
+});
