@@ -31,9 +31,9 @@
   }
   const cacheKey = () => 'ps.kor.pending.' + account.id;
   function sync(next) { state = next; for (const fn of listeners) fn(next); }
-  async function api(path, method = 'GET', data) {
+  async function api(path, method = 'GET', data, { timeout = 15_000 } = {}) {
     const response = await fetch('/api' + path, {
-      method, credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(15_000),
+      method, credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(timeout),
       headers: data === undefined ? {} : { 'Content-Type': 'application/json' },
       body: data === undefined ? undefined : JSON.stringify(data)
     });
