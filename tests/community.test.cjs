@@ -2,11 +2,11 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const code=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
-function setup(){
- const handlers=[],calls=[],leave=[];
+function setup(overrides={}){
+ const handlers=[],calls=[],leave=[]; let uuid=0;
  const G={DB:{selfhostUser:{id:'a',name:'가'},flush:async()=>{},onLeave:fn=>leave.push(fn)},Social:{profileData:()=>({name:'가'})},Ranking:{periodIds:()=>({d:'same-calendar'})},Game:{state:'ui'},Flow:{startCoop:cfg=>calls.push(['start',cfg])},UI:{toast:x=>calls.push(['toast',x])},KorAPI:{request:async(p,m,d)=>{calls.push([p,m,d]);return {me:{uid:'a',name:'가'},friends:[],invites:[],room:null}}}};
  class WS{static OPEN=1;constructor(url){this.url=url;this.readyState=0;this.bufferedAmount=0;this.sent=[];handlers.push(this)}send(s){this.sent.push(JSON.parse(s))}close(){this.readyState=3}open(){this.readyState=1;this.onopen()}message(data){this.onmessage({data:JSON.stringify(data)})}}
- const s={G,WebSocket:WS,crypto:{randomUUID:()=> '00000000-0000-4000-8000-000000000001'},location:{protocol:'https:',host:'local.invalid'},setTimeout,clearTimeout,console,URLSearchParams,Date};s.window=s;vm.createContext(s);
+ const s={G,WebSocket:WS,crypto:{randomUUID:()=> '00000000-0000-4000-8000-'+String(++uuid).padStart(12,'0')},location:{protocol:'https:',host:'local.invalid'},setTimeout,clearTimeout,console,URLSearchParams,Date,performance,...overrides};s.window=s;vm.createContext(s);
  for(const f of ['kor/social.js','kor/net.js','kor/ranking.js'])vm.runInContext(code(f),s);
  return {G,WS,handlers,calls,leave,s};
 }
@@ -86,4 +86,48 @@ test('original cooperative game accepts a recovered independent relay without ex
  G.Coop.begin({host:'host',members:[{uid:'host',name:'host',dex:25},{uid:'guest',name:'guest',dex:25}]},{x:0,y:0},{lost:m=>lost.push(m)});
  mode='failed';peer('host',mode);assert.equal(timers.size,1);
  mode='relay';peer('host',mode);assert.equal(timers.size,0);assert.equal(lost.length,0);assert.equal(G.Coop.active,true);G.Coop.end();
+});
+
+test('upstream cooperative events survive a full relay disconnect and are sent once after same-window reconnection',async()=>{
+ const timers=[];const {G,handlers}=setup({setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length},clearTimeout(){}});
+ await G.Social.start();let ws=handlers[0];ws.open();const members=[{uid:'b',name:'방장',dex:25,online:true},{uid:'a',name:'참가자',dex:25,online:true}];
+ ws.message({type:'room',room:{id:'r',host:'b',members}});G.Net.open('r',false,'b');G.Net.syncMembers(['a','b']);
+ Object.assign(G,{Player:class{constructor(){this.maxHp=300}},DEX_BY:{25:{dex:25}},baseStartOf:()=> 'thundershock',Sprites:{preload(){}},U:{dist2:()=>0},Projectiles:{clearOrbs(){}},Spawner:{say(){}}});
+ const {source}=require('../kor/module-source.cjs');new Function('G','document',source('js/net/coop.js'))(G,{addEventListener(){}});
+ const local={x:0,y:0,moveAngle:0,walking:false,hp:300,maxHp:300,magnet:78,aim:0,xpMul:1,activeGroup:()=>[]};
+ G.Coop.begin({host:'b',members},local,{choosing:()=>false});
+ G.Coop.status({id:7},'b',3);ws.onclose({code:1006});assert.equal(G.Net.busy('b'),true);G.Coop.tick(1);
+ assert.ok(!ws.sent.some(m=>m.type==='frame'));timers.find(t=>t.ms===2500).fn();ws=handlers.at(-1);ws.open();
+ G.Coop.tick(1);const frames=ws.sent.filter(m=>m.type==='frame');assert.equal(frames.length,1);assert.deepEqual(Array.from(frames[0].message.ev[0]),['s',7,'b',3]);
+ G.Coop.tick(1);assert.equal(ws.sent.filter(m=>m.type==='frame').flatMap(m=>m.message.ev).filter(e=>e[0]==='s').length,1);G.Coop.end();G.Social.stop();
+});
+
+test('ranking start retries transient failures with the same request key and submits once with the recovered token',async()=>{
+ let ticks=0;const {G,calls}=setup({setTimeout:(fn,ms)=>{ticks+=ms;queueMicrotask(fn);return 1},performance:{now:()=>ticks}});
+ let attempts=0;const ids=[];
+ G.KorAPI.request=async(p,m,data,options)=>{
+  calls.push([p,m,data]);if(p.endsWith('/runs/start')){attempts++;ids.push(data.requestId);assert.ok(options.timeout<=15000);if(attempts<3)throw Object.assign(Error('temporarily unavailable'),{status:503});return{id:'recovered-start'}}
+  if(p.endsWith('/runs/finish'))return{periods:['a']};
+ };
+ G.Ranking.runStarted('s');await G.Ranking.submitSolo({t:1800,lv:10,kills:20});
+ assert.equal(attempts,3);assert.equal(new Set(ids).size,1);assert.equal(calls.filter(c=>c[0].endsWith('/runs/finish')).length,1);
+ assert.equal(calls.find(c=>c[0].endsWith('/runs/finish'))[2].id,'recovered-start');assert.equal(ticks,6000);
+});
+test('ranking retry budget is bounded, permanent auth errors stop immediately and final failure is visible',async()=>{
+ for(const status of [503,401]){
+  let ticks=0,attempts=0;const {G,calls}=setup({setTimeout:(fn,ms)=>{ticks+=ms;queueMicrotask(fn);return 1},performance:{now:()=>ticks}});
+  G.KorAPI.request=async(p,m,data,options)=>{attempts++;assert.ok(Number.isInteger(options.timeout));if(status===503){ticks+=options.timeout;if(attempts===1)ticks+=0.25;}throw Object.assign(Error('not connected'),{status})};
+  G.Ranking.runStarted('s');assert.deepEqual(Array.from(await G.Ranking.submitSolo({t:3,lv:1,kills:0})),[]);
+  assert.equal(attempts,status===401?1:5);assert.ok(ticks<=80000);assert.ok(calls.some(c=>c[0]==='toast'&&c[1].includes('생존 기록을 등록하지 못했습니다')));
+ }
+});
+test('late ranking responses after logout or a newer run cannot submit or change the new playing state',async()=>{
+ const {G,calls,leave}=setup();let oldReply;G.KorAPI.request=async(p,m,data)=>{
+  calls.push([p,m,data]);if(p.endsWith('/runs/start'))return new Promise(r=>oldReply=r);return{periods:['a']};
+ };
+ G.Ranking.runStarted('s');const old=G.Ranking.submitSolo({t:2,lv:1,kills:0});await new Promise(r=>setImmediate(r));
+ const pendingOld=oldReply;G.Ranking.useGroupRun('new-group');G.Ranking.runStarted('g');pendingOld({id:'old-game'});await old;
+ assert.ok(!calls.some(c=>c[0].endsWith?.('/runs/finish')));
+ await G.Ranking.submitGroup({t:3,lv:1,kills:0});assert.equal(calls.find(c=>c[0].endsWith('/runs/finish'))[2].id,'new-group');
+ for(const fn of leave)fn();G.DB.selfhostUser=null;assert.deepEqual(Array.from(await G.Ranking.submitSolo({t:3})),[]);
 });
