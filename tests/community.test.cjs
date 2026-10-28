@@ -116,7 +116,7 @@ test('ranking start retries transient failures with the same request key and sub
 test('ranking retry budget is bounded, permanent auth errors stop immediately and final failure is visible',async()=>{
  for(const status of [503,401]){
   let ticks=0,attempts=0;const {G,calls}=setup({setTimeout:(fn,ms)=>{ticks+=ms;queueMicrotask(fn);return 1},performance:{now:()=>ticks}});
-  G.KorAPI.request=async(p,m,data,options)=>{attempts++;if(status===503)ticks+=options.timeout;throw Object.assign(Error('not connected'),{status})};
+  G.KorAPI.request=async(p,m,data,options)=>{attempts++;assert.ok(Number.isInteger(options.timeout));if(status===503){ticks+=options.timeout;if(attempts===1)ticks+=0.25;}throw Object.assign(Error('not connected'),{status})};
   G.Ranking.runStarted('s');assert.deepEqual(Array.from(await G.Ranking.submitSolo({t:3,lv:1,kills:0})),[]);
   assert.equal(attempts,status===401?1:5);assert.ok(ticks<=80000);assert.ok(calls.some(c=>c[0]==='toast'&&c[1].includes('생존 기록을 등록하지 못했습니다')));
  }

@@ -15,7 +15,7 @@
       const left = START_WINDOW - (performance.now() - t0);
       if (!current(context) || left < 2000) break;
       try {
-        const result = await G.KorAPI.request('/community/runs/start', 'POST', { requestId: context.requestId }, { timeout: Math.min(15000, left) });
+        const result = await G.KorAPI.request('/community/runs/start', 'POST', { requestId: context.requestId }, { timeout: Math.floor(Math.min(15000, left)) });
         if (typeof result.id !== 'string' || !result.id) throw new Error('탐험 시작 응답을 확인할 수 없습니다.');
         return current(context) ? result.id : null;
       } catch (e) {
