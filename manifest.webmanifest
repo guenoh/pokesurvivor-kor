@@ -5,8 +5,8 @@
   "lang": "ko",
   "start_url": "./",
   "scope": "./",
-  "display": "standalone",
-  "orientation": "any",
+  "display": "fullscreen",
+  "orientation": "landscape",
   "background_color": "#0a1430",
   "theme_color": "#0a1430",
   "icons": [

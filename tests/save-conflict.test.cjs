@@ -27,7 +27,7 @@ function browser(server, storage = new Map()) {
     setTimeout: () => 1, clearTimeout() {}, addEventListener() {},
     localStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, String(value)), removeItem: key => storage.delete(key) } };
   ctx.window = ctx; vm.createContext(ctx);
-  for (const file of ['js/core/db.js', 'kor/selfhost-db.js']) vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), ctx);
+  for (const file of ['js/core/db.js', 'kor/retired-content.js', 'kor/selfhost-db.js']) vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), ctx);
   return { db: ctx.G.DB, storage };
 }
 async function seed(server) {
@@ -66,7 +66,7 @@ test('two devices retain both earnings, spending, items, event ownership, upgrad
   assert.equal(b.syncState, 'ok'); assert.equal(b.save, saveReference); assert.equal(b.save.pupg[150], upgrades);
   assert.equal(server.save.coins, 950); assert.equal(server.save.tickets.t10, 9);
   assert.equal(server.save.bag.mint, 1); assert.equal(server.save.tms.confusion, 1);
-  assert.ok(server.save.owned[1150]); assert.equal(server.save.pupg[150].hp, 2);
+  assert.ok(server.save.owned[150]); assert.equal(server.save.owned[1150], undefined); assert.equal(server.save.pupg[150].hp, 2);
   assert.equal(server.save.stats.bestTime, 1823); assert.deepEqual(server.save.ptm[150], ['confusion']);
 });
 
@@ -197,7 +197,7 @@ test('Halloween purchases and candy survive device conflicts alongside Korean gi
   b.save.pskin[25] = ['bruja-pikachu', 200]; b.commit(); await b.flush();
   assert.equal(server.save.bag.candy, 305);
   assert.equal(server.save.coins, coins); assert.equal(server.save.tickets.t1, tickets);
-  assert.ok(server.save.owned[1150]);
+  assert.ok(server.save.owned[150]); assert.equal(server.save.owned[1150], undefined);
   assert.deepEqual(server.save.skins, { 'bruja-gengar': 100, 'bruja-pikachu': 200 });
   assert.deepEqual(server.save.pskin, { 94: ['bruja-gengar', 100], 25: ['bruja-pikachu', 200] });
   const reopened = browser(server).db; await reopened.ready();

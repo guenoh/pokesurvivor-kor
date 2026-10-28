@@ -36,12 +36,10 @@ G.RankingUI = (() => {
   function open() {
     if (!G.SocialUI.needOnline()) return;
     G.UI.show('scr-rank', true);
-    const body = $('rk-body'); if (body) body.scrollTop = 0;
     if (!G.Social.started) G.Social.start();
     $('rk-mod').classList.toggle('hidden', !G.Ranking.isAdmin());
     tabs();
-    if (G.Social.independent && !G.Social.me) G.Social.start().then(() => { if (G.UI.isOpen('scr-rank')) load(); });
-    else load();
+    load();
   }
 
   function tabs() {
@@ -75,7 +73,7 @@ G.RankingUI = (() => {
     try {
       [rows, me, dmg] = await Promise.all([
         G.Ranking.top(mode, period, dex, scope === 'friends'),
-        G.Social.me ? G.Ranking.myRank(mode, period, dex, scope === 'friends') : Promise.resolve(null),
+        G.Social.me ? G.Ranking.myRank(mode, period, dex) : Promise.resolve(null),
         dex ? Promise.resolve(dmg) : G.Ranking.topDmg(mode, period, scope === 'friends')
       ]);
     } catch (e) {
@@ -87,7 +85,7 @@ G.RankingUI = (() => {
     list.innerHTML = dlist.innerHTML = '';
     if (!rows.length) {
       // Sólo amigos en diario, semanal y mensual: ahí sólo se guarda el top 50 (ranking.js).
-      list.innerHTML = !G.Social.independent && scope === 'friends' && period !== 'a' && !dex
+      list.innerHTML = scope === 'friends' && period !== 'a' && !dex
         ? '<p class="sub">Ninguno de tus amigos está en el top 50 de este periodo. En Histórico salen todos.</p>'
         : '<p class="sub">Todavía no hay marcas aquí. ¡Sé el primero!</p>';
     }
@@ -148,7 +146,7 @@ G.RankingUI = (() => {
        <span class="time">${dmg ? num(r.d) : fmt(r.t)}</span>`);
     el.querySelectorAll('.plink').forEach(a => { a.onclick = e => { e.preventDefault(); G.ProfileUI.show(a.dataset.u); }; });
     // Reportar una marca sospechosa (no la tuya). Lo revisa el admin (mod-ui.js).
-    if (!mine && G.Social.me && G.Ranking.canReport !== false) {
+    if (!mine && G.Social.me) {
       const rep = document.createElement('button');
       const sent = done.has(b + '__' + r.id);
       rep.className = 'rk-rep' + (sent ? ' sent' : '');

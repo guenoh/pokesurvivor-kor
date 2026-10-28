@@ -108,9 +108,9 @@
   ],
   "patches": {
     "dev.html": {
-      "reviewed": "1f668cffa4486455b1c60cd2ded141fcc9bba32a46c20fa7bc4bb516ccaf1465",
-      "reason": "한국판 문구·화면·확장 로딩 순서",
-      "extension": "kor/edition.js"
+      "reviewed": "c854266cd5231ec4687995a8d96425e4819867f40461fcaa466ff347db311473",
+      "reason": "한국어·서비스 신원·독립 서버 모듈 로딩",
+      "extension": "kor/operations.js"
     },
     "js/boot.js": {
       "reviewed": "8aee18000e0f3eacb427bf3a9cff03b29b3d9f6efa22bb9a1457c92a2bcdba2e",
@@ -127,11 +127,6 @@
       "reason": "원작 Firebase 접속 비활성화",
       "extension": "kor/selfhost-db.js"
     },
-    "js/core/gamepad.js": {
-      "reviewed": "214b127d53623040613c877a0f7619405a71eb78568d273a227467d193f354c0",
-      "reason": "한국판 메뉴·버튼 탐색",
-      "extension": "kor/mobile-ui.js"
-    },
     "js/core/i18n.js": {
       "reviewed": "a335cde402d4fa91a22f9cba45f6d9b9811f57c12914bcdbe93924a5d02c692e",
       "reason": "한국어 폰트·조사·동적 문구 번역",
@@ -142,134 +137,115 @@
       "reason": "한국어 언어팩 등록",
       "extension": "js/data/lang-ko.js"
     },
-    "js/core/settings.js": {
-      "reviewed": "3c566d091213c2a0ec6c817c2a4e256bf4097228478e8577b49203e15f811b1e",
-      "reason": "기본 언어 한국어",
-      "extension": "kor/edition.js"
-    },
-    "js/data/funding.js": {
-      "reviewed": "40ec05e51b164e51e0b8d06075aa5b1119a66c7e1de0b18f68d550bea55c4f99",
-      "reason": "한국판 운영 후원 연결",
-      "extension": "kor/notices.js"
-    },
     "js/systems/mons.js": {
       "reviewed": "c710d5cd595841f8d4979b2c950e3b95a54ac9ecdfa116e5f8aabcc6dd3afe0f",
-      "reason": "성격·특성 명칭의 한국어 번역",
-      "extension": "kor/armored-data.js"
-    },
-    "js/ui/icons.js": {
-      "reviewed": "451a279d2d41d0570b2232bca29914ba1abdcefe1d79857a1fded61bdafdde30",
-      "reason": "전용 기술 아이콘",
-      "extension": "kor/armored-data.js"
-    },
-    "js/ui/menu.js": {
-      "reviewed": "9ada2c0e114cf285d43696e2436765e71c6f91d6af09c43be5d0a52419f6d1d5",
-      "reason": "한국판 포켓몬·특성·전용 기술 안내",
-      "extension": "kor/mon-settings.js"
-    },
-    "js/ui/ranking-ui.js": {
-      "reviewed": "4c9b1c4e779f76351b93b1fdb84e7996132afed970279f9cd1ba91f363e50ef8",
-      "reason": "독립 랭킹 친구 범위·초기화·신고 정책",
-      "extension": "kor/ranking.js"
-    },
-    "js/ui/run-ui.js": {
-      "reviewed": "f1003e4e4b851301c052a7cc24aba52f3b13ae9513dac2bf5580c735bfd8dfc4",
-      "reason": "선택 입력·한국판 기술 등급 표시",
-      "extension": "kor/move-ratings.js"
-    },
-    "js/ui/settings-ui.js": {
-      "reviewed": "535c94e966699085980054032f7031e0e24cfc59b6900d32c74a67fecfb7c68b",
-      "reason": "한국판 저장·로그아웃·서비스 안내",
-      "extension": "kor/logout.js"
-    },
-    "js/ui/slots.js": {
-      "reviewed": "54300232a48b1bfde25a83227c0992290bbe1c68472ec920587dcc08ffdb373d",
-      "reason": "슬롯 진행 상태를 한국어 캡션에 전달",
-      "extension": "kor/mobile-ui.js"
-    },
-    "js/ui/social-ui.js": {
-      "reviewed": "03f019b8f694ccad99651852279c917b8ebd4ad65e3dd14a32286f56a804faa7",
-      "reason": "한국판 계정·협동·친구 동작",
-      "extension": "kor/social.js"
-    },
-    "js/ui/support-ui.js": {
-      "reviewed": "1ef53a334fb337cdc4a71c7994eea3361a3f5c3526dd36029ac1379ebb9f178e",
-      "reason": "한국판 운영 후원 문구와 링크",
-      "extension": "kor/notices.js"
-    },
-    "js/ui/ui.js": {
-      "reviewed": "9f105ea9296855292d89699306590b035f0174dd14c3842307beb703764b6b43",
-      "reason": "한국어 텍스트·알림 연동",
-      "extension": "kor/mobile-ui.js"
+      "reason": "성격·특성 명칭 한국어 번역",
+      "extension": "js/data/lang-ko-terms.js"
     }
   },
   "pristineEngine": [
+    "css/pages.css",
+    "css/style.css",
+    "js/core/audio.js",
+    "js/core/camera.js",
+    "js/core/gamepad.js",
+    "js/core/input.js",
+    "js/core/settings.js",
+    "js/core/skins.js",
+    "js/core/sprites.js",
+    "js/core/touch.js",
+    "js/core/updater.js",
+    "js/core/util.js",
+    "js/data/abilities.js",
+    "js/data/ability-fx.js",
+    "js/data/achievements.js",
+    "js/data/changelog.js",
+    "js/data/enemies.js",
+    "js/data/funding.js",
+    "js/data/items.js",
+    "js/data/lang-en.js",
+    "js/data/lang-fr.js",
+    "js/data/lang-it.js",
+    "js/data/lang-pt.js",
+    "js/data/lang-updates.js",
+    "js/data/lang-zh-cn-names.js",
+    "js/data/lang-zh-cn.js",
+    "js/data/lang-zh-hant-names.js",
+    "js/data/lang-zh-hant.js",
+    "js/data/missions.js",
     "js/data/moves.js",
+    "js/data/music.js",
+    "js/data/natures.js",
+    "js/data/pokedex.js",
+    "js/data/shop.js",
+    "js/data/sprites-meta.js",
+    "js/data/starters.js",
+    "js/data/tms.js",
+    "js/data/types.js",
+    "js/data/upgrades.js",
+    "js/entities/enemy.js",
+    "js/entities/fx.js",
+    "js/entities/pickup.js",
     "js/entities/player.js",
     "js/entities/projectile.js",
+    "js/entities/vfx.js",
     "js/game.js",
+    "js/main.js",
+    "js/net/codec.js",
     "js/net/coop.js",
+    "js/net/net.js",
+    "js/net/ranking.js",
+    "js/net/social.js",
+    "js/noframe.js",
     "js/systems/combat.js",
+    "js/systems/events.js",
     "js/systems/gacha.js",
+    "js/systems/halloween.js",
     "js/systems/hazards.js",
+    "js/systems/interact.js",
     "js/systems/judgment.js",
+    "js/systems/levelup.js",
+    "js/systems/orbs.js",
+    "js/systems/pathing.js",
+    "js/systems/progress.js",
     "js/systems/rift.js",
     "js/systems/spawner.js",
+    "js/systems/stats.js",
+    "js/systems/weather.js",
     "js/ui/gacha-ui.js",
-    "js/data/achievements.js"
+    "js/ui/goals-ui.js",
+    "js/ui/hud.js",
+    "js/ui/icons.js",
+    "js/ui/layout-ui.js",
+    "js/ui/live-ui.js",
+    "js/ui/login.js",
+    "js/ui/menu.js",
+    "js/ui/mod-ui.js",
+    "js/ui/news-ui.js",
+    "js/ui/ranking-ui.js",
+    "js/ui/run-ui.js",
+    "js/ui/settings-ui.js",
+    "js/ui/shop-ui.js",
+    "js/ui/slots.js",
+    "js/ui/social-ui.js",
+    "js/ui/support-ui.js",
+    "js/ui/test.js",
+    "js/ui/ui.js",
+    "js/world/tiles.js",
+    "js/world/world.js"
   ],
   "extensions": {
-    "js/data/moves.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/content-registry.js"
-    },
-    "js/entities/player.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
-    "js/entities/projectile.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
-    "js/game.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
     "js/net/coop.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
+      "reason": "독립 서버 연결 규약만 빌드 시 적용; 게임 규칙·배치 변경 없음",
+      "extension": "kor/service-adapter.cjs"
     },
-    "js/systems/combat.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
+    "js/ui/social-ui.js": {
+      "reason": "독립 서버 연결 규약만 빌드 시 적용; 게임 규칙·배치 변경 없음",
+      "extension": "kor/service-adapter.cjs"
     },
-    "js/systems/gacha.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
-    "js/systems/hazards.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
-    "js/systems/judgment.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
-    "js/systems/rift.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
-    "js/systems/spawner.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
-    "js/ui/gacha-ui.js": {
-      "reason": "원작 파일을 보존하고 빌드 단계에서 확장 연결만 적용",
-      "extension": "kor/engine-adapter.cjs"
-    },
-    "js/data/achievements.js": {
-      "reason": "이벤트 포켓몬 업적 제외 조건을 한국판 어댑터로 분리",
-      "extension": "kor/engine-adapter.cjs"
+    "js/ui/ranking-ui.js": {
+      "reason": "독립 서버 연결 규약만 빌드 시 적용; 게임 규칙·배치 변경 없음",
+      "extension": "kor/service-adapter.cjs"
     }
   }
 }

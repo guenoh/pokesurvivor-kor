@@ -1,11 +1,19 @@
-/* Korean server funding is configured by /api/notices, shared with menu links.
- * Remain disabled until that response arrives; never fall back to upstream recipients. */
+/* ============ funding.js — donaciones ============
+ * Las donaciones son voluntarias, no dan ninguna ventaja en el juego y se
+ * usan sólo para mantenerlo en línea: servidores y dominio.
+ * Este archivo es la fuente de lo que se enseña en el juego (botón "Apoyar")
+ * y en la página /apoyar/. Se actualiza a mano:
+ *
+ *   kofi      usuario de Ko-fi (vacío = el botón no sale)
+ *   sponsors  usuario de GitHub Sponsors (para quien entra al repositorio)
+ *   costs     gastos [concepto, euros al mes]; si el coste no es fijo, un texto
+ */
 G.Funding = {
-  kofi: '',
-  sponsors: '',
-  url: '',
+  kofi: 'jpter78',
+  sponsors: 'JPTER78',
   costs: [
-    ['한국어 게임 서버·데이터베이스', '현재 무료 요금제 사용 중'],
-    ['향후 운영 비용', '이용 규모와 요금제에 따라 달라집니다']
-  ]
+    ['Servidores (partidas, cuentas, ranking y multijugador)', 'Según cuánta gente juegue'],
+    ['Dominio pokesurvivor.com', '≈12 € al año']
+  ],
+  get url() { return this.kofi ? 'https://ko-fi.com/' + this.kofi : ''; }
 };

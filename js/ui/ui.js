@@ -135,12 +135,12 @@ G.UI = (() => {
 
   // ---------------- aviso legal ----------------
 
-  const CONTACT = 'github.com/guenoh/pokesurvivor-kor/issues';
-  const REPO = 'https://github.com/guenoh/pokesurvivor-kor';
+  const CONTACT = 'contactopokesurvivor@gmail.com';
+  const REPO = 'https://github.com/JPTER78/pokesurvivor';
 
   function openLegal() {
     $('legal-mail').textContent = CONTACT;
-    $('legal-mail').href = 'https://' + CONTACT;
+    $('legal-mail').href = 'mailto:' + CONTACT + '?subject=Pok%C3%A9Survivor';
     $('legal-repo').textContent = REPO.replace('https://', '');
     $('legal-repo').href = REPO;
     const canDelete = G.DB.loggedIn && !G.DB.guest;
@@ -164,7 +164,7 @@ G.UI = (() => {
       el.innerHTML = `<div class="box center" style="max-width:380px">
         <h3>Borrar cuenta</h3>
         <p class="sub">Se borrarán tu cuenta y toda tu partida, para siempre. Para confirmarlo, escribe tu contraseña.</p>
-        <input class="field" type="password" maxlength="128" autocomplete="current-password" style="width:100%">
+        <input class="field" type="password" maxlength="64" autocomplete="current-password" style="width:100%">
         <div style="display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap">
           <button class="btn ghost" data-a="no">Cancelar</button>
           <button class="btn danger" data-a="yes">Borrar para siempre</button>

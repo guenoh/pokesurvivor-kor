@@ -35,7 +35,7 @@ function audit() {
   load('js/core/util.js'); load('js/core/i18n.js'); load('js/data/lang-en.js');
   for (const [dictionary, lang, context] of dictionaries) sandbox.G.I18n.add(dictionary, lang, context);
   for (const file of ['pokedex', 'sprites-meta', 'moves', 'types', 'items', 'achievements', 'upgrades', 'natures', 'abilities', 'ability-fx', 'shop', 'changelog', 'starters']) load(`js/data/${file}.js`);
-  load('js/data/tms.js'); load('kor/armored-data.js');
+  load('js/data/tms.js');
   load('js/systems/mons.js'); load('js/systems/levelup.js');
   const G = sandbox.G, groups = {};
   // These localized Pokémon names intentionally contain Latin letters.

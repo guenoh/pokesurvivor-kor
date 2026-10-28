@@ -14,8 +14,6 @@ const ROOT = path.join(__dirname, '..');
 const DEV = path.join(ROOT, 'dev.html'), OUT = path.join(ROOT, 'index.html');
 const BEGIN = '<!-- scripts:begin -->', END = '<!-- scripts:end -->';
 
-// Regenerate the shared cohort from this checkout before bundling.
-execFileSync(process.execPath, [path.join(ROOT, 'tools', 'generate-tiers.cjs')], { cwd: ROOT, stdio: 'inherit' });
 const dev = fs.readFileSync(DEV, 'utf8');
 const i = dev.indexOf(BEGIN), j = dev.indexOf(END);
 if (i < 0 || j < 0) throw new Error('dev.html no tiene las marcas ' + BEGIN + ' / ' + END);

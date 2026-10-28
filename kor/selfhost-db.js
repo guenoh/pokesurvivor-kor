@@ -1,6 +1,7 @@
 /* Independent API bridge. No Firebase SDK, credentials, or original service calls. */
 (() => {
   const local = G.DB, listeners = new Set();
+  const normalize = save => G.RetiredContent ? G.RetiredContent.normalize(save) : save;
   let account = null, revision = 0, pending = false, state = 'local', pushing = null, timer, generation = 0;
   let device, deviceLedger = {};
   try { device = JSON.parse(localStorage.getItem('ps.dev')); } catch {}
@@ -8,6 +9,7 @@
   const copy = value => JSON.parse(JSON.stringify(value));
   function rememberLedger() { deviceLedger = copy(local.save?.led?.[device] || {}); }
   function persist() {
+    if (G.RetiredContent && local.save) assign(local.save, normalize(local.save));
     const ok = local.commit();
     if (!device || !local.save?.led) return ok;
     // Upstream shares one device ledger between browser tabs. The API bridge has
@@ -56,10 +58,10 @@
   function merge(data) {
     if (!object(data)) throw new Error('서버의 저장 데이터를 확인할 수 없습니다. 브라우저 백업은 유지됩니다.');
     if (!Object.keys(data).length) return;
-    const other = JSON.parse(JSON.stringify(data));
+    const other = normalize(data);
     other.upgrades ||= {}; other.stats ||= {}; other.tickets ||= { t1: 0, t10: 0 };
     persist(); // Fold changes made while a request was in flight into the ledger first.
-    assign(local.save, local.merge(JSON.parse(JSON.stringify(local.save)), other));
+    assign(local.save, normalize(local.merge(normalize(local.save), other)));
     rememberLedger(); persist();
     G.UI?.refreshCoins?.();
   }
@@ -69,11 +71,11 @@
   function open(result) {
     generation++;
     account = result.user; revision = result.revision;
-    let data = result.save, recovered = false, conflict = false;
+    let data = normalize(result.save), recovered = false, conflict = false;
     try {
       const cached = JSON.parse(localStorage.getItem(cacheKey()));
       if (cached?.pending) {
-        if (cached.revision === revision) { data = cached.save; recovered = true; }
+        if (cached.revision === revision) { data = normalize(cached.save); recovered = true; }
         else {
           // A newer server revision also occurs after a successful write whose response
           // was lost. Merge the pending copy rather than permanently locking saving.
@@ -198,8 +200,8 @@
     }
   });
   Object.defineProperties(facade, {
-    // Cloud here controls save UI; online controls upstream Firebase social modules.
-    mode: { get: () => 'cloud' }, online: { get: () => false }, fb: { get: () => null },
+    // The facade reports independent online accounts; Firebase modules are replaced before boot.
+    mode: { get: () => 'cloud' }, online: { get: () => !!account && !local.guest }, fb: { get: () => null },
     nameAccount: { get: () => true }, hasGoogle: { get: () => false },
     syncState: { get: () => state },
     selfhostUser: { get: () => account },
