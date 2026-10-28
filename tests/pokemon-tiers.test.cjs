@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 function setup(stored=false){
   const s={console};s.window=s;vm.createContext(s);
-  const load=f=>vm.runInContext(fs.readFileSync(path.join(__dirname,'..',f),'utf8'),s,{filename:f});
+  const load=f=>vm.runInContext(require('../kor/module-source.cjs').isolatedSource(f),s,{filename:f});
   load('js/core/util.js');const G=s.G;G.T=x=>x;G.I18n={lang:'ko'};
   G.DB={save:{created:1700000000000,owned:{150:{at:1}},pnat:{150:['hardy',1]},pabil:{150:[0,1]},ptm:{}},upgradesOf:()=>({})};
   for(const f of ['js/data/types.js','js/data/pokedex.js','js/data/sprites-meta.js','js/core/sprites.js','js/data/moves.js','js/systems/stats.js','js/data/abilities.js','js/data/natures.js','js/systems/mons.js','js/data/upgrades.js','js/data/ability-fx.js','js/data/tms.js','kor/armored-data.js'])load(f);

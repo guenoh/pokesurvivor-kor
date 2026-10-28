@@ -49,7 +49,7 @@ G.Gacha = (() => {
     { gen: 9, name: 'Paldea',  color: ['#6a2a1a', '#4a1a5a', '#1a4a6a'] }
   ];
 
-  function inBanner(p, gen) { return !p.eventOnly && p.gen === gen && !!G.SPRITE_META[p.dex]; }
+  function inBanner(p, gen) { return p.gen === gen && !!G.SPRITE_META[p.dex]; }
 
   /** Pokémon de una rareza en un banner. */
   function pool(rarity, gen) { return G.DEX.filter(p => inBanner(p, gen) && p.rarity === rarity); }
@@ -67,12 +67,12 @@ G.Gacha = (() => {
 
   /** Cuántos tienes de una generación → { have, total }. */
   function dexOf(save, gen) {
-    const list = G.DEX.filter(p => !p.eventOnly && p.gen === gen);
+    const list = G.DEX.filter(p => p.gen === gen);
     return { have: list.filter(p => save.owned[p.dex]).length, total: list.length };
   }
 
   /** ¿Tiene el Amuleto Iris de esa generación (su Pokédex completa)? */
-  function hasIris(save, gen) { const d = dexOf(save, gen); return d.total > 0 && d.have >= d.total; }
+  function hasIris(save, gen) { const d = dexOf(save, gen); return d.have >= d.total; }
 
   function shinyRate(save, gen) { return hasIris(save, gen) ? SHINY_RATE_IRIS : SHINY_RATE; }
 

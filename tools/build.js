@@ -23,7 +23,13 @@ const block = dev.slice(i, j + END.length);
 const files = [...block.matchAll(/<script[^>]*src="((?:js|kor)\/[^"]+\.js)"/g)].map(m => m[1]);
 
 // Une los archivos en orden; cada uno separado por ';' por si alguno no acaba en punto y coma.
-let joined = files.map(f => `/* ${f} */\n` + fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n;\n');
+const { source: gameSource, validate: validateAdapters } = require('../kor/module-source.cjs');
+validateAdapters();
+let joined = files.map(f => `/* ${f} */\n` + gameSource(f, ROOT)).join('\n;\n');
+// Development and production use the same adapter-aware module composition.
+fs.mkdirSync(path.join(ROOT, 'tools', 'cache'), { recursive: true });
+fs.writeFileSync(path.join(ROOT, 'tools', 'cache', 'dev-app.js'), joined);
+
 // Anti-trampas: en la versión publicada el juego va ENCERRADO en una función:
 // G deja de existir en la consola del navegador (F12), y con él los atajos para
 // hacerse invencible, saltar el reloj, etc. (dev.html sigue igual, para programar).

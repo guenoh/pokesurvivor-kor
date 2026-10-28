@@ -119,7 +119,6 @@ G.Game = (() => {
     G.Spawner.reset();
     G.Rift.reset();
     G.Judgment.reset();
-    G.ArmoredMewtwo.reset();
     G.Events.reset();
     G.Weather.reset();
     G.Path.clear();
@@ -576,8 +575,6 @@ G.Game = (() => {
   // ---------------- teclado ----------------
 
   function handleKeys() {
-    if (G.PokemonTiers && G.PokemonTiers.isOpen()) { if (G.Input.tap('escape')) G.PokemonTiers.close(); return; }
-    if (G.MoveRatings && G.MoveRatings.isOpen()) { if (G.Input.tap('escape')) G.MoveRatings.close(); return; }
     if (G.SettingsUI.isOpen) { if (G.Input.tap('escape')) G.SettingsUI.close(); return; }
     // La Sentencia de Arceus: Espacio, Intro o Esc saltan la animación (si se puede).
     if (G.Judgment.cinematic && state === 'playing') {
@@ -754,7 +751,6 @@ G.Game = (() => {
     G.Hazards.update(dt);
     G.Interact.update(dt, pl);
     G.Rift.update(dt, pl, time);
-    G.ArmoredMewtwo.tick(dt, time);
     G.Judgment.update(dt, pl, time);
     G.Events.update(dt, all, time);
     G.Weather.update(dt, time, pl);
@@ -867,7 +863,6 @@ G.Game = (() => {
     }
     if (!G.Judgment.cinematic) G.HUD.draw(ctx, w, h, pl, st);
     G.Judgment.drawOverlay(ctx, w, h);
-    G.ArmoredMewtwo.renderHud(time);
     G.Touch.draw(ctx);
     drawAimMark();
     if (G.Settings.get('fps')) {

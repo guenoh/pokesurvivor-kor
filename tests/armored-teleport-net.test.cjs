@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
-const source=file=>fs.readFileSync(path.join(__dirname,'..',file),'utf8');
+const source=file=>require('../kor/module-source.cjs').isolatedSource(file);
 
 function peer(host){
   const G={},noop=()=>{},frames=[];let receive,now=1000;

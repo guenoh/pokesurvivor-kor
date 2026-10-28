@@ -2,8 +2,8 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 function setup(wall=Infinity){
   const s={console,performance:{now:()=>0}};s.window=s;vm.createContext(s);
-  const load=f=>vm.runInContext(fs.readFileSync(path.join(__dirname,'..',f),'utf8'),s,{filename:f});
-  for(const f of ['js/core/util.js','js/data/pokedex.js','js/data/sprites-meta.js','js/data/abilities.js','js/data/tms.js','js/data/moves.js','kor/armored-data.js','js/data/starters.js'])load(f);
+  const load=f=>vm.runInContext(require('../kor/module-source.cjs').isolatedSource(f),s,{filename:f});
+  for(const f of ['js/core/util.js','js/data/pokedex.js','js/data/sprites-meta.js','js/data/moves.js','js/data/abilities.js','js/data/tms.js','kor/armored-data.js','js/data/starters.js'])load(f);
   const G=s.G,noop=()=>{},hits=[];
   const enemy={x:60,y:0,r:10,types:[],mon:{},dead:false,cy(){return this.y},hurt(damage){hits.push(damage)}};
   Object.assign(G,{DB:{save:{}},Game:{st:{time:0}},Mons:{taught:()=>[]},Stats:{fit:()=>1,taken:()=>1},

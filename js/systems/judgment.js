@@ -113,7 +113,7 @@ G.Judgment = (() => {
 
   /** Quien manda: elige la arena y los legendarios, y avisa a todos. */
   function start() {
-    const pool = G.DEX.filter(p => p.leg && !p.eventOnly && p.dex !== ARCEUS && G.SPRITE_META[p.dex]);
+    const pool = G.DEX.filter(p => p.leg && p.dex !== ARCEUS && G.SPRITE_META[p.dex]);
     const q = [];
     for (let i = 0; i < 40; i++) q.push(G.U.pick(pool).dex);
     const c = { tx: -6000 - Math.floor(Math.random() * 2000), ty: -6000 - Math.floor(Math.random() * 2000), q,
@@ -287,7 +287,7 @@ G.Judgment = (() => {
   function update(dt, pl, time) {
     if (!phase) {
       sampleDps(dt);                        // (para la vida del primer legendario)
-      if (authority() && time >= AT && !G.Rift.inArena && G.ArmoredMewtwo.canJudge(time)) start();
+      if (authority() && time >= AT && !G.Rift.inArena) start();
       return;
     }
     if (phase !== 'fight') return;

@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { frame, client } = require('./net-fixtures.cjs');
-const source = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+const source = file => require('../kor/module-source.cjs').isolatedSource(file);
 function codec() { const G = {}; new Function('G', source('js/net/codec.js'))(G); return G.NetCodec; }
 const C = codec();
 // Mensajes por la base de datos: rooms/{sala}/q/{para}/{remitente}_00..99 (database.rules.json).

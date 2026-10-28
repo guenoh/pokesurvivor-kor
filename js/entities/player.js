@@ -126,7 +126,7 @@ G.Player = class Player {
 
   // ---------------- movimientos ----------------
   addMove(id) {
-    if (this.slots.length >= this.maxMoves || this.hasMove(id) || !G.Moves.canUse(this.mon, id)) return false;
+    if (this.slots.length >= this.maxMoves || this.hasMove(id)) return false;
     const m = G.Moves.instance(id, 1);
     m.since = G.Game.st.time;          // desde cuándo lo tienes (daño por segundo en el resumen)
     this.moves.push(m);
@@ -400,11 +400,11 @@ G.Player = class Player {
 
     // --- movimiento con colisiones ---
     // (En cooperativo la pausa no para el juego: sólo te quedas quieto.)
-    const [ax, ay] = this.frozen || this.rushActive ? [0, 0] : G.Input.axis();
+    const [ax, ay] = this.frozen ? [0, 0] : G.Input.axis();
     this.walking = ax !== 0 || ay !== 0;
     const s = this.spd;
     // Hielo: resbalas (la velocidad cambia despacio).
-    const slide = !this.rushActive && this.inLiquid && G.World.liquidEffect(this.mon.types).slide;
+    const slide = this.inLiquid && G.World.liquidEffect(this.mon.types).slide;
     this.svx = slide ? G.U.damp(this.svx || 0, ax * s * 1.15, 1.6, dt) : ax * s;
     this.svy = slide ? G.U.damp(this.svy || 0, ay * s * 1.15, 1.6, dt) : ay * s;
     this.x += this.svx * dt;
