@@ -90,16 +90,18 @@
         const reward = notice.reward;
         const gift = make('div', 'kor-notice-gift');
         gift.append(make('strong', '', rewardLabel(reward)));
-        gift.append(make('p', 'kor-auth-help', reward.automatic ? '기존·신규 가입 회원 모두 계정당 한 번 자동 지급됩니다. 수령 기한은 없습니다.' : reward.window === 'signup24h' ? '가입 후 24시간 안에 계정당 한 번 받을 수 있습니다.' : '오픈 이벤트 시작부터 24시간 동안 계정당 한 번 받을 수 있습니다.'));
+        const loginEvent = reward.window === 'login24h';
+        const expired = !!reward.expiresAt && Date.parse(reward.expiresAt) <= Date.parse(data.serverNow);
+        gift.append(make('p', 'kor-auth-help', loginEvent ? '이벤트 시작부터 24시간 안에 접속한 계정에 한 번 자동 지급됩니다. 기간 중 신규 가입자도 포함됩니다.' : reward.automatic ? '기존·신규 가입 회원 모두 계정당 한 번 자동 지급됩니다. 수령 기한은 없습니다.' : reward.window === 'signup24h' ? '가입 후 24시간 안에 계정당 한 번 받을 수 있습니다.' : '오픈 이벤트 시작부터 24시간 동안 계정당 한 번 받을 수 있습니다.'));
+        if (reward.expiresAt && (loginEvent || !reward.claimed)) {
+          const date = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: false }).format(new Date(reward.expiresAt));
+          gift.append(make('p', 'kor-auth-help', `${loginEvent ? '접속 기한' : '수령 기한'}: ${date} (한국 시간)`));
+        }
         if (reward.automatic) {
-          gift.append(make('p', 'kor-auth-help', reward.claimed ? locallyCredited(notice) ? '지급 완료! 선물이 보유 재화에 반영되었습니다.' : '서버 지급 완료! 저장을 눌러 보유 재화를 동기화해 주세요.' : reward.needsLogin ? '계정을 만들거나 로그인하면 자동으로 지급됩니다.' : '자동 지급을 확인하고 있습니다. 잠시 후 공지를 다시 열어 주세요.'));
+          gift.append(make('p', 'kor-auth-help', reward.claimed ? locallyCredited(notice) ? '지급 완료! 선물이 보유 재화에 반영되었습니다.' : '서버 지급 완료! 저장을 눌러 보유 재화를 동기화해 주세요.' : expired ? '이벤트가 종료되었습니다. 기간 중 접속한 계정에만 지급되는 선물입니다.' : reward.needsLogin ? '계정을 만들거나 로그인하면 자동으로 지급됩니다.' : '자동 지급을 확인하고 있습니다. 잠시 후 공지를 다시 열어 주세요.'));
           article.append(gift); body.append(article); continue;
         }
         if (reward.partiallyClaimed) gift.append(make('p', 'kor-auth-help', `이미 받은 선물은 유지됩니다. 추가로 받을 선물: ${rewardLabel(reward.remaining)}`));
-        if (reward.expiresAt && !reward.claimed) {
-          const date = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: false }).format(new Date(reward.expiresAt));
-          gift.append(make('p', 'kor-auth-help', `수령 기한: ${date} (한국 시간)`));
-        }
         const button = make('button', 'btn gold', reward.claimed ? '수령 완료' : reward.needsLogin ? '로그인 후 받기' : reward.eligible ? reward.partiallyClaimed ? '추가 선물 받기' : '받기' : '수령 기간 종료');
         button.type = 'button'; button.disabled = reward.claimed || reward.needsLogin || !reward.eligible;
         button.onclick = async () => {
