@@ -273,3 +273,13 @@ G.I18n.add({
   "Guardado en la nube: si pulsabas Guardar poco después de otro Guardar, el juego decía «Se guarda en la nube en X s» y, si salías antes de ese tiempo, no se subía nunca (en el otro aparato no estaban los tickets). Ahora la espera es mucho más corta y, si sales del juego con un Guardar pendiente, se sube al salir.": "원작에서 저장 대기 중 게임을 종료하면 클라우드 반영이 누락되던 문제를 고쳤습니다. 저장 간격을 줄이고 종료 시 남은 저장을 처리합니다. 한국판은 기존 독립 서버 저장을 유지합니다.",
   "Móvil: al minimizar el juego, la música seguía sonando, y distorsionada. Ahora se para y vuelve al volver al juego.": "모바일에서 게임을 최소화하면 음악을 멈추고, 돌아왔을 때 다시 재생합니다."
 }, "ko");
+
+/* Upstream 2026-10-28: one extra Halloween day and menu persistence. */
+G.I18n.add({
+  "Sólo hasta el 2 de noviembre. Los caramelos salen en las partidas (sobre todo de los Fantasma y las calabazas) y ante el gran Gengar. La skin es para siempre; se pone y se quita en la ficha del Pokémon.": "한국 시간 11월 3일 오전 8시까지 판매합니다. 탐험 중 고스트타입 포켓몬과 호박, 거대 팬텀에게서 사탕을 얻을 수 있습니다. 의상은 영구 보유하며 포켓몬 상세 화면에서 입히거나 벗길 수 있습니다.",
+  "Los {x} Pokémon de tipo Fantasma de todas las regiones, con el doble de shiny. Sólo hasta el 2 de noviembre.": "모든 지방의 고스트타입 포켓몬 {x}마리가 등장합니다. 색이 다른 포켓몬 등장 확률 2배! 한국 시간 11월 3일 오전 8시까지입니다.",
+  "Evento de Halloween del 30 de octubre al 2 de noviembre (hora de España). Lo que trae, lo descubrirás jugando.": "할로윈 이벤트는 한국 시간 10월 30일 오전 8시부터 11월 3일 오전 8시까지입니다. 무엇이 기다리는지는 직접 탐험하며 확인해 보세요.",
+  "Halloween, un día más": "할로윈을 하루 더!",
+  "El evento de Halloween dura un día más: del 30 de octubre al 2 de noviembre (hora de España).": "할로윈 이벤트가 하루 연장됩니다! 한국 시간 10월 30일 오전 8시부터 11월 3일 오전 8시까지 즐길 수 있습니다.",
+  "Durante Halloween, unos segundos después de abrir el juego (y al empezar o acabar el evento), la tienda, el gacha u otra pantalla del menú se cerraban solos y te devolvían al menú. Ya no.": "할로윈 기간에 게임을 열거나 이벤트가 시작·종료될 때 상점·뽑기 등의 화면이 저절로 닫히며 메뉴로 돌아가던 문제를 고쳤습니다."
+}, "ko");
