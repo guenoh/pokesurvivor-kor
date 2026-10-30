@@ -62,6 +62,7 @@
     other.upgrades ||= {}; other.stats ||= {}; other.tickets ||= { t1: 0, t10: 0 };
     persist(); // Fold changes made while a request was in flight into the ledger first.
     assign(local.save, normalize(local.merge(normalize(local.save), other)));
+    if (other.korGrowth) local.save.korGrowth = copy(other.korGrowth); else delete local.save.korGrowth;
     rememberLedger(); persist();
     G.UI?.refreshCoins?.();
   }
@@ -87,6 +88,7 @@
       }
     } catch { /* no cached save */ }
     local.openSelfhost(account.id, account.name, data);
+    if (result.save.korGrowth) local.save.korGrowth = copy(result.save.korGrowth); else delete local.save.korGrowth;
     rememberLedger();
     pending = recovered;
     sync(conflict ? 'conflict' : recovered ? 'pending' : 'ok');
@@ -186,6 +188,45 @@
       if (state !== 'conflict') backup();
       return { granted: result.granted, alreadyClaimed: result.alreadyClaimed, awarded: result.awarded };
     },
+    async pullGacha(n, gen, use) {
+      if (!account || local.guest) return G.Gacha.pull(local.save, n, gen, use);
+      if (state === 'conflict') throw new Error('저장 내용을 동기화한 뒤 다시 뽑아 주세요.');
+      const userId = account.id, epoch = generation;
+      const current = () => account?.id === userId && generation === epoch && !local.guest;
+      commit(); await flush();
+      if (!current()) throw new Error('로그인 계정이 바뀌었습니다.');
+      const key = 'ps.kor.gacha.' + userId;
+      const clearRequest = requestId => { try { if (JSON.parse(localStorage.getItem(key))?.requestId === requestId) localStorage.removeItem(key); } catch {} };
+      let request;
+      try { request = JSON.parse(localStorage.getItem(key)); } catch {}
+      if (!request) {
+        request = { requestId: crypto.randomUUID(), n, gen, use };
+        try { localStorage.setItem(key, JSON.stringify(request)); }
+        catch { throw new Error('뽑기 복구 정보를 저장할 공간이 부족합니다. 브라우저 저장 공간을 확인해 주세요.'); }
+      }
+      for (let attempt = 0; attempt < 4; attempt++) {
+        try {
+          const result = await api('/gacha', 'POST', { ...request, revision, accountId: userId }, { timeout: 45000 });
+          if (!current()) throw new Error('로그인 계정이 바뀌었습니다. 뽑기 결과는 원래 계정에 저장됩니다.');
+          if (result.user?.id !== userId || !Array.isArray(result.results) || !Number.isSafeInteger(result.revision)) throw new Error('뽑기 결과를 확인할 수 없습니다.');
+          merge(result.save); revision = result.revision;
+          pending = true; backup();
+          clearRequest(request.requestId); sync('pending');
+          const results = result.results; results.iris = result.iris || 0;
+          commit(); return results;
+        } catch (error) {
+          if (!current()) throw error;
+          if (error.status === 409 && attempt < 3) {
+            const remote = await api('/session');
+            if (!current() || remote.user?.id !== userId) throw new Error('로그인 계정이 바뀌었습니다.');
+            merge(remote.save); revision = remote.revision; pending = true; backup(); await flush(); continue;
+          }
+          if ([400,410].includes(error.status)) clearRequest(request.requestId);
+          if (!error.status) throw new Error('뽑기 결과를 확인하는 중입니다. 뽑기 화면을 다시 열면 같은 요청을 복구하며 중복 차감하지 않습니다.');
+          throw error;
+        }
+      }
+    },
     async saveNow() { try { await flush(); return local.guest ? { ok: false, why: 'guest' } : { ok: true }; } catch { return { ok: false, why: 'fail' }; } },
     onSync(fn) { listeners.add(fn); },
     setName(name) { local.setName(name); commit(); },
@@ -203,6 +244,7 @@
     // The facade reports independent online accounts; Firebase modules are replaced before boot.
     mode: { get: () => 'cloud' }, online: { get: () => !!account && !local.guest }, fb: { get: () => null },
     nameAccount: { get: () => true }, hasGoogle: { get: () => false },
+    pendingGacha: { get: () => { if (!account || local.guest) return null; try { return JSON.parse(localStorage.getItem('ps.kor.gacha.' + account.id)); } catch { return null; } } },
     syncState: { get: () => state },
     selfhostUser: { get: () => account },
     accountKey: { get: () => account?.id || 'guest' }

@@ -108,8 +108,8 @@
   ],
   "patches": {
     "dev.html": {
-      "reviewed": "c854266cd5231ec4687995a8d96425e4819867f40461fcaa466ff347db311473",
-      "reason": "한국어·서비스 신원·독립 서버 모듈 로딩",
+      "reviewed": "cc5c238733c207a33c04cf70c019d7374bff757867a58a3e126adc8a50895647",
+      "reason": "한국어·독립 서버·중복 성장 모듈 로딩",
       "extension": "kor/operations.js"
     },
     "js/boot.js": {
@@ -246,6 +246,18 @@
     "js/ui/ranking-ui.js": {
       "reason": "독립 서버 연결 규약만 빌드 시 적용; 게임 규칙·배치 변경 없음",
       "extension": "kor/service-adapter.cjs"
+    },
+    "js/game.js": {
+      "reason": "한국판 중복 성장과 서버 뽑기 연결만 빌드 시 적용",
+      "extension": "kor/growth-adapter.cjs"
+    },
+    "js/ui/menu.js": {
+      "reason": "한국판 중복 성장과 서버 뽑기 연결만 빌드 시 적용",
+      "extension": "kor/growth-adapter.cjs"
+    },
+    "js/ui/gacha-ui.js": {
+      "reason": "한국판 중복 성장과 서버 뽑기 연결만 빌드 시 적용",
+      "extension": "kor/growth-adapter.cjs"
     }
   }
 }

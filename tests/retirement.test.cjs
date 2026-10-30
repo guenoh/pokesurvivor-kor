@@ -32,13 +32,14 @@ test('old exclusive move ledger entries cannot recreate removed TMs after mergin
   assert.deepEqual(retired.tms,{confusion:3}); assert.equal(retired.led.base['m:psycho-rush'],undefined);
   assert.deepEqual(retired.led.base.c,[9,0]); assert.deepEqual(retired.retiredKor.armoredMewtwo.moveLedger.base,[2,0]);
 });
-test('upstream gameplay, battle UI and stylesheet are unmodified and receive no custom gameplay hooks', () => {
+test('preserved upstream sources stay intact and duplicate growth uses only reviewed isolated hooks', () => {
   const manifest=require('../kor/upstream-boundary.json'); validate();
   assert.equal(Object.keys(manifest.patches).length,7);
   for (const name of manifest.pristineEngine) assert.equal(hash(fs.readFileSync(path.join(root,name))),manifest.original[name],name);
-  for (const name of ['js/entities/player.js','js/entities/projectile.js','js/systems/combat.js','js/systems/spawner.js','js/systems/judgment.js','js/systems/gacha.js','js/game.js','js/ui/menu.js','js/ui/run-ui.js','css/style.css']) {
+  for (const name of ['js/entities/player.js','js/entities/projectile.js','js/systems/combat.js','js/systems/spawner.js','js/systems/judgment.js','js/systems/gacha.js','js/ui/run-ui.js','css/style.css']) {
     const raw=fs.readFileSync(path.join(root,name),'utf8'); assert.equal(source(name),raw,name);
   }
+  for (const name of ['js/game.js','js/ui/menu.js','js/ui/gacha-ui.js']) assert.equal(source(name),require('../kor/growth-adapter.cjs').adapt(name,fs.readFileSync(path.join(root,name),'utf8')));
   for (const name of ['kor/armored-encounter.js','kor/timed-rush.js','kor/pokemon-tiers.js','kor/move-ratings.js','kor/mon-settings.js','kor/mobile-ui.js','assets/events/armored-mewtwo']) assert.equal(fs.existsSync(path.join(root,name)),false,name);
   assert.doesNotMatch(fs.readFileSync(path.join(root,'kor/style.css'),'utf8'),/kor-ui-scale|kor-choice|kor-rated|kor-menu/);
 });
