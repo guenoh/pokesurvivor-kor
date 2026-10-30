@@ -71,6 +71,8 @@ dialog.kor-notices::backdrop { background: #081022d9; }
 .kor-notices-message { color: #ffe391; line-height: 1.6; }
 .kor-notices-message:empty { display: none; }
 .kor-support .btn { display: inline-block; text-decoration: none; }
+/* Keep the update label visible at every upstream compact-bar breakpoint. */
+#topbar #btn-news > span { display: inline; }
 .kor-updates-heading{color:#ffe391;margin:0 0 12px;font-size:18px}
 .kor-update-archive{margin-top:18px;border-top:1px solid #8cafff66;padding-top:8px}
 .kor-update-archive>summary{cursor:pointer;min-height:44px;padding:10px 0;color:#d4e1f6;font-weight:700}
