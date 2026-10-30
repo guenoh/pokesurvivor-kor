@@ -5,7 +5,7 @@
   G.CHANGELOG.unshift({id:'kor-update-event-separation-20261030',kor:true,d:'2026-10-30',title:['한국판 업데이트와 이벤트 안내를 나눴습니다','Korean updates and event announcements'],chg:[
     ['상단 업데이트 버튼에서 한국판의 새 기능·개선·버그 수정을 확인할 수 있습니다. 이전 원작 업데이트는 접힌 기록으로 보관합니다.','The update button shows Korean edition features and fixes, with earlier original updates in a collapsed archive.'],
     ['메인과 로그인 화면의 공지사항·이벤트 버튼에서는 이벤트·선물·보상·운영 안내를 확인할 수 있습니다.','Use Announcements & Events on the main or login screen for events, gifts, compensation and service notices.']
-  ]});
+  ],fix:[['작은 화면에서도 상단 버튼에 업데이트 글자를 표시해 쉽게 찾을 수 있도록 했습니다.','The top button keeps its Update label visible on smaller screens.']]});
   G.Updates={
     entries(){
       const own=G.CHANGELOG.filter(v=>v.kor),ids=new Set(own.map(v=>v.id)),remote=serverEntries.filter(v=>!ids.has(v.id));
