@@ -50,7 +50,7 @@
 })();
 
 // Korean game changes stay separate from the preserved original changelog file.
-G.CHANGELOG.unshift({d:'2026-10-30',title:['한국판: 중복 성장 업데이트','Korean edition: duplicate growth'],new:[
+G.CHANGELOG.unshift({id:'kor-duplicate-growth-20261030',kor:true,d:'2026-10-30',title:['한국판: 중복 성장 업데이트','Korean edition: duplicate growth'],new:[
  ['메인 화면의 파트너·도감 카드·포켓몬 상세·강화창에 중복 성장 0~5성을 표시합니다. 채워진 별 하나는 추가 강화 한 단계이며 일반·색이 다른 모습의 성장은 같습니다.','The main partner, collection cards, details and upgrades display duplicate growth from zero to five stars, shared across normal and shiny appearances.'],
  ['같은 포켓몬을 다시 뽑으면 중복 성장이 쌓입니다. 일반 모습과 색이 다른 모습은 함께 성장하며 기존 중복 코인 보상도 유지됩니다.','Duplicate species now earn growth, shared across normal and shiny appearances, alongside the existing coin refund.'],
  ['강화창의 체력·공격·획득 범위·방어·재생 추가 강화가 차례로 무료 해금됩니다. 필요한 중복 횟수는 포켓몬별 실제 획득 확률에 맞췄습니다.','Five free automatic bonuses unlock in the existing upgrades screen, with milestones adjusted to each species\' acquisition rate.'],

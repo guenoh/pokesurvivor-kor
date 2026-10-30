@@ -1,7 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
-function boot({ loggedIn = true, credited = false, offline = false, loginEvent = false, expired = false } = {}) {
+function boot({ loggedIn = true, credited = false, offline = false, loginEvent = false, expired = false, extra = [], updatesOnly = false } = {}) {
   class Element {
     constructor(tag) { this.tagName = tag; this.children = []; this.textContent = ''; this.attrs = {}; }
     append(...children) { this.children.push(...children); }
@@ -9,9 +9,9 @@ function boot({ loggedIn = true, credited = false, offline = false, loginEvent =
     replaceChildren(...children) { this.children = children; }
     setAttribute(k, v) { this.attrs[k] = v; }
     removeAttribute(k) { delete this.attrs[k]; }
-    addEventListener() {}
+    addEventListener(k,fn) { (this.handlers||={})[k]=fn; }
     showModal() { this.open = true; }
-    close() { this.open = false; }
+    close() { this.open = false;this.handlers?.close?.(); }
   }
   const body = new Element('body'), login = new Element('div');
   const entry = { t1: [loginEvent ? 500 : 333, 0], c: [loginEvent ? 0 : 50000, 0] };
@@ -19,14 +19,14 @@ function boot({ loggedIn = true, credited = false, offline = false, loginEvent =
   if (loginEvent) { notice.id = 'surprise'; notice.title = '깜짝 이벤트'; notice.reward = { ticket1:500, window:'login24h', automatic:true, claimed:loggedIn && !expired, needsLogin:!loggedIn, expiresAt:expired ? '2026-10-27T09:00:00Z' : '2026-10-29T09:00:00Z' }; }
   let writes = 0;
   const db = { accountKey: loggedIn ? 'member' : 'guest', selfhostUser: loggedIn ? { id: 'member' } : null, guest: !loggedIn,
-    save: { led: credited ? { ['server:'+notice.id]: entry } : {} }, getNotices: async () => ({ serverNow:'2026-10-28T09:00:00Z', notices: [notice], support: {} }),
+    save: { led: credited ? { ['server:'+notice.id]: entry } : {} }, getNotices: async () => ({ serverNow:'2026-10-28T09:00:00Z', notices: [...(updatesOnly?[]:[notice]),...extra], support: {} }),
     commit() { writes++; }, async flush() { if (offline) throw Error('offline'); this.save.led['server:'+notice.id] = entry; } };
   const G = { DB: db, MenuUI: { open() {} }, Flow: { afterLogin() {} }, Game: { state: 'ui' }, UI: { refreshCoins() {} } };
-  const context = { G, URL, console, document: { readyState: 'complete', body, createElement: tag => new Element(tag), querySelector: sel => sel === '#scr-login .box' ? login : null }, localStorage: { getItem() { return null; }, setItem() {} } };
+  const seen=new Map();const context = { G, URL, console, document: { readyState: 'complete', body, createElement: tag => new Element(tag), querySelector: sel => sel === '#scr-login .box' ? login : null }, localStorage: { getItem(k) { return seen.get(k)||null; }, setItem(k,v) { seen.set(k,v); } } };
   vm.createContext(context); vm.runInContext(fs.readFileSync(path.join(__dirname, '../kor/notices.js'), 'utf8'), context);
   const visit = node => [node, ...node.children.flatMap(visit)];
-  const open = async () => { const button = visit(login).find(e => e.tagName === 'button' && e.textContent === '공지사항'); await button.onclick(); };
-  return { open, elements: () => visit(body), text: () => visit(body).map(e => e.textContent).join('\n'), writes: () => writes, db };
+  const open = async () => { const button = visit(login).find(e => e.tagName === 'button' && e.textContent === '공지사항·이벤트'); await button.onclick(); };
+  return { open, elements: () => visit(body), text: () => visit(body).map(e => e.textContent).join('\n'), writes: () => writes, db, seen, automatic:()=>G.MenuUI.open() };
 }
 test('automatic single-ticket gift shows 333 tickets and 50000 coins with no claim button or opening-event deadline', async () => {
   const b = boot(); await b.open();
@@ -48,4 +48,12 @@ test('limited login gift shows 500 single tickets and a KST deadline, with no cl
 });
 test('an expired login gift explains the cutoff and never says credit is pending or unlimited',async()=>{
  const b=boot({loginEvent:true,expired:true});await b.open();assert.match(b.text(),/이벤트가 종료되었습니다/);assert.doesNotMatch(b.text(),/자동 지급을 확인하고|수령 기한은 없습니다/);assert.equal(b.writes(),0);
+});
+test('update notes do not appear or become event-read receipts, and cannot trigger an event popup',async()=>{
+ const update={id:'new-update',version:1,channel:'updates',title:'게임 수정 내역',paragraphs:['업데이트 창에서만']};
+ const b=boot({extra:[update]});await b.open();assert.doesNotMatch(b.text(),/게임 수정 내역|업데이트 창에서만/);assert.match(b.text(),/기아 타이거즈/);
+ b.elements().find(e=>e.tagName==='button'&&e.textContent==='닫기').onclick();assert.ok([...b.seen.keys()].some(k=>k.includes('.kia.')));assert.equal([...b.seen.keys()].some(k=>k.includes('.new-update.')),false);
+ const only=boot({updatesOnly:true,extra:[update]});only.automatic();await new Promise(resolve=>setImmediate(resolve));assert.equal(only.elements().find(e=>e.tagName==='dialog').open,undefined);
+ const reward={...update,id:'protected-gift',title:'보호된 선물',reward:{ticket1:1,automatic:true,window:'members',needsLogin:true}};
+ const protectedGift=boot({loggedIn:false,updatesOnly:true,extra:[reward]});await protectedGift.open();assert.match(protectedGift.text(),/보호된 선물|1회 뽑기권 1장/);
 });

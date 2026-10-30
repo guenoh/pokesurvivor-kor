@@ -72,7 +72,7 @@
     $('f-pass').minLength = 4; $('f-pass').maxLength = 128;
     $('f-user').pattern = '[\\p{L}\\p{N}_]{3,16}';
     const title = document.createElement('p'); title.className = 'note'; title.setAttribute('translate','no');
-    title.textContent = '게임 업데이트 기록입니다. 한국어 서버 운영 공지는 공지사항에서 확인하세요.';
+    title.textContent = '한국판의 새 기능·개선·버그 수정 내역입니다. 이벤트·선물·운영 안내는 공지사항·이벤트에서 확인하세요.';
     $('news-body').before(title);
     const tools = document.createElement('details'); tools.setAttribute('translate','no');
     const summary = document.createElement('summary'); summary.textContent = '서버 저장·복구';
