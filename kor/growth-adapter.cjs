@@ -4,7 +4,17 @@ const hooks={
   'const perks = G.Upgrades.perks(G.DB.upgradesOf(mon.dex));',
   'const perks = G.DuplicateGrowth.perks(G.Upgrades.perks(G.DB.upgradesOf(mon.dex)), save, mon.dex);'
  ]],
- 'js/ui/menu.js':[[
+ 'js/ui/menu.js':[
+ [
+  "    $('menu-partner-info').innerHTML = G.UI.typeChips(mon.types) + ' ' + G.UI.stars(mon.rarity);",
+  "    G.GrowthUI?.menu(s, mon.dex);\n    $('menu-partner-info').innerHTML = G.UI.typeChips(mon.types) + ' ' + G.UI.stars(mon.rarity);"
+ ],[
+  '    cell.onclick = () => {',
+  '    if (own && G.GrowthUI) cell.appendChild(G.GrowthUI.badge(s, p.dex, true));\n    cell.onclick = () => {'
+ ],[
+  '    for (const [el, t] of scrolls) el.scrollTop = t;',
+  '    G.GrowthUI?.detail(s, dex, box);\n    for (const [el, t] of scrolls) el.scrollTop = t;'
+ ],[
   'const box = $(\'upg-list\');',
   "G.GrowthUI?.render(s, upgDex);\n    const box = $('upg-list');"
  ]],
