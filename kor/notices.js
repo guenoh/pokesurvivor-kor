@@ -2,6 +2,7 @@
 (() => {
   let dialog, body, message, closeButton, data, loading = false, busy = false;
   const checked = new Map(), supportLinks = [];
+  const announcements = notices => notices.filter(n => n.channel !== 'updates' || n.reward || n.retirement);
   const make = (tag, className, text) => {
     const element = document.createElement(tag);
     if (className) element.className = className;
@@ -9,7 +10,7 @@
     return element;
   };
   const seenKey = notice => `ps.kor.notice.${G.DB.accountKey}.${notice.id}.${notice.version}`;
-  function markRead() { for (const notice of data?.notices || []) try { localStorage.setItem(seenKey(notice), '1'); } catch {} }
+  function markRead() { for (const notice of announcements(data?.notices || [])) try { localStorage.setItem(seenKey(notice), '1'); } catch {} }
   function unread(notice) { try { return !localStorage.getItem(seenKey(notice)); } catch { return true; } }
   function rewardLabel(reward) {
     const parts = [];
@@ -33,7 +34,7 @@
     dialog = make('dialog', 'box kor-notices');
     dialog.id = 'kor-notices'; dialog.setAttribute('translate', 'no'); dialog.setAttribute('aria-labelledby', 'kor-notices-title');
     const header = make('div', 'kor-notices-header');
-    const title = make('h2', '', '공지사항'); title.id = 'kor-notices-title';
+    const title = make('h2', '', '공지사항·이벤트'); title.id = 'kor-notices-title';
     closeButton = make('button', 'btn small ghost', '닫기'); closeButton.type = 'button';
     closeButton.onclick = () => { if (!busy) dialog.close(); };
     header.append(title, closeButton);
@@ -50,7 +51,7 @@
       if (!parent) continue;
       const actions = make('nav', 'kor-server-actions');
       actions.setAttribute('aria-label', '한국어 서버 안내'); actions.setAttribute('translate', 'no');
-      const button = make('button', 'btn small ghost', '공지사항');
+      const button = make('button', 'btn small ghost', '공지사항·이벤트');
       button.type = 'button'; button.setAttribute('translate', 'no'); button.onclick = () => open();
       const support = make('a', 'btn small gold kor-support-shortcut', '서버 후원');
       support.hidden = true; support.target = '_blank'; support.rel = 'noopener noreferrer';
@@ -59,14 +60,15 @@
       if (after) after.after(actions); else parent.prepend(actions);
     }
     // Fetch the operator's current link once on entry, including before login.
-    G.DB.getNotices().then(result => updateSupport(result.support)).catch(() => {});
+    G.DB.getNotices().then(result => { G.Updates?.accept(result); updateSupport(result.support); }).catch(() => {});
   }
   function render() {
+    G.Updates?.accept(data);
     updateSupport(data.support);
     body.replaceChildren();
     // Important campaigns precede routine fixes, regardless of update date.
     // Reward identity, eligibility and claim flow remain server-owned.
-    const notices = [...data.notices].sort((a, b) => (Number(b.priority) || 0) - (Number(a.priority) || 0) || Number(!!b.reward) - Number(!!a.reward) || (Date.parse(b.publishedAt) || 0) - (Date.parse(a.publishedAt) || 0));
+    const notices = announcements(data.notices).sort((a, b) => (Number(b.priority) || 0) - (Number(a.priority) || 0) || Number(!!b.reward) - Number(!!a.reward) || (Date.parse(b.publishedAt) || 0) - (Date.parse(a.publishedAt) || 0));
     for (const notice of notices) {
       const showReward = !!notice.reward && notice.hideReward !== true;
       const archived = notice.collapsed === true && !showReward;
@@ -160,8 +162,8 @@
     try {
       const result = await G.DB.getNotices();
       await syncMemberGifts(result);
-      updateSupport(result.support);
-      if (!G.DB.guest && user === G.DB.accountKey && G.Game.state === 'ui' && result.notices.some(notice => notice.autoOpen !== false && unread(notice))) {
+      G.Updates?.accept(result); updateSupport(result.support);
+      if (!G.DB.guest && user === G.DB.accountKey && G.Game.state === 'ui' && announcements(result.notices).some(notice => notice.autoOpen !== false && unread(notice))) {
         init(); data = result; render(); message.textContent = ''; if (!dialog.open) dialog.showModal(); dialog.scrollTop = 0;
       }
     } catch { /* Opening announcements must not block the game. Manual retry remains available. */ }

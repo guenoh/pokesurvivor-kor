@@ -108,8 +108,8 @@
   ],
   "patches": {
     "dev.html": {
-      "reviewed": "cc5c238733c207a33c04cf70c019d7374bff757867a58a3e126adc8a50895647",
-      "reason": "한국어·독립 서버·중복 성장 모듈 로딩",
+      "reviewed": "7a3ea414cc3a4db9ff271ff9134258ebf125bfd761306b5db73d3a923b7ffef6",
+      "reason": "한국어·독립 서버·성장·업데이트 안내 모듈 로딩",
       "extension": "kor/operations.js"
     },
     "js/boot.js": {
@@ -258,6 +258,10 @@
     "js/ui/gacha-ui.js": {
       "reason": "한국판 중복 성장과 서버 뽑기 연결만 빌드 시 적용",
       "extension": "kor/growth-adapter.cjs"
+    },
+    "js/ui/news-ui.js": {
+      "reason": "한국판 업데이트와 이전 원작 기록을 기존 업데이트 창에서 구분 표시",
+      "extension": "kor/service-adapter.cjs"
     }
   }
 }
