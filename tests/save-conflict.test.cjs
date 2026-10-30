@@ -23,7 +23,7 @@ function cloud() {
   return state;
 }
 function browser(server, storage = new Map()) {
-  const ctx = { G: {}, console, fetch: (...args) => server.fetch(...args), AbortSignal,
+  const ctx = { G: {}, console, crypto: require('node:crypto').webcrypto, fetch: (...args) => server.fetch(...args), AbortSignal,
     setTimeout: () => 1, clearTimeout() {}, addEventListener() {},
     localStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, String(value)), removeItem: key => storage.delete(key) } };
   ctx.window = ctx; vm.createContext(ctx);
@@ -202,4 +202,32 @@ test('Halloween purchases and candy survive device conflicts alongside Korean gi
   assert.deepEqual(server.save.pskin, { 94: ['bruja-gengar', 100], 25: ['bruja-pikachu', 200] });
   const reopened = browser(server).db; await reopened.ready();
   assert.equal(reopened.save.bag.candy, 305); assert.deepEqual(clone(reopened.save.skins), server.save.skins);
+});
+
+
+test('server gacha response loss resumes the same receipt and merges growth with local currency once', async () => {
+  const server=cloud(); await seed(server);
+  server.save.tickets.t1=100; server.save.led.base=server.save.led.base||{};
+  // Use a normal browser commit so the seed tickets have an original ledger entry.
+  const first=browser(server); await first.db.ready(); first.db.save.tickets.t1=100; first.db.commit(); await first.db.flush();
+  const original=server.fetch, receipts=new Map(); let lose=true,limited=true;
+  server.fetch=async(url,options)=>{
+    if(url!=='/api/gacha')return original(url,options);
+    const d=JSON.parse(options.body);
+    if(!receipts.has(d.requestId)){
+      assert.equal(d.revision,server.revision);
+      const s=clone(server.save);s.tickets.t1-=10;s.coins+=150;s.korGrowth={v:1,counts:{150:10}};
+      s.led['server:gacha:'+d.requestId]={c:[150,0],t1:[0,10],t10:[0,0]};server.save=s;server.revision++;
+      receipts.set(d.requestId,Array.from({length:10},()=>({dex:150,rarity:5,isNew:false,refund:15,growth:{duplicate:true,count:10,rank:5,unlocked:[]}})));
+    }
+    if(lose){lose=false;throw Error('response lost');}
+    if(limited){limited=false;return reply({error:'잠시 후 다시 시도해 주세요.'},429);}
+    return reply({user:server.user,save:server.save,revision:server.revision,results:receipts.get(d.requestId),iris:0});
+  };
+  await assert.rejects(first.db.pullGacha(10,1,'t1'),/같은 요청을 복구/);
+  assert.ok(first.db.pendingGacha);assert.equal(server.save.tickets.t1,90);
+  const recovered=browser(server,first.storage);await recovered.db.ready();assert.ok(recovered.db.pendingGacha);
+  await assert.rejects(recovered.db.pullGacha(100,1,'t10'),/잠시 후/);assert.ok(recovered.db.pendingGacha);
+  const results=await recovered.db.pullGacha(100,1,'t10');assert.equal(results.length,10);assert.equal(receipts.size,1);assert.equal(recovered.db.pendingGacha,null);assert.equal(recovered.db.save.korGrowth.counts[150],10);
+  await recovered.db.flush();assert.equal(server.save.tickets.t1,90);assert.equal(server.save.coins,1150);assert.equal(server.save.tickets.t10,10);
 });
