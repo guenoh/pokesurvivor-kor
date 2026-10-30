@@ -33,7 +33,7 @@ G.CHANGELOG.unshift({d:'2026-10-30',title:['한국판: 중복 성장 업데이�
  ['같은 포켓몬을 다시 뽑으면 중복 성장이 쌓입니다. 일반 모습과 색이 다른 모습은 함께 성장하며 기존 중복 코인 보상도 유지됩니다.','Duplicate species now earn growth, shared across normal and shiny appearances, alongside the existing coin refund.'],
  ['강화창의 체력·공격·획득 범위·방어·재생 추가 강화가 차례로 무료 해금됩니다. 필요한 중복 횟수는 포켓몬별 실제 획득 확률에 맞췄습니다.','Five free automatic bonuses unlock in the existing upgrades screen, with milestones adjusted to each species\' acquisition rate.'],
  ['새 버전에서 뽑은 중복 획득부터 누적하며 과거 획득 횟수는 소급하지 않습니다. 계정 뽑기는 서버에 기록하고 연결이 끊기면 같은 요청으로 결과를 복구합니다.','Progress starts with new duplicate draws. Account draws are recorded by the independent server and interrupted requests recover the same result.']
-]});
+],fix:[['공지 분류 배지의 글자 그림자를 제거하고 글자 크기와 여백을 조정해 읽기 쉽게 했습니다.','Removed inherited text shadows from notice badges and improved their type size and spacing.']]});
 (() => {
  const open=G.GachaUI.open;
  G.GachaUI.open=function(){const result=open.apply(this,arguments);if(!document.getElementById('kor-growth-gacha-help')){const help=document.createElement('p');help.id='kor-growth-gacha-help';help.className='note';help.setAttribute('translate','no');help.textContent='같은 포켓몬을 다시 뽑으면 코인 보상과 중복 성장을 함께 받습니다. 강화창에서 다음 추가 강화까지의 횟수를 확인하세요.';document.getElementById('gacha-rates').before(help);}return result;};
