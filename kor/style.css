@@ -59,7 +59,7 @@ dialog.kor-notices::backdrop { background: #081022d9; }
 .kor-notices-body > .kor-notice:first-child { border-top: 0; margin-top: 0; padding-top: 8px; }
 .kor-notice-archive > summary { min-height: 44px; padding: 10px 0; color: #e4edff; cursor: pointer; font-weight: 700; }
 .kor-notice-archive > summary:focus-visible { outline: 3px solid #ffe391; outline-offset: 3px; }
-.kor-notice-badge { display: inline-flex; margin-bottom: 10px; padding: 4px 9px; border-radius: 6px; background: #ffe391; color: #17244a; font-weight: 700; font-size: 13px; }
+.kor-notice-badge { display: inline-flex; align-items: center; margin-bottom: 10px; padding: 5px 10px; border-radius: 6px; background: #ffe391; color: #17244a; text-shadow: none; font-weight: 700; font-size: 14px; line-height: 1.5; }
 .kor-notice .kor-notice-summary { padding: 12px 14px; border: 1px solid #8cafff; border-radius: 8px; background: #132449; color: #fff; font-weight: 700; }
 .kor-notice-history { margin-top: 16px; border-top: 1px solid #b3caff55; border-bottom: 1px solid #b3caff55; }
 .kor-notice-history summary { box-sizing: border-box; min-height: 44px; padding: 12px 0; color: #e4edff; cursor: pointer; font-weight: 700; }
