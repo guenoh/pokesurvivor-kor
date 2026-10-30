@@ -83,7 +83,11 @@ dialog.kor-notices::backdrop { background: #081022d9; }
 #upg-list > .upg-item .upg-btns .btn { min-width: 0; max-width: 100%; min-height: 36px; white-space: normal; }
 #upg-list > .upg-item .upg-btns .btn:not([data-buy]) { flex: 1 1 140px; }
 
-/* Duplicate growth is isolated inside the existing upgrades screen. */
+/* Growth indicators and automatic upgrades stay separate from upstream styles. */
+.kor-growth-rating{display:inline-flex;align-items:center;justify-content:center;gap:6px;max-width:100%;padding:3px 8px;border:1px solid #738cb7;border-radius:7px;background:#132449;color:#eef4ff;font-size:12px;line-height:1.5;text-shadow:none;white-space:nowrap}
+.kor-growth-rating .kor-growth-label{color:#d0def3}.kor-growth-stars{display:inline-flex;letter-spacing:1px;font-family:"Galmuri11",sans-serif}.kor-growth-stars .earned{color:#ffdc70}.kor-growth-stars .empty{color:#a9b9d3}.kor-growth-number{color:#ffdc70}
+.kor-growth-partner{margin:3px 0}.kor-growth-detail{margin:7px 0}.kor-growth-detail>small{display:block;margin-top:4px;color:#d0def3;font-size:12px;line-height:1.5;text-shadow:none}
+#dex-grid .cell>.kor-growth-rating{display:flex;width:max-content;margin:4px auto 0;padding:1px 3px;gap:3px;font-size:10px;border-color:#60799d}.kor-growth-rating.compact .kor-growth-stars{letter-spacing:0;font-size:11px}
 .kor-growth{margin:14px 0;padding:14px;border:2px solid #6e89bf;border-radius:12px;background:#132750;color:#edf3ff}
 .kor-growth-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .kor-growth-head h3{margin:0}.kor-growth .note{color:#c6d5ed;line-height:1.5;margin:8px 0}
