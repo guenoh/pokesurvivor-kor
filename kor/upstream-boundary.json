@@ -108,8 +108,8 @@
   ],
   "patches": {
     "dev.html": {
-      "reviewed": "7a3ea414cc3a4db9ff271ff9134258ebf125bfd761306b5db73d3a923b7ffef6",
-      "reason": "한국어·독립 서버·성장·업데이트 안내 모듈 로딩",
+      "reviewed": "983aa8173fcea7532adb6543bd08d73d36eb099b91eee18a5f5d9bf98d0853dd",
+      "reason": "한국어·독립 서버·성장·소식 배너·업데이트 안내 모듈 로딩",
       "extension": "kor/operations.js"
     },
     "js/boot.js": {
@@ -261,6 +261,10 @@
     },
     "js/ui/news-ui.js": {
       "reason": "한국판 업데이트와 이전 원작 기록을 기존 업데이트 창에서 구분 표시",
+      "extension": "kor/service-adapter.cjs"
+    },
+    "js/core/input.js": {
+      "reason": "입력 필드의 브라우저 키보드 조작 보존; 전투 단축키 유지",
       "extension": "kor/service-adapter.cjs"
     }
   }
