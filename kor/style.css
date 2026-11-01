@@ -103,8 +103,8 @@ dialog.kor-notices::backdrop { background: #081022d9; }
  .kor-news-banner + .menu-left #menu-partner { height:min(26vh,104px); }
 }
 @media (max-height:400px) {
- .kor-news-banner { top:38px; }.kor-news-banner + .menu-left { padding-top:128px; }
- .kor-news-banner + .menu-left .logo .t2 { display:none; }.kor-news-banner + .menu-left #menu-partner { height:min(23vh,80px); }
+ .kor-news-banner { top:38px; }.kor-news-banner + .menu-left { padding-top:124px; }
+ .kor-news-banner + .menu-left .logo .t2 { display:none; }.kor-news-banner + .menu-left #menu-partner { height:min(21vh,76px); }
  .kor-news-banner + .menu-left { overflow-y:auto; }
  .kor-news-banner + .menu-left .partner-card .nm { display:inline-block;vertical-align:middle;margin-right:6px; }
  .kor-news-banner + .menu-left .kor-growth-partner { display:inline-block;vertical-align:middle;margin:3px 0; }
