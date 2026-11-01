@@ -73,6 +73,44 @@ dialog.kor-notices::backdrop { background: #081022d9; }
 .kor-support .btn { display: inline-block; text-decoration: none; }
 /* Keep the update label visible at every upstream compact-bar breakpoint. */
 #topbar #btn-news > span { display: inline; }
+/* Upstream-style menu news, isolated from game layout and battle screens. */
+.kor-news-banner { position:absolute;top:22px;left:24px;z-index:5;width:clamp(210px,17vw,270px);padding:7px;border:2px solid #afc2e1;border-radius:18px;background:#122348ee;box-shadow:0 8px 20px #0007; }
+.kor-news-card { display:flex;align-items:center;gap:10px;width:100%;min-width:0;padding:8px;border:0;border-radius:10px;background:transparent;color:#fff;text-align:left;cursor:pointer; }
+.kor-news-icon { flex:0 0 40px;display:flex;justify-content:center; }
+.kor-news-text { display:flex;flex-direction:column;gap:4px;min-width:0; }
+.kor-news-tag { align-self:flex-start;max-width:100%;padding:2px 6px;border-radius:5px;background:#ffe391;color:#17244a;font-size:11px;font-weight:700;text-shadow:none; }
+.kor-news-text strong,.kor-news-text small { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.4; }
+.kor-news-text strong { font-size:14px; }.kor-news-text small { color:#d1def3;font-size:12px; }
+.kor-news-nav { display:flex;justify-content:center;align-items:center;gap:6px;margin-top:4px; }
+.kor-news-nav button { min-width:30px;min-height:30px;padding:2px 7px;border:1px solid #869fc7;border-radius:7px;background:#243e72;color:#fff;font-size:13px;cursor:pointer; }
+.kor-news-nav button[aria-pressed=true] { border-color:#ffe391;color:#ffe391; }
+.kor-news-count { min-width:40px;text-align:center;color:#d1def3;font-size:12px; }
+.kor-news-banner button:focus-visible { outline:3px solid #ffe391;outline-offset:2px; }
+@media (max-width:1200px) and (min-width:761px),(max-height:860px) and (min-height:521px) and (min-width:761px),(max-height:520px) {
+ .kor-news-banner { top:18px;left:20px;width:clamp(220px,22vw,260px);padding:5px; }
+ .kor-news-card { padding:3px;gap:7px; }.kor-news-text { gap:2px; }.kor-news-text strong { font-size:12px; }.kor-news-text small { display:none; }
+ .kor-news-tag { font-size:10px;padding:1px 5px; }.kor-news-nav { margin-top:2px;gap:5px; }.kor-news-nav button { min-height:26px;min-width:28px;padding:1px 6px;font-size:12px; }
+}
+@media (max-width:760px) and (min-height:521px) {
+ .kor-news-banner { position:relative;top:auto;left:auto;flex:0 0 auto;align-self:center;width:min(320px,calc(100% - 32px));margin-top:88px; }
+ .kor-news-banner + .menu-left { padding-top:18px; }
+}
+@media (max-height:520px) {
+ .kor-news-banner { --kor-news-width:min(290px,calc(100% - min(54vw,420px) - 16px));top:44px;left:calc((100% - min(54vw,420px) - var(--kor-news-width))/2);width:var(--kor-news-width);border-radius:12px; }
+ .kor-news-card { min-height:40px;padding:0; }.kor-news-tag { display:none; }.kor-news-text strong { line-height:1.3; }
+ .kor-news-banner + .menu-left { justify-content:flex-start;padding-top:138px; }
+ .kor-news-banner + .menu-left .logo .t1 { font-size:24px; }
+ .kor-news-banner + .menu-left #menu-partner { height:min(26vh,104px); }
+}
+@media (max-height:400px) {
+ .kor-news-banner { top:38px; }.kor-news-banner + .menu-left { padding-top:124px; }
+ .kor-news-banner + .menu-left .logo .t2 { display:none; }.kor-news-banner + .menu-left #menu-partner { height:min(21vh,76px); }
+ .kor-news-banner + .menu-left { overflow-y:auto; }
+ .kor-news-banner + .menu-left .partner-card .nm { display:inline-block;vertical-align:middle;margin-right:6px; }
+ .kor-news-banner + .menu-left .kor-growth-partner { display:inline-block;vertical-align:middle;margin:3px 0; }
+ .kor-news-banner + .menu-left .kor-growth-rating { padding:1px 5px;gap:4px;font-size:10px;line-height:1.3; }
+ .kor-news-banner + .menu-left .kor-growth-label { display:none; }
+}
 .kor-updates-heading{color:#ffe391;margin:0 0 12px;font-size:18px}
 .kor-update-archive{margin-top:18px;border-top:1px solid #8cafff66;padding-top:8px}
 .kor-update-archive>summary{cursor:pointer;min-height:44px;padding:10px 0;color:#d4e1f6;font-weight:700}

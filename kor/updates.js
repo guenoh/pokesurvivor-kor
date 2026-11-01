@@ -2,6 +2,11 @@
 (() => {
   let serverEntries=[],loaded=false,pending=null;
   const make=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text)e.textContent=text;return e;};
+  G.CHANGELOG.unshift({id:'kor-menu-news-keyboard-20261101',kor:true,d:'2026-11-01',title:['메인 소식 배너와 키보드 편의 개선','Menu news and keyboard navigation'],new:[
+    ['메인 화면의 작은 소식 배너에서 한국판 이벤트와 업데이트를 확인할 수 있습니다. 화살표로 넘기거나 자동 넘김을 멈출 수 있으며 모바일 가로 화면에도 표시합니다.','A compact menu banner shows Korean edition events and updates, including on landscape phones, with previous/next and pause controls.']
+  ],fix:[
+    ['이름·비밀번호·비밀번호 확인 칸에서 Tab과 Shift+Tab으로 이동할 수 있습니다. 입력 중에는 게임 단축키가 작동하지 않으며 전투 중 Tab 기술 전환은 유지됩니다.','Tab and Shift+Tab navigate form fields without triggering game shortcuts. Tab still cycles moves during battle.']
+  ]});
   G.CHANGELOG.unshift({id:'kor-update-event-separation-20261030',kor:true,d:'2026-10-30',title:['한국판 업데이트와 이벤트 안내를 나눴습니다','Korean updates and event announcements'],chg:[
     ['상단 업데이트 버튼에서 한국판의 새 기능·개선·버그 수정을 확인할 수 있습니다. 이전 원작 업데이트는 접힌 기록으로 보관합니다.','The update button shows Korean edition features and fixes, with earlier original updates in a collapsed archive.'],
     ['메인과 로그인 화면의 공지사항·이벤트 버튼에서는 이벤트·선물·보상·운영 안내를 확인할 수 있습니다.','Use Announcements & Events on the main or login screen for events, gifts, compensation and service notices.']
@@ -24,7 +29,7 @@
     },
     accept(data){
       serverEntries=(data?.notices||[]).filter(n=>n.channel==='updates'&&!n.reward&&!n.retirement).map(n=>({id:n.id,version:n.version,kor:n.source!=='upstream',d:n.publishedAt||'2026-10-30',title:[n.title,n.title],chg:n.paragraphs.map(p=>[p,p])}));
-      loaded=true;this.refreshIndicator();
+      loaded=true;this.refreshIndicator();G.MenuNews?.accept(data);
     },
     init(){
       const b=document.getElementById('btn-news');b.setAttribute('aria-label','한국판 업데이트 내역');b.title='한국판 업데이트 내역';

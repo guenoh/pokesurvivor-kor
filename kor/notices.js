@@ -173,5 +173,6 @@
   G.MenuUI.open = function () { const result = menu.apply(this, arguments); automatic(); return result; };
   const afterLogin = G.Flow.afterLogin;
   G.Flow.afterLogin = function () { const result = afterLogin.apply(this, arguments); automatic(); return result; };
+  G.Notices = { open };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

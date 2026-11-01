@@ -1,5 +1,10 @@
 /* Independent service contracts and release-note routing; original sources stay intact. */
 const hooks = {
+  'js/core/input.js': [
+    ["    const c = code(e);", "    if (e.target.closest?.('input, textarea, select, [contenteditable]:not([contenteditable=\"false\"]), [role=\"textbox\"]')) return;\n    const c = code(e);"],
+    [".includes(c)) e.preventDefault();", ".includes(c) && G.Game?.state === 'playing') e.preventDefault();"],
+    ["  addEventListener('blur', () => { down.clear(); });", "  addEventListener('focusin', e => {\n    if (e.target.closest?.('input, textarea, select, [contenteditable]:not([contenteditable=\"false\"]), [role=\"textbox\"]')) { down.clear(); pressed.clear(); }\n  });\n  addEventListener('blur', () => { down.clear(); });"]
+  ],
   'js/net/coop.js': [
     ["if (mode === 'direct') {", 'if (G.Net.connectedMode(mode)) {'],
     ["G.Net.mode(u) === 'direct'", 'G.Net.connectedMode(G.Net.mode(u))']
