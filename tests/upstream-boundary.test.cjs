@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
-const { audit, hash, refreshBaseline, overlapReport } = require('../kor/upstream-boundary.cjs');
+const { audit, hash, refreshBaseline, overlapReport, sourceAvailability } = require('../kor/upstream-boundary.cjs');
 
 function fixture(t) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kor-boundary-'));
@@ -62,4 +62,22 @@ test('upstream baseline refresh reports overlap and never approves a changed ada
 test('checked-in Korean game sources match the reviewed extension boundary', () => {
   const manifest = require('../kor/upstream-boundary.json');
   assert.deepEqual(audit(path.join(__dirname, '..'), manifest).errors, []);
+});
+
+test('distribution-only upstream cannot erase the development source baseline', t => {
+  const { dir, write, manifest } = fixture(t);
+  const git = args => execFileSync('git', args, { cwd: dir, encoding: 'utf8', env: { ...process.env, GIT_AUTHOR_NAME: 'test', GIT_AUTHOR_EMAIL: 'test@example.invalid', GIT_COMMITTER_NAME: 'test', GIT_COMMITTER_EMAIL: 'test@example.invalid' } });
+  git(['init', '-q']); git(['add', '.']); git(['commit', '-qm', 'source release']);
+  manifest.upstream = git(['rev-parse', 'HEAD']).trim();
+  const before = structuredClone(manifest);
+  fs.rmSync(path.join(dir, 'js'), { recursive: true });
+  write('js/app.min.js', 'published bundle'); write('index.html', 'published page');
+  git(['add', '-A']); git(['commit', '-qm', 'published files only']);
+  assert.deepEqual(sourceAvailability(dir, manifest, 'HEAD').missing, ['js/core/plain.js', 'js/ui/patched.js']);
+  assert.throws(() => refreshBaseline(dir, manifest, 'HEAD'), /source review required; baseline preserved/);
+  assert.deepEqual(manifest, before);
+  // A deliberate single-file deletion also needs a source compatibility review.
+  git(['checkout', manifest.upstream, '--', 'js/core/plain.js']);
+  git(['commit', '-qm', 'partial source return']);
+  assert.deepEqual(sourceAvailability(dir, manifest, 'HEAD').missing, ['js/ui/patched.js']);
 });

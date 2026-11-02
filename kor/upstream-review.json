@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "commit": "90cdd941da04793e3023b4a28aff552819c70f21",
+  "parent": "b742e43772e37d077549bf2fad3d615d60f42961",
+  "version": "75a5062841",
+  "disposition": "no-runtime-port",
+  "report": "docs/upstream-internal-20261102.md",
+  "reason": "Firebase administration/revocation and cache hash compatibility; no gameplay change found. Independent PostgreSQL service has no equivalent revocation operation."
+}
