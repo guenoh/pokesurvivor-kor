@@ -39,10 +39,18 @@ function audit(dir, manifest) {
   return { errors, changed };
 }
 
-function refreshBaseline(dir, manifest, ref) {
-  // Baselines may advance automatically; reviewed Korean patch hashes never do.
+function sourceAvailability(dir, manifest, ref) {
   const commit = git(dir, ['rev-parse', '--verify', ref + '^{commit}']).trim();
   const names = git(dir, ['ls-tree', '-r', '--name-only', commit, '--', 'js', 'css', 'dev.html']).trim().split('\n').filter(sourcePath);
+  const missing = Object.keys(manifest.original).filter(name => !names.includes(name));
+  return { commit, names, missing };
+}
+
+function refreshBaseline(dir, manifest, ref) {
+  // A published bundle cannot replace the reviewed development-source baseline.
+  const { commit, names, missing } = sourceAvailability(dir, manifest, ref);
+  if (missing.length) throw new Error('Upstream source review required; baseline preserved. Missing source files:\n' + missing.join('\n'));
+  // Baselines may advance automatically; reviewed Korean patch hashes never do.
   const original = Object.fromEntries(names.map(name => [name, hash(git(dir, ['show', commit + ':' + name], true))]));
   return { ...manifest, upstream: commit, original };
 }
@@ -62,10 +70,13 @@ if (require.main === module) {
     fs.writeFileSync(manifestPath, JSON.stringify(refreshBaseline(root, manifest, process.argv[3]), null, 2) + '\n');
   } else if (process.argv[2] === '--report' && process.argv[3]) {
     process.stdout.write(overlapReport(root, manifest, process.argv[3]));
+  } else if (process.argv[2] === '--require-sources' && process.argv[3]) {
+    const { missing } = sourceAvailability(root, manifest, process.argv[3]);
+    if (missing.length) { console.error(missing.join('\n')); process.exitCode = 1; }
   } else if (process.argv.length === 2) {
     const result = audit(root, manifest);
     if (result.errors.length) { console.error(result.errors.join('\n')); process.exitCode = 1; }
     else console.log('Korean extension boundary verified: ' + result.changed.length + ' reviewed core patches; upstream ' + manifest.upstream.slice(0, 12));
-  } else { console.error('Usage: node kor/upstream-boundary.cjs [--report|--refresh-baseline upstream-commit]'); process.exitCode = 1; }
+  } else { console.error('Usage: node kor/upstream-boundary.cjs [--report|--require-sources|--refresh-baseline upstream-commit]'); process.exitCode = 1; }
 }
-module.exports = { audit, hash, refreshBaseline, overlapReport };
+module.exports = { audit, hash, refreshBaseline, overlapReport, sourceAvailability };

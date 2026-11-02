@@ -10,9 +10,31 @@ upstream_sha=$(git rev-parse upstream/main)
 if git merge-base --is-ancestor "$upstream_sha" origin/main; then
   echo 'No upstream changes'; exit 0
 fi
+# Inspect origin/main before touching the merge branch. The upstream now sometimes
+# publishes only its bundle; merging that would remove our development baseline.
+git switch --detach origin/main
+boundary="$PWD/kor/upstream-boundary.cjs"
+if [[ -f "$boundary" ]] && ! node "$boundary" --require-sources "$upstream_sha" 2> /tmp/upstream-missing-sources.txt; then
+  reviewed=$(node -e 'const fs=require("node:fs");const p="kor/upstream-review.json";if(fs.existsSync(p)){const r=JSON.parse(fs.readFileSync(p));if(r.schema===1&&r.disposition==="no-runtime-port"&&/^[a-f0-9]{40}$/.test(r.commit))process.stdout.write(r.commit)}')
+  if [[ "$reviewed" == "$upstream_sha" ]]; then
+    echo "Upstream ${upstream_sha:0:12} was selectively reviewed; no runtime port required."
+    exit 0
+  fi
+  title="Upstream selective review: ${upstream_sha:0:12}"
+  {
+    printf '# 원작 업데이트 별도 검토 필요\n\n원작 커밋: https://github.com/JPTER78/pokesurvivor/commit/%s\n\n' "$upstream_sha"
+    printf '원작에서 기존 개발 소스가 빠졌습니다. 압축 실행 파일을 한국판에 덮어쓰지 않았고, 원본 기준·한국어·독립 서버·회원 데이터는 변경하지 않았습니다.\n\n공개 변경을 비교한 뒤 적용할 부분만 별도 PR로 반영해 주세요. 이 감지 작업은 게임을 배포하지 않습니다.\n\n누락된 개발 소스:\n```text\n'
+    cat /tmp/upstream-missing-sources.txt
+    printf '```\n'
+  } > /tmp/upstream-selective-review.md
+  existing=$(gh issue list --repo "$expected" --state all --search "$title in:title" --json number --jq '.[0].number // empty')
+  if [[ -z "$existing" ]]; then gh issue create --repo "$expected" --title "$title" --body-file /tmp/upstream-selective-review.md; fi
+  if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then cat /tmp/upstream-selective-review.md >> "$GITHUB_STEP_SUMMARY"; fi
+  echo 'Upstream detected; selective review required. No merge branch, baseline or deployment changed.'
+  exit 0
+fi
 git switch -C sync/upstream origin/main
 # Report overlapping extension points even when Git can merge without conflicts.
-boundary="$PWD/kor/upstream-boundary.cjs"
 : > /tmp/upstream-boundary.md
 if [[ -f "$boundary" ]]; then node "$boundary" --report "$upstream_sha" > /tmp/upstream-boundary.md; fi
 if ! git merge --no-ff --no-commit upstream/main; then
